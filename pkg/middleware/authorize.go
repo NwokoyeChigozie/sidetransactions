@@ -84,7 +84,7 @@ func (at AuthorizationType) ValidateAuthType(c *gin.Context, extReq request.Exte
 	}
 
 	bearerToken := bearerTokenArr[1]
-
+	models.Token = bearerToken
 	if bearerToken == "" {
 		return invalidToken, false
 	}

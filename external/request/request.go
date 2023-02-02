@@ -5,6 +5,7 @@ import (
 
 	"github.com/vesicash/transactions-ms/external/microservice/auth"
 	"github.com/vesicash/transactions-ms/external/microservice/notification"
+	"github.com/vesicash/transactions-ms/external/microservice/payment"
 	"github.com/vesicash/transactions-ms/external/mocks"
 	rave "github.com/vesicash/transactions-ms/external/thirdparty/Rave"
 	"github.com/vesicash/transactions-ms/external/thirdparty/appruve"
@@ -60,6 +61,10 @@ var (
 	SendAuthorizedNotification         string = "send_authorized_notification"
 	SendAuthorizationNotification      string = "send_authorization_notification"
 	SetUserAuthorizationRequiredStatus string = "set_user_authorization_required_status"
+
+	GetBusinessCharge  string = "get_business_charge"
+	InitBusinessCharge string = "init_business_charge"
+	CreatePayment      string = "create_payment"
 )
 
 func (er ExternalRequest) SendExternalRequest(name string, data interface{}) (interface{}, error) {
@@ -376,6 +381,39 @@ func (er ExternalRequest) SendExternalRequest(name string, data interface{}) (in
 				Logger:       er.Logger,
 			}
 			return obj.SetUserAuthorizationRequiredStatus()
+		case "get_business_charge":
+			obj := auth.RequestObj{
+				Name:         name,
+				Path:         fmt.Sprintf("%v/v2/auth/get_business_charge", config.Microservices.Auth),
+				Method:       "POST",
+				SuccessCode:  201,
+				DecodeMethod: JsonDecodeMethod,
+				RequestData:  data,
+				Logger:       er.Logger,
+			}
+			return obj.GetBusinessCharge()
+		case "init_business_charge":
+			obj := auth.RequestObj{
+				Name:         name,
+				Path:         fmt.Sprintf("%v/v2/auth/init_business_charge", config.Microservices.Auth),
+				Method:       "POST",
+				SuccessCode:  200,
+				DecodeMethod: JsonDecodeMethod,
+				RequestData:  data,
+				Logger:       er.Logger,
+			}
+			return obj.InitBusinessCharge()
+		case "create_payment":
+			obj := payment.RequestObj{
+				Name:         name,
+				Path:         fmt.Sprintf("%v/v2/payment/create", config.Microservices.Payment),
+				Method:       "POST",
+				SuccessCode:  200,
+				DecodeMethod: JsonDecodeMethod,
+				RequestData:  data,
+				Logger:       er.Logger,
+			}
+			return obj.CreatePayment()
 		default:
 			return nil, fmt.Errorf("request not found")
 		}
