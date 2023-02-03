@@ -64,12 +64,10 @@ type TransactionCreateResponse struct {
 	InspectionPeriod string               `json:"inspection_period"`
 	DueDate          string               `json:"due_date"`
 	ShippingFee      float64              `json:"shipping_fee"`
-	GracePeriod      string               `json:"grace_period"`
 	Currency         string               `json:"currency"`
 	DeletedAt        time.Time            `json:"deleted_at"`
 	CreatedAt        time.Time            `json:"created_at"`
 	UpdatedAt        time.Time            `json:"updated_at"`
-	BusinessID       int                  `json:"business_id"`
 	IsPaylinked      bool                 `json:"is_paylinked"`
 	Source           string               `json:"source"`
 	TransUssdCode    int                  `json:"trans_ussd_code"`

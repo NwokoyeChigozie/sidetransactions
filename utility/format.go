@@ -1,6 +1,7 @@
 package utility
 
 import (
+	"reflect"
 	"strconv"
 	"time"
 )
@@ -40,4 +41,23 @@ func ConvertStringInterfaceToStringFloat(originalMap map[string]interface{}) map
 		}
 	}
 	return convertedMap
+}
+
+func RemoveKey(p interface{}, key string) {
+	val := reflect.ValueOf(p).Elem()
+	val.FieldByName(key).Set(reflect.Zero(val.FieldByName(key).Type()))
+}
+
+func CopyStruct(src, dst interface{}) {
+	srcValue := reflect.ValueOf(src).Elem()
+	dstValue := reflect.ValueOf(dst).Elem()
+
+	for i := 0; i < srcValue.NumField(); i++ {
+		srcField := srcValue.Field(i)
+		dstField := dstValue.FieldByName(srcValue.Type().Field(i).Name)
+
+		if dstField.IsValid() {
+			dstField.Set(srcField)
+		}
+	}
 }

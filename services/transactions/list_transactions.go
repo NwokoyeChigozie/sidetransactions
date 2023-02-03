@@ -282,6 +282,11 @@ func resolveTransactionAndListTransactionResponse(transaction models.Transaction
 		EscrowWallet:     transaction.EscrowWallet,
 	}
 }
+func resolveTransactionAndListTransactionResponse2(transaction models.Transaction) models.TransactionByIDResponse {
+	v := models.TransactionByIDResponse{}
+	utility.CopyStruct(&transaction, &v)
+	return v
+}
 
 func GetCountryByNameOrCode(extReq request.ExternalRequest, logger *utility.Logger, NameOrCode string) (external_models.Country, error) {
 
