@@ -30,7 +30,7 @@ type TransactionByIDResponse struct {
 	IsPaylinked         bool                        `json:"is_paylinked"`
 	Source              string                      `json:"source"`
 	TransUssdCode       int                         `json:"trans_ussd_code"`
-	Recipients          string                      `json:"recipients"`
+	Recipients          []MileStoneRecipient        `json:"recipients"`
 	DisputeHandler      string                      `json:"dispute_handler"`
 	AmountPaid          float64                     `json:"amount_paid"`
 	EscrowCharge        float64                     `json:"escrow_charge"`
@@ -71,7 +71,7 @@ type TransactionCreateResponse struct {
 	IsPaylinked      bool                 `json:"is_paylinked"`
 	Source           string               `json:"source"`
 	TransUssdCode    int                  `json:"trans_ussd_code"`
-	Recipients       string               `json:"recipients"`
+	Recipients       []MileStoneRecipient `json:"recipients"`
 	DisputeHandler   string               `json:"dispute_handler"`
 	AmountPaid       float64              `json:"amount_paid"`
 	EscrowCharge     float64              `json:"escrow_charge"`

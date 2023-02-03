@@ -148,6 +148,9 @@ func CreateTransactionService(extReq request.ExternalRequest, logger *utility.Lo
 		return models.TransactionCreateResponse{}, http.StatusInternalServerError, err
 	}
 
+	var rRrecipients []models.MileStoneRecipient
+	json.Unmarshal([]byte(transaction.Recipients), &rRrecipients)
+
 	return models.TransactionCreateResponse{
 		ID:               transaction.ID,
 		TransactionID:    transaction.TransactionID,
@@ -167,7 +170,7 @@ func CreateTransactionService(extReq request.ExternalRequest, logger *utility.Lo
 		IsPaylinked:      transaction.IsPaylinked,
 		Source:           transactionSource,
 		TransUssdCode:    transaction.TransUssdCode,
-		Recipients:       transaction.Recipients,
+		Recipients:       rRrecipients,
 		DisputeHandler:   transactionDisputeHandler,
 		EscrowCharge:     transaction.EscrowCharge,
 		EscrowWallet:     transaction.EscrowWallet,
