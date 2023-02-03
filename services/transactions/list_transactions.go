@@ -251,6 +251,8 @@ func getPartiesAndMembersFromParties(extReq request.ExternalRequest, parties []m
 }
 
 func resolveTransactionAndListTransactionResponse(transaction models.Transaction) models.TransactionByIDResponse {
+	var rRrecipients []models.MileStoneRecipient
+	json.Unmarshal([]byte(transaction.Recipients), &rRrecipients)
 	return models.TransactionByIDResponse{
 		ID:               transaction.ID,
 		TransactionID:    transaction.TransactionID,
@@ -275,7 +277,7 @@ func resolveTransactionAndListTransactionResponse(transaction models.Transaction
 		IsPaylinked:      transaction.IsPaylinked,
 		Source:           transaction.Source,
 		TransUssdCode:    transaction.TransUssdCode,
-		Recipients:       transaction.Recipients,
+		Recipients:       rRrecipients,
 		DisputeHandler:   transaction.DisputeHandler,
 		AmountPaid:       transaction.AmountPaid,
 		EscrowCharge:     transaction.EscrowCharge,
