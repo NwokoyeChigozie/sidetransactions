@@ -12,7 +12,7 @@ import (
 	"github.com/vesicash/transactions-ms/utility"
 )
 
-func Verification(r *gin.Engine, ApiVersion string, validator *validator.Validate, db postgresql.Databases, logger *utility.Logger) *gin.Engine {
+func Transaction(r *gin.Engine, ApiVersion string, validator *validator.Validate, db postgresql.Databases, logger *utility.Logger) *gin.Engine {
 	extReq := request.ExternalRequest{Logger: logger, Test: false}
 	transaction := transactions.Controller{Db: db, Validator: validator, Logger: logger, ExtReq: extReq}
 
