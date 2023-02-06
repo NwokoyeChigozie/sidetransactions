@@ -3,7 +3,7 @@ package models
 import (
 	"database/sql/driver"
 	"encoding/json"
-	"errors"
+	"fmt"
 )
 
 type Tabler interface {
@@ -21,7 +21,11 @@ func (a jsonmap) Value() (driver.Value, error) {
 func (a *jsonmap) Scan(value interface{}) error {
 	b, ok := value.([]byte)
 	if !ok {
-		return errors.New("type assertion to []byte failed")
+		b, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("type assertion to []byte or string failed: %v", value)
+		}
+		return json.Unmarshal([]byte(b), &a)
 	}
 	return json.Unmarshal(b, &a)
 }

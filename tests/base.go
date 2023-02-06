@@ -38,3 +38,8 @@ func AssertResponseMessage(t *testing.T, got, expected string) {
 		t.Errorf("handler returned wrong message: got message: %q expected: %q", got, expected)
 	}
 }
+func AssertBool(t *testing.T, got, expected bool) {
+	if got != expected {
+		t.Errorf("handler returned wrong boolean: got %v expected %v", got, expected)
+	}
+}
