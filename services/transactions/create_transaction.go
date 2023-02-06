@@ -421,7 +421,7 @@ func resolveParties(extReq request.ExternalRequest, parties []models.Party, tran
 
 	for _, p := range parties {
 		var roleCapabilities map[string]interface{}
-		inrec, err := json.Marshal(p.AccessLevel)
+		inrec, err := json.Marshal(&p.AccessLevel)
 		if err != nil {
 			return transactionParties, partiesResponse, err
 		}

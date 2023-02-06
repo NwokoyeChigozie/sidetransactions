@@ -8,6 +8,7 @@ import (
 	"github.com/vesicash/transactions-ms/external/mocks/ipstack_mocks"
 	"github.com/vesicash/transactions-ms/external/mocks/monnify_mocks"
 	"github.com/vesicash/transactions-ms/external/mocks/notification_mocks"
+	"github.com/vesicash/transactions-ms/external/mocks/payment_mocks"
 	"github.com/vesicash/transactions-ms/external/mocks/rave_mocks"
 	"github.com/vesicash/transactions-ms/utility"
 )
@@ -92,6 +93,12 @@ func (er ExternalRequest) SendExternalRequest(name string, data interface{}) (in
 		return notification_mocks.SendAuthorizationNotification(er.Logger, data)
 	case "set_user_authorization_required_status":
 		return auth_mocks.SetUserAuthorizationRequiredStatus(er.Logger, data)
+	case "get_business_charge":
+		return auth_mocks.GetBusinessCharge(er.Logger, data)
+	case "init_business_charge":
+		return auth_mocks.InitBusinessCharge(er.Logger, data)
+	case "create_payment":
+		return payment_mocks.CreatePayment(er.Logger, data)
 	default:
 		return nil, fmt.Errorf("request not found")
 	}
