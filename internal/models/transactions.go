@@ -52,7 +52,7 @@ type CreateTransactionRequest struct {
 	Milestones       []MileStone `json:"milestones"`
 	Quantity         int         `json:"quantity"`
 	Amount           float64     `json:"amount"`
-	InspectionPeriod string      `json:"inspection_period"`
+	InspectionPeriod int         `json:"inspection_period"`
 	GracePeriod      string      `json:"grace_period"`
 	DueDate          string      `json:"due_date" validate:"required"`
 	ShippingFee      float64     `json:"shipping_fee"`
@@ -60,6 +60,17 @@ type CreateTransactionRequest struct {
 	Source           string      `json:"source" validate:"oneof=api instantescrow trizact transfer"`
 	DisputeHandler   string      `json:"dispute_handler"`
 	Paylinked        bool        `json:"paylinked"`
+}
+type EditTransactionRequest struct {
+	TransactionID    string  `json:"transaction_id" validate:"required" pgvalidate:"exists=transaction$transactions$transaction_id"`
+	Title            string  `json:"title"`
+	Description      string  `json:"description"`
+	Quantity         int     `json:"quantity"`
+	InspectionPeriod int     `json:"inspection_period"`
+	DueDate          string  `json:"due_date"`
+	ShippingFee      float64 `json:"shipping_fee"`
+	Currency         string  `json:"currency"  validate:"required"`
+	GracePeriod      string  `json:"grace_period"`
 }
 
 type Party struct {
@@ -115,7 +126,7 @@ type File struct {
 type MileStone struct {
 	Title            string               `json:"title"`
 	Amount           float64              `json:"amount"`
-	InspectionPeriod string               `json:"inspection_period"`
+	InspectionPeriod int                  `json:"inspection_period"`
 	DueDate          string               `json:"due_date"`
 	Status           string               `json:"status"`
 	Description      string               `json:"description"`
@@ -172,6 +183,17 @@ func (t *Transaction) GetTransactionByTransactionID(db *gorm.DB) (int, error) {
 	}
 	return http.StatusOK, nil
 }
+func (t *Transaction) GetTransactionByUssdCode(db *gorm.DB) (int, error) {
+	err, nilErr := postgresql.SelectOneFromDb(db, &t, "trans_ussd_code = ?", t.TransUssdCode)
+	if nilErr != nil {
+		return http.StatusBadRequest, nilErr
+	}
+
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
+	return http.StatusOK, nil
+}
 
 func (t *Transaction) GetAllByTransactionID(db *gorm.DB) ([]Transaction, error) {
 	details := []Transaction{}
@@ -188,4 +210,12 @@ func (t *Transaction) GetAllOthersByIDAndPartiesID(db *gorm.DB) ([]Transaction, 
 		return details, err
 	}
 	return details, nil
+}
+
+func (t *Transaction) Delete(db *gorm.DB) error {
+	err := postgresql.DeleteRecordFromDb(db, &t)
+	if err != nil {
+		return fmt.Errorf("transaction delete failed: %v", err.Error())
+	}
+	return nil
 }

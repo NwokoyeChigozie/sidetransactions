@@ -152,6 +152,19 @@ func ListTransactionsByIDService(extReq request.ExternalRequest, logger *utility
 	return transactionReponse, http.StatusOK, nil
 }
 
+func ListTransactionsByUssdCodeService(extReq request.ExternalRequest, logger *utility.Logger, db postgresql.Databases, ussdCode int) (models.TransactionByIDResponse, int, error) {
+	var (
+		transaction = models.Transaction{TransUssdCode: ussdCode}
+	)
+
+	code, err := transaction.GetTransactionByUssdCode(db.Transaction)
+	if err != nil {
+		return models.TransactionByIDResponse{}, code, err
+	}
+
+	return ListTransactionsByIDService(extReq, logger, db, transaction.TransactionID)
+}
+
 func resolveTransactionForAmountAndMilestoneResponse(extReq request.ExternalRequest, i int, t models.Transaction) (float64, models.MilestonesResponse) {
 	var (
 		totalAmount float64 = 0
