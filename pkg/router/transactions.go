@@ -24,11 +24,14 @@ func Transaction(r *gin.Engine, ApiVersion string, validator *validator.Validate
 	transactionsAuthUrl := r.Group(fmt.Sprintf("%v/transactions", ApiVersion), middleware.Authorize(db, extReq, middleware.AuthType))
 	{
 		transactionsAuthUrl.POST("/create", transaction.CreateTransaction)
+		transactionsAuthUrl.PATCH("/edit", transaction.EditTransaction)
+		transactionsAuthUrl.DELETE("/delete/:id", transaction.DeleteTransaction)
 	}
 
 	transactionsApiUrl := r.Group(fmt.Sprintf("%v/transactions", ApiVersion), middleware.Authorize(db, extReq, middleware.ApiType))
 	{
 		transactionsApiUrl.GET("/listById/:id", transaction.ListTransactionsByID)
+		transactionsApiUrl.GET("list-transactions-by-ussd-code/:code", transaction.ListTransactionsByUSSDCode)
 	}
 
 	transactionsAppUrl := r.Group(fmt.Sprintf("%v/transactions", ApiVersion), middleware.Authorize(db, extReq, middleware.AppType))

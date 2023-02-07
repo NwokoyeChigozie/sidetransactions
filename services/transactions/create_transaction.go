@@ -163,7 +163,7 @@ func CreateTransactionService(extReq request.ExternalRequest, logger *utility.Lo
 		Amount:           transactionAmount,
 		Status:           transactionStatus,
 		Quantity:         transaction.Quantity,
-		InspectionPeriod: inspectionPeriod,
+		InspectionPeriod: strconv.Itoa(inspectionPeriod),
 		DueDate:          transactionDueDate,
 		ShippingFee:      transactionShippingFee,
 		Currency:         transactionCurrency,
@@ -255,7 +255,7 @@ func resolveCreateOneOffTransaction(extReq request.ExternalRequest, milestones [
 			Amount:           transactionObj.Amount,
 			Status:           m.Status,
 			Quantity:         transactionObj.Quantity,
-			InspectionPeriod: m.InspectionPeriod,
+			InspectionPeriod: strconv.Itoa(m.InspectionPeriod),
 			DueDate:          dueDate,
 			ShippingFee:      transactionObj.ShippingFee,
 			GracePeriod:      transactionObj.GracePeriod,
@@ -300,7 +300,7 @@ func resolveCreateOneOffTransaction(extReq request.ExternalRequest, milestones [
 					Title:            m.Title,
 					Amount:           m.Amount,
 					Status:           m.Status,
-					InspectionPeriod: m.InspectionPeriod,
+					InspectionPeriod: strconv.Itoa(m.InspectionPeriod),
 					DueDate:          dDate,
 					Recipients:       recipientsArray,
 				})
@@ -346,7 +346,7 @@ func resolveCreateMilestoneTransaction(extReq request.ExternalRequest, milestone
 			Amount:           m.Amount,
 			Status:           m.Status,
 			Quantity:         quantity,
-			InspectionPeriod: m.InspectionPeriod,
+			InspectionPeriod: strconv.Itoa(m.InspectionPeriod),
 			DueDate:          dueDate,
 			ShippingFee:      m.ShippingFee,
 			GracePeriod:      gracePeriod,
@@ -391,7 +391,7 @@ func resolveCreateMilestoneTransaction(extReq request.ExternalRequest, milestone
 					Title:            m.Title,
 					Amount:           m.Amount,
 					Status:           m.Status,
-					InspectionPeriod: m.InspectionPeriod,
+					InspectionPeriod: strconv.Itoa(m.InspectionPeriod),
 					DueDate:          dDate,
 					Recipients:       recipientsArray,
 				})
@@ -643,7 +643,7 @@ func validatePartiesAndMilestones(tType string, parties []models.Party, mileston
 			if v.Title == "" {
 				return fmt.Errorf("Title is required for milestone %v", position)
 			}
-			if v.InspectionPeriod == "" {
+			if v.InspectionPeriod == 0 {
 				return fmt.Errorf("Inspection is required for milestone %v", position)
 			}
 			if v.DueDate == "" {

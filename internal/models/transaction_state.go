@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"net/http"
 	"time"
 
@@ -28,4 +29,12 @@ func (t *TransactionState) GetTransactionStateByTransactionIDAndStatus(db *gorm.
 		return http.StatusInternalServerError, err
 	}
 	return http.StatusOK, nil
+}
+
+func (t *TransactionState) CreateTransactionState(db *gorm.DB) error {
+	err := postgresql.CreateOneRecord(db, &t)
+	if err != nil {
+		return fmt.Errorf("transaction state creation failed: %v", err.Error())
+	}
+	return nil
 }
