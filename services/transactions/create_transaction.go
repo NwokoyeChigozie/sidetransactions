@@ -509,7 +509,7 @@ func GetTransactionStatus(index string) string {
 		"cr":      "Closed - Refunded",
 		"deleted": "Deleted",
 	}
-	status := dataMap[index]
+	status := dataMap[strings.ToLower(index)]
 	if status == "" {
 		status = dataMap[""]
 	}

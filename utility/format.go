@@ -29,6 +29,31 @@ func GetUnixString(date, currentISOFormat, newISOFormat string) (string, error) 
 	return strconv.Itoa(int(t.Unix())), nil
 }
 
+func GetStartAndEnd(interval string) (time.Time, time.Time) {
+	var (
+		start time.Time
+		end   time.Time
+	)
+	switch interval {
+	case "day":
+		startOfDay := time.Now().Truncate(24 * time.Hour)
+		start = startOfDay
+		end = startOfDay.Add(24 * time.Hour).Add(-time.Nanosecond)
+	case "week":
+		startOfWeek := time.Now().Truncate(24*time.Hour).AddDate(0, 0, -int(time.Now().Weekday()))
+		start = startOfWeek
+		end = startOfWeek.Add(24*7*time.Hour - time.Nanosecond)
+	case "month":
+		startOfMonth := time.Now().Truncate(24*time.Hour).AddDate(0, 0, -int(time.Now().Day()-1))
+		start = startOfMonth
+		end = startOfMonth.AddDate(0, 1, -1).Add(24*time.Hour - time.Nanosecond)
+	default:
+		start = time.Now()
+		end = time.Now()
+	}
+	return start, end
+}
+
 func ConvertStringInterfaceToStringFloat(originalMap map[string]interface{}) map[string]float64 {
 	convertedMap := make(map[string]float64)
 	for key, value := range originalMap {

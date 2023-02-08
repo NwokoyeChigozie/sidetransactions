@@ -65,6 +65,7 @@ var (
 	GetBusinessCharge  string = "get_business_charge"
 	InitBusinessCharge string = "init_business_charge"
 	CreatePayment      string = "create_payment"
+	ListPayment        string = "list_payment"
 )
 
 func (er ExternalRequest) SendExternalRequest(name string, data interface{}) (interface{}, error) {
@@ -414,6 +415,17 @@ func (er ExternalRequest) SendExternalRequest(name string, data interface{}) (in
 				Logger:       er.Logger,
 			}
 			return obj.CreatePayment()
+		case "list_payment":
+			obj := payment.RequestObj{
+				Name:         name,
+				Path:         fmt.Sprintf("%v/v2/payment/list", config.Microservices.Payment),
+				Method:       "GET",
+				SuccessCode:  200,
+				DecodeMethod: JsonDecodeMethod,
+				RequestData:  data,
+				Logger:       er.Logger,
+			}
+			return obj.ListPayment()
 		default:
 			return nil, fmt.Errorf("request not found")
 		}

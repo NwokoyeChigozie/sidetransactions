@@ -165,6 +165,48 @@ func ListTransactionsByUssdCodeService(extReq request.ExternalRequest, logger *u
 	return ListTransactionsByIDService(extReq, logger, db, transaction.TransactionID)
 }
 
+func ListTransactionsByBusinessService(extReq request.ExternalRequest, logger *utility.Logger, db postgresql.Databases, req models.ListTransactionByBusinessRequest) ([]models.TransactionByIDResponse, int, error) {
+	var (
+		transaction  = models.Transaction{BusinessID: req.BusinessID, IsPaylinked: req.Paylinked}
+		transactions = []models.Transaction{}
+	)
+
+	if req.Status != "" {
+		transaction.Status = req.Status
+	} else {
+		transaction.Status = GetTransactionStatus(req.StatusCode)
+	}
+
+	transactions, err := transaction.GetAllOthersByAndQueries(db.Transaction, req.Paylinked, req.Filter, "id", "asc")
+	if err != nil {
+		return []models.TransactionByIDResponse{}, http.StatusInternalServerError, err
+	}
+
+	var transactionsResponses []models.TransactionByIDResponse
+
+	for _, t := range transactions {
+		transactionResponse, _, err := ListTransactionsByIDService(extReq, logger, db, transaction.TransactionID)
+		if err != nil {
+			logger.Error("list transaction by id error", err.Error())
+		}
+
+		payment, err := ListPayment(extReq, t.TransactionID)
+		if err != nil {
+			transactionResponse.TotalAmount = 0
+			transactionResponse.EscrowCharge = 0
+			logger.Error("list payment by transaction id error", err.Error())
+		} else {
+			transactionResponse.TotalAmount = payment.TotalAmount
+			transactionResponse.EscrowCharge = payment.EscrowCharge
+		}
+
+		transactionsResponses = append(transactionsResponses, transactionResponse)
+	}
+
+	return transactionsResponses, http.StatusOK, nil
+
+}
+
 func resolveTransactionForAmountAndMilestoneResponse(extReq request.ExternalRequest, i int, t models.Transaction) (float64, models.MilestonesResponse) {
 	var (
 		totalAmount float64 = 0
@@ -322,4 +364,21 @@ func GetCountryByNameOrCode(extReq request.ExternalRequest, logger *utility.Logg
 	}
 
 	return country, nil
+}
+
+func ListPayment(extReq request.ExternalRequest, transactionID string) (external_models.ListPayment, error) {
+	paymentInterface, err := extReq.SendExternalRequest(request.ListPayment, transactionID)
+	if err != nil {
+		return external_models.ListPayment{}, err
+	}
+
+	payment, ok := paymentInterface.(external_models.ListPayment)
+	if !ok {
+		return external_models.ListPayment{}, fmt.Errorf("response data format error")
+	}
+
+	if payment.ID == 0 {
+		return external_models.ListPayment{}, fmt.Errorf("payment creation failed")
+	}
+	return payment, nil
 }

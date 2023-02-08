@@ -29,3 +29,12 @@ func (a *jsonmap) Scan(value interface{}) error {
 	}
 	return json.Unmarshal(b, &a)
 }
+
+func addQuery(oldQuery, newQuery, joinValue string) string {
+	if oldQuery == "" {
+		return " " + newQuery + " "
+	}
+
+	return oldQuery + " " + joinValue + " " + newQuery
+
+}
