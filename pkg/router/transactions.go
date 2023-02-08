@@ -31,7 +31,8 @@ func Transaction(r *gin.Engine, ApiVersion string, validator *validator.Validate
 	transactionsApiUrl := r.Group(fmt.Sprintf("%v/transactions", ApiVersion), middleware.Authorize(db, extReq, middleware.ApiType))
 	{
 		transactionsApiUrl.GET("/listById/:id", transaction.ListTransactionsByID)
-		transactionsApiUrl.GET("list-transactions-by-ussd-code/:code", transaction.ListTransactionsByUSSDCode)
+		transactionsApiUrl.GET("/list-transactions-by-ussd-code/:code", transaction.ListTransactionsByUSSDCode)
+		transactionsApiUrl.GET("/listByBusiness", transaction.ListTransactionsByBusiness)
 	}
 
 	transactionsAppUrl := r.Group(fmt.Sprintf("%v/transactions", ApiVersion), middleware.Authorize(db, extReq, middleware.AppType))

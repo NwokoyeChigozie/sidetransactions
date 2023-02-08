@@ -11,7 +11,18 @@ func SelectAllFromDb(db *gorm.DB, order string, receiver interface{}, query inte
 	if order == "" {
 		order = "desc"
 	}
-	tx := db.Where(query, args...).Find(receiver)
+	tx := db.Order("id "+order).Where(query, args...).Find(receiver)
+	return tx.Error
+}
+
+func SelectAllFromDbOrderBy(db *gorm.DB, orderBy, order string, receiver interface{}, query interface{}, args ...interface{}) error {
+	if order == "" {
+		order = "desc"
+	}
+	if orderBy == "" {
+		orderBy = "id"
+	}
+	tx := db.Order(orderBy+" "+order).Where(query, args...).Find(receiver)
 	return tx.Error
 }
 

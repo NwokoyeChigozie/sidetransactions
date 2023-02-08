@@ -83,3 +83,11 @@ type TransactionCreateResponse struct {
 	Milestones       []MilestonesResponse `json:"milestones"`
 	Broker           TransactionBroker    `json:"broker"`
 }
+
+type ListTransactionByBusinessRequest struct {
+	BusinessID int    `json:"business_id"  pgvalidate:"exists=auth$business_profiles$account_id"`
+	Status     string `json:"status"`
+	StatusCode string `json:"status_code"`
+	Paylinked  bool   `json:"paylinked"`
+	Filter     string `json:"filter" validate:"oneof=day week month"`
+}
