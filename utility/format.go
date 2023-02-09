@@ -39,6 +39,11 @@ func GetStartAndEnd(interval string) (time.Time, time.Time) {
 		startOfDay := time.Now().Truncate(24 * time.Hour)
 		start = startOfDay
 		end = startOfDay.Add(24 * time.Hour).Add(-time.Nanosecond)
+	case "monday_to_thursday":
+		now := time.Now()
+		startOfWeek := now.AddDate(0, 0, -int(now.Weekday()-1))
+		start = startOfWeek
+		end = startOfWeek.AddDate(0, 0, 4)
 	case "week":
 		startOfWeek := time.Now().Truncate(24*time.Hour).AddDate(0, 0, -int(time.Now().Weekday()))
 		start = startOfWeek

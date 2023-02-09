@@ -165,7 +165,40 @@ func ListTransactionsByUssdCodeService(extReq request.ExternalRequest, logger *u
 	return ListTransactionsByIDService(extReq, logger, db, transaction.TransactionID)
 }
 
-func ListTransactionsByBusinessService(extReq request.ExternalRequest, logger *utility.Logger, db postgresql.Databases, req models.ListTransactionByBusinessRequest) ([]models.TransactionByIDResponse, int, error) {
+func ListTransactionsService(extReq request.ExternalRequest, logger *utility.Logger, db postgresql.Databases, req models.ListTransactionsRequest, paginator postgresql.Pagination) ([]models.TransactionByIDResponse, postgresql.PaginationResponse, int, error) {
+	var (
+		transaction  = models.Transaction{}
+		transactions = []models.Transaction{}
+	)
+
+	if req.Status != "" {
+		transaction.Status = req.Status
+	} else {
+		transaction.Status = GetTransactionStatus(req.StatusCode)
+	}
+
+	transactions, pagination, err := transaction.GetAllByAndQueries(db.Transaction, false, req.Filter, "id", "asc", paginator)
+	if err != nil {
+		return []models.TransactionByIDResponse{}, postgresql.PaginationResponse{}, http.StatusInternalServerError, err
+	}
+
+	var transactionsResponses []models.TransactionByIDResponse
+
+	for _, t := range transactions {
+		transactionResponse, _, err := ListTransactionsByIDService(extReq, logger, db, t.TransactionID)
+		if err != nil {
+			logger.Error("list transaction by id error", err.Error())
+		} else {
+			transactionsResponses = append(transactionsResponses, transactionResponse)
+		}
+
+	}
+
+	return transactionsResponses, pagination, http.StatusOK, nil
+
+}
+
+func ListTransactionsByBusinessService(extReq request.ExternalRequest, logger *utility.Logger, db postgresql.Databases, req models.ListTransactionByBusinessRequest, paginator postgresql.Pagination) ([]models.TransactionByIDResponse, postgresql.PaginationResponse, int, error) {
 	var (
 		transaction  = models.Transaction{BusinessID: req.BusinessID, IsPaylinked: req.Paylinked}
 		transactions = []models.Transaction{}
@@ -177,33 +210,154 @@ func ListTransactionsByBusinessService(extReq request.ExternalRequest, logger *u
 		transaction.Status = GetTransactionStatus(req.StatusCode)
 	}
 
-	transactions, err := transaction.GetAllOthersByAndQueries(db.Transaction, req.Paylinked, req.Filter, "id", "asc")
+	transactions, pagination, err := transaction.GetAllByAndQueries(db.Transaction, req.Paylinked, req.Filter, "id", "asc", paginator)
 	if err != nil {
-		return []models.TransactionByIDResponse{}, http.StatusInternalServerError, err
+		return []models.TransactionByIDResponse{}, postgresql.PaginationResponse{}, http.StatusInternalServerError, err
 	}
 
 	var transactionsResponses []models.TransactionByIDResponse
 
 	for _, t := range transactions {
-		transactionResponse, _, err := ListTransactionsByIDService(extReq, logger, db, transaction.TransactionID)
+		transactionResponse, _, err := ListTransactionsByIDService(extReq, logger, db, t.TransactionID)
 		if err != nil {
 			logger.Error("list transaction by id error", err.Error())
-		}
-
-		payment, err := ListPayment(extReq, t.TransactionID)
-		if err != nil {
-			transactionResponse.TotalAmount = 0
-			transactionResponse.EscrowCharge = 0
-			logger.Error("list payment by transaction id error", err.Error())
 		} else {
-			transactionResponse.TotalAmount = payment.TotalAmount
-			transactionResponse.EscrowCharge = payment.EscrowCharge
+			payment, err := ListPayment(extReq, t.TransactionID)
+			if err != nil {
+				transactionResponse.TotalAmount = 0
+				transactionResponse.EscrowCharge = 0
+				logger.Error("list payment by transaction id error", err.Error())
+			} else {
+				transactionResponse.TotalAmount = payment.TotalAmount
+				transactionResponse.EscrowCharge = payment.EscrowCharge
+			}
+
+			transactionsResponses = append(transactionsResponses, transactionResponse)
 		}
 
-		transactionsResponses = append(transactionsResponses, transactionResponse)
 	}
 
-	return transactionsResponses, http.StatusOK, nil
+	return transactionsResponses, pagination, http.StatusOK, nil
+
+}
+func ListByBusinessFromMondayToThursdayService(extReq request.ExternalRequest, logger *utility.Logger, db postgresql.Databases, req models.ListByBusinessFromMondayToThursdayRequest, paginator postgresql.Pagination) ([]models.TransactionByIDResponse, postgresql.PaginationResponse, int, error) {
+	var (
+		transaction  = models.Transaction{BusinessID: req.BusinessID, IsPaylinked: req.Paylinked}
+		transactions = []models.Transaction{}
+	)
+
+	if req.Status != "" {
+		transaction.Status = req.Status
+	} else {
+		transaction.Status = GetTransactionStatus(req.StatusCode)
+	}
+
+	transactions, pagination, err := transaction.GetAllByAndQueries(db.Transaction, req.Paylinked, "monday_to_thursday", "id", "asc", paginator)
+	if err != nil {
+		return []models.TransactionByIDResponse{}, postgresql.PaginationResponse{}, http.StatusInternalServerError, err
+	}
+
+	var transactionsResponses []models.TransactionByIDResponse
+
+	for _, t := range transactions {
+		transactionResponse, _, err := ListTransactionsByIDService(extReq, logger, db, t.TransactionID)
+		if err != nil {
+			logger.Error("list transaction by id error", err.Error())
+		} else {
+			payment, err := ListPayment(extReq, t.TransactionID)
+			if err != nil {
+				transactionResponse.TotalAmount = 0
+				transactionResponse.EscrowCharge = 0
+				logger.Error("list payment by transaction id error", err.Error())
+			} else {
+				transactionResponse.TotalAmount = payment.TotalAmount
+				transactionResponse.EscrowCharge = payment.EscrowCharge
+			}
+
+			transactionsResponses = append(transactionsResponses, transactionResponse)
+		}
+
+	}
+
+	return transactionsResponses, pagination, http.StatusOK, nil
+
+}
+
+func ListTransactionsByUserService(extReq request.ExternalRequest, logger *utility.Logger, db postgresql.Databases, req models.ListTransactionByUserRequest, paginator postgresql.Pagination, user external_models.User) ([]models.TransactionByIDResponse, postgresql.PaginationResponse, int, error) {
+	var (
+		transactions          = []models.Transaction{}
+		transactionsResponses = []models.TransactionByIDResponse{}
+		transactionParty      = models.TransactionParty{AccountID: int(user.AccountID), Role: req.Role}
+	)
+
+	transactionParties, pagination, err := transactionParty.GetAllByAndQueriesForUniqueValue(db.Transaction, "", "id", "desc", "transaction_id", paginator)
+	if err != nil {
+		return []models.TransactionByIDResponse{}, postgresql.PaginationResponse{}, http.StatusInternalServerError, err
+	}
+
+	for _, tp := range transactionParties {
+		lTransaction := models.Transaction{TransactionID: tp.TransactionID, IsPaylinked: req.Paylinked, Status: GetTransactionStatus(req.StatusCode)}
+		code, err := lTransaction.GetLatestByAndQueries(db.Transaction, req.Paylinked, "")
+		if err != nil {
+			if code == http.StatusInternalServerError {
+				return []models.TransactionByIDResponse{}, postgresql.PaginationResponse{}, code, err
+			}
+			logger.Error("error getting lastest transaction byy transaction id", err.Error())
+		} else {
+			transactions = append(transactions, lTransaction)
+		}
+	}
+
+	for _, t := range transactions {
+		transactionResponse, _, err := ListTransactionsByIDService(extReq, logger, db, t.TransactionID)
+		if err != nil {
+			logger.Error("list transaction by id error", err.Error())
+		} else {
+			transactionsResponses = append(transactionsResponses, transactionResponse)
+		}
+
+	}
+
+	return transactionsResponses, pagination, http.StatusOK, nil
+
+}
+
+func ListArchivedTransactionsService(extReq request.ExternalRequest, logger *utility.Logger, db postgresql.Databases, paginator postgresql.Pagination, user external_models.User) ([]models.TransactionByIDResponse, postgresql.PaginationResponse, int, error) {
+	var (
+		transactions          = []models.Transaction{}
+		transactionsResponses = []models.TransactionByIDResponse{}
+		transactionParty      = models.TransactionParty{AccountID: int(user.AccountID), Role: "sender"}
+	)
+
+	transactionParties, pagination, err := transactionParty.GetAllByAndQueriesForUniqueValue(db.Transaction, "", "id", "desc", "transaction_id", paginator)
+	if err != nil {
+		return []models.TransactionByIDResponse{}, postgresql.PaginationResponse{}, http.StatusInternalServerError, err
+	}
+
+	for _, tp := range transactionParties {
+		lTransaction := models.Transaction{TransactionID: tp.TransactionID, Status: "Deleted"}
+		code, err := lTransaction.GetLatestByAndQueries(db.Transaction, false, "")
+		if err != nil {
+			if code == http.StatusInternalServerError {
+				return []models.TransactionByIDResponse{}, postgresql.PaginationResponse{}, code, err
+			}
+			logger.Error("error getting lastest transaction byy transaction id", err.Error())
+		} else {
+			transactions = append(transactions, lTransaction)
+		}
+	}
+
+	for _, t := range transactions {
+		transactionResponse, _, err := ListTransactionsByIDService(extReq, logger, db, t.TransactionID)
+		if err != nil {
+			logger.Error("list transaction by id error", err.Error())
+		} else {
+			transactionsResponses = append(transactionsResponses, transactionResponse)
+		}
+
+	}
+
+	return transactionsResponses, pagination, http.StatusOK, nil
 
 }
 
@@ -220,6 +374,7 @@ func resolveTransactionForAmountAndMilestoneResponse(extReq request.ExternalRequ
 	if len(titleSlice) >= 3 {
 		totalAmount, _ = strconv.ParseFloat(titleSlice[2], 64)
 	}
+
 	if len(titleSlice) > 0 {
 		title = titleSlice[1]
 	}
