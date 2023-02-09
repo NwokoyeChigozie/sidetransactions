@@ -1,6 +1,7 @@
 package transactions
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -47,9 +48,10 @@ func (base *Controller) ListTransactionsByUSSDCode(c *gin.Context) {
 
 }
 
-func (base *Controller) ListTransactionsByBusiness(c *gin.Context) {
+func (base *Controller) ListTransactions(c *gin.Context) {
 	var (
-		req models.ListTransactionByBusinessRequest
+		req       models.ListTransactionsRequest
+		paginator = postgresql.GetPagination(c)
 	)
 
 	err := c.ShouldBind(&req)
@@ -74,14 +76,164 @@ func (base *Controller) ListTransactionsByBusiness(c *gin.Context) {
 		return
 	}
 
-	transactions, code, err := transactions.ListTransactionsByBusinessService(base.ExtReq, base.Logger, base.Db, req)
+	transactions, pagination, code, err := transactions.ListTransactionsService(base.ExtReq, base.Logger, base.Db, req, paginator)
 	if err != nil {
 		rd := utility.BuildErrorResponse(code, "error", err.Error(), err, nil)
 		c.JSON(code, rd)
 		return
 	}
 
-	rd := utility.BuildSuccessResponse(http.StatusOK, "successful", transactions)
+	rd := utility.BuildSuccessResponse(http.StatusOK, "successful", transactions, pagination)
+	c.JSON(http.StatusOK, rd)
+
+}
+
+func (base *Controller) ListTransactionsByBusiness(c *gin.Context) {
+	var (
+		req       models.ListTransactionByBusinessRequest
+		paginator = postgresql.GetPagination(c)
+	)
+
+	err := c.ShouldBind(&req)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", "Failed to parse request body", err, nil)
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	err = base.Validator.Struct(&req)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", "Validation failed", utility.ValidationResponse(err, base.Validator), nil)
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	vr := postgresql.ValidateRequestM{Logger: base.Logger, Test: base.ExtReq.Test}
+	err = vr.ValidateRequest(req)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", err.Error(), err, nil)
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	transactions, pagination, code, err := transactions.ListTransactionsByBusinessService(base.ExtReq, base.Logger, base.Db, req, paginator)
+	if err != nil {
+		rd := utility.BuildErrorResponse(code, "error", err.Error(), err, nil)
+		c.JSON(code, rd)
+		return
+	}
+
+	rd := utility.BuildSuccessResponse(http.StatusOK, "successful", transactions, pagination)
+	c.JSON(http.StatusOK, rd)
+
+}
+
+func (base *Controller) ListByBusinessFromMondayToThursday(c *gin.Context) {
+	var (
+		req       models.ListByBusinessFromMondayToThursdayRequest
+		paginator = postgresql.GetPagination(c)
+	)
+
+	err := c.ShouldBind(&req)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", "Failed to parse request body", err, nil)
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	err = base.Validator.Struct(&req)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", "Validation failed", utility.ValidationResponse(err, base.Validator), nil)
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	vr := postgresql.ValidateRequestM{Logger: base.Logger, Test: base.ExtReq.Test}
+	err = vr.ValidateRequest(req)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", err.Error(), err, nil)
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	transactions, pagination, code, err := transactions.ListByBusinessFromMondayToThursdayService(base.ExtReq, base.Logger, base.Db, req, paginator)
+	if err != nil {
+		rd := utility.BuildErrorResponse(code, "error", err.Error(), err, nil)
+		c.JSON(code, rd)
+		return
+	}
+
+	rd := utility.BuildSuccessResponse(http.StatusOK, "successful", transactions, pagination)
+	c.JSON(http.StatusOK, rd)
+
+}
+
+func (base *Controller) ListTransactionsByUser(c *gin.Context) {
+	var (
+		req       models.ListTransactionByUserRequest
+		paginator = postgresql.GetPagination(c)
+	)
+
+	err := c.ShouldBind(&req)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", "Failed to parse request body", err, nil)
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	err = base.Validator.Struct(&req)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", "Validation failed", utility.ValidationResponse(err, base.Validator), nil)
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	vr := postgresql.ValidateRequestM{Logger: base.Logger, Test: base.ExtReq.Test}
+	err = vr.ValidateRequest(req)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", err.Error(), err, nil)
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+	user := models.MyIdentity
+	if user == nil {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", "error retrieving authenticated user", err, nil)
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	transactions, pagination, code, err := transactions.ListTransactionsByUserService(base.ExtReq, base.Logger, base.Db, req, paginator, *user)
+	if err != nil {
+		rd := utility.BuildErrorResponse(code, "error", err.Error(), err, nil)
+		c.JSON(code, rd)
+		return
+	}
+
+	rd := utility.BuildSuccessResponse(http.StatusOK, "successful", transactions, pagination)
+	c.JSON(http.StatusOK, rd)
+
+}
+
+func (base *Controller) ListArchivedTransactions(c *gin.Context) {
+	var (
+		paginator = postgresql.GetPagination(c)
+	)
+
+	user := models.MyIdentity
+	if user == nil {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", "error retrieving authenticated user", fmt.Errorf("error retrieving authenticated user"), nil)
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	transactions, pagination, code, err := transactions.ListArchivedTransactionsService(base.ExtReq, base.Logger, base.Db, paginator, *user)
+	if err != nil {
+		rd := utility.BuildErrorResponse(code, "error", err.Error(), err, nil)
+		c.JSON(code, rd)
+		return
+	}
+
+	rd := utility.BuildSuccessResponse(http.StatusOK, "successful", transactions, pagination)
 	c.JSON(http.StatusOK, rd)
 
 }

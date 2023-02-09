@@ -84,10 +84,27 @@ type TransactionCreateResponse struct {
 	Broker           TransactionBroker    `json:"broker"`
 }
 
+type ListTransactionsRequest struct {
+	Status     string `json:"status"`
+	StatusCode string `json:"status_code"`
+	Filter     string `json:"filter" validate:"oneof=day week month"`
+}
 type ListTransactionByBusinessRequest struct {
-	BusinessID int    `json:"business_id"  pgvalidate:"exists=auth$business_profiles$account_id"`
+	BusinessID int    `json:"business_id" validate:"required" pgvalidate:"exists=auth$business_profiles$account_id"`
 	Status     string `json:"status"`
 	StatusCode string `json:"status_code"`
 	Paylinked  bool   `json:"paylinked"`
 	Filter     string `json:"filter" validate:"oneof=day week month"`
+}
+type ListByBusinessFromMondayToThursdayRequest struct {
+	BusinessID int    `json:"business_id" validate:"required" pgvalidate:"exists=auth$business_profiles$account_id"`
+	Status     string `json:"status"`
+	StatusCode string `json:"status_code"`
+	Paylinked  bool   `json:"paylinked"`
+}
+
+type ListTransactionByUserRequest struct {
+	Role       string `json:"role"`
+	Paylinked  bool   `json:"paylinked"`
+	StatusCode string `json:"status_code"`
 }

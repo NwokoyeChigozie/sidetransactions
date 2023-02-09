@@ -214,7 +214,7 @@ func (t *Transaction) GetAllOthersByIDAndPartiesID(db *gorm.DB) ([]Transaction, 
 	return details, nil
 }
 
-func (t *Transaction) GetAllOthersByAndQueries(db *gorm.DB, usePaylinked bool, CreatedAtInterval string, orderBy, order string) ([]Transaction, error) {
+func (t *Transaction) GetAllByAndQueries(db *gorm.DB, usePaylinked bool, CreatedAtInterval string, orderBy, order string, paginator postgresql.Pagination) ([]Transaction, postgresql.PaginationResponse, error) {
 	var (
 		details = []Transaction{}
 		query   = ``
@@ -245,11 +245,51 @@ func (t *Transaction) GetAllOthersByAndQueries(db *gorm.DB, usePaylinked bool, C
 		query = addQuery(query, fmt.Sprintf("(created_at BETWEEN '%s' AND '%s')", start, end), "AND")
 	}
 
-	err := postgresql.SelectAllFromDbOrderBy(db, orderBy, order, &details, query)
+	totalPages, err := postgresql.SelectAllFromDbOrderByPaginated(db, orderBy, order, paginator, &details, query)
 	if err != nil {
-		return details, err
+		return details, totalPages, err
 	}
-	return details, nil
+	return details, totalPages, nil
+}
+func (t *Transaction) GetLatestByAndQueries(db *gorm.DB, usePaylinked bool, CreatedAtInterval string) (int, error) {
+	var (
+		query = ``
+	)
+
+	if t.TransactionID != "" {
+		query = addQuery(query, fmt.Sprintf("transaction_id = '%v'", t.TransactionID), "AND")
+	}
+	if t.ID != 0 {
+		query = addQuery(query, fmt.Sprintf("id = %v", t.ID), "AND")
+	}
+	if t.PartiesID != "" {
+		query = addQuery(query, fmt.Sprintf("parties_id = '%v'", t.PartiesID), "AND")
+	}
+	if t.BusinessID != 0 {
+		query = addQuery(query, fmt.Sprintf("business_id = %v", t.BusinessID), "AND")
+	}
+	if t.Status != "" {
+		query = addQuery(query, fmt.Sprintf("status = '%v'", t.Status), "AND")
+	}
+
+	if usePaylinked {
+		query = addQuery(query, fmt.Sprintf("is_paylinked = %v", t.IsPaylinked), "AND")
+	}
+
+	if CreatedAtInterval != "" {
+		start, end := utility.GetStartAndEnd(CreatedAtInterval)
+		query = addQuery(query, fmt.Sprintf("(created_at BETWEEN '%s' AND '%s')", start, end), "AND")
+	}
+
+	err, nilErr := postgresql.SelectLatestFromDb(db, &t, query)
+	if nilErr != nil {
+		return http.StatusBadRequest, nilErr
+	}
+
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
+	return http.StatusOK, nil
 }
 
 func (t *Transaction) Delete(db *gorm.DB) error {
