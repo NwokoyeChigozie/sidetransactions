@@ -418,7 +418,7 @@ func (er ExternalRequest) SendExternalRequest(name string, data interface{}) (in
 		case "list_payment":
 			obj := payment.RequestObj{
 				Name:         name,
-				Path:         fmt.Sprintf("%v/v2/payment/list", config.Microservices.Payment),
+				Path:         fmt.Sprintf("%v/v2/payment/listByTransactionId", config.Microservices.Payment),
 				Method:       "GET",
 				SuccessCode:  200,
 				DecodeMethod: JsonDecodeMethod,

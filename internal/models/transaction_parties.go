@@ -65,7 +65,7 @@ func (t *TransactionParty) GetAllByAndQueriesForUniqueValue(db *gorm.DB, Created
 		query = addQuery(query, fmt.Sprintf("id = %v", t.ID), "AND")
 	}
 	if t.Role != "" {
-		query = addQuery(query, fmt.Sprintf("role = %v", t.Role), "AND")
+		query = addQuery(query, fmt.Sprintf("role = '%v'", t.Role), "AND")
 	}
 	if t.Status != "" {
 		query = addQuery(query, fmt.Sprintf("status = '%v'", t.Status), "AND")
@@ -73,7 +73,7 @@ func (t *TransactionParty) GetAllByAndQueriesForUniqueValue(db *gorm.DB, Created
 
 	if CreatedAtInterval != "" {
 		start, end := utility.GetStartAndEnd(CreatedAtInterval)
-		query = addQuery(query, fmt.Sprintf("(created_at BETWEEN '%s' AND '%s')", start, end), "AND")
+		query = addQuery(query, fmt.Sprintf("(created_at BETWEEN '%s' AND '%s')", start.Format(time.RFC3339), end.Format(time.RFC3339)), "AND")
 	}
 
 	totalPages, err := postgresql.SelectAllFromByGroup(db, orderBy, order, &paginator, &details, query, groupColumn)

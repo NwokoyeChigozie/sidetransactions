@@ -70,7 +70,7 @@ type EditTransactionRequest struct {
 	InspectionPeriod int     `json:"inspection_period"`
 	DueDate          string  `json:"due_date"`
 	ShippingFee      float64 `json:"shipping_fee"`
-	Currency         string  `json:"currency"  validate:"required"`
+	Currency         string  `json:"currency"`
 	GracePeriod      string  `json:"grace_period"`
 }
 
@@ -242,7 +242,7 @@ func (t *Transaction) GetAllByAndQueries(db *gorm.DB, usePaylinked bool, Created
 
 	if CreatedAtInterval != "" {
 		start, end := utility.GetStartAndEnd(CreatedAtInterval)
-		query = addQuery(query, fmt.Sprintf("(created_at BETWEEN '%s' AND '%s')", start, end), "AND")
+		query = addQuery(query, fmt.Sprintf("(created_at BETWEEN '%s' AND '%s')", start.Format(time.RFC3339), end.Format(time.RFC3339)), "AND")
 	}
 
 	totalPages, err := postgresql.SelectAllFromDbOrderByPaginated(db, orderBy, order, paginator, &details, query)
@@ -278,7 +278,7 @@ func (t *Transaction) GetLatestByAndQueries(db *gorm.DB, usePaylinked bool, Crea
 
 	if CreatedAtInterval != "" {
 		start, end := utility.GetStartAndEnd(CreatedAtInterval)
-		query = addQuery(query, fmt.Sprintf("(created_at BETWEEN '%s' AND '%s')", start, end), "AND")
+		query = addQuery(query, fmt.Sprintf("(created_at BETWEEN '%s' AND '%s')", start.Format(time.RFC3339), end.Format(time.RFC3339)), "AND")
 	}
 
 	err, nilErr := postgresql.SelectLatestFromDb(db, &t, query)
