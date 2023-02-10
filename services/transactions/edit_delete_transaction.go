@@ -88,7 +88,7 @@ func DeleteTransactionService(extReq request.ExternalRequest, logger *utility.Lo
 	code, err := transaction.GetTransactionByTransactionID(db.Transaction)
 	if err != nil {
 		if code == http.StatusBadRequest {
-			return code, fmt.Errorf("Transaction has been deleted")
+			return http.StatusOK, fmt.Errorf("Transaction has been deleted")
 		}
 		return code, err
 	}

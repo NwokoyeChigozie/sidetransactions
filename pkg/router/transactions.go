@@ -26,17 +26,17 @@ func Transaction(r *gin.Engine, ApiVersion string, validator *validator.Validate
 		transactionsAuthUrl.POST("/create", transaction.CreateTransaction)
 		transactionsAuthUrl.PATCH("/edit", transaction.EditTransaction)
 		transactionsAuthUrl.DELETE("/delete/:id", transaction.DeleteTransaction)
-		transactionsAuthUrl.DELETE("/listByUser", transaction.ListTransactionsByUser)
-		transactionsAuthUrl.DELETE("list/archived", transaction.ListArchivedTransactions)
+		transactionsAuthUrl.POST("/listByUser", transaction.ListTransactionsByUser)
+		transactionsAuthUrl.GET("list/archived", transaction.ListArchivedTransactions)
 	}
 
 	transactionsApiUrl := r.Group(fmt.Sprintf("%v/transactions", ApiVersion), middleware.Authorize(db, extReq, middleware.ApiType))
 	{
-		transactionsApiUrl.GET("/list", transaction.ListTransactions)
+		transactionsApiUrl.POST("/list", transaction.ListTransactions)
 		transactionsApiUrl.GET("/listById/:id", transaction.ListTransactionsByID)
 		transactionsApiUrl.GET("/list-transactions-by-ussd-code/:code", transaction.ListTransactionsByUSSDCode)
-		transactionsApiUrl.GET("/listByBusiness", transaction.ListTransactionsByBusiness)
-		transactionsApiUrl.GET("/listByBusinessFromMondayToThursday", transaction.ListByBusinessFromMondayToThursday)
+		transactionsApiUrl.POST("/listByBusiness", transaction.ListTransactionsByBusiness)
+		transactionsApiUrl.POST("/listByBusinessFromMondayToThursday", transaction.ListByBusinessFromMondayToThursday)
 	}
 
 	transactionsAppUrl := r.Group(fmt.Sprintf("%v/transactions", ApiVersion), middleware.Authorize(db, extReq, middleware.AppType))

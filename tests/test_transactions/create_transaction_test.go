@@ -92,24 +92,6 @@ func TestCreateTransaction(t *testing.T) {
 		DisburseCurrency: "NGN",
 	}
 
-	transaction := models.Transaction{
-		TransactionID: transactionID,
-		PartiesID:     utility.RandomString(20),
-		MilestoneID:   utility.RandomString(20),
-		Title:         "test transaction;milestone title;2000;1",
-		Type:          "milestone",
-		Description:   "description",
-		Amount:        2000,
-		ShippingFee:   10,
-		AmountPaid:    0,
-		EscrowCharge:  10,
-		EscrowWallet:  "yes",
-	}
-	err := transaction.CreateTransaction(db.Transaction)
-	if err != nil {
-		panic("error creating transaction: " + err.Error())
-	}
-
 	trans := transactions.Controller{Db: db, Validator: validatorRef, Logger: logger, ExtReq: request.ExternalRequest{
 		Logger: logger,
 		Test:   true,

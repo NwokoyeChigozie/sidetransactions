@@ -82,7 +82,7 @@ func SelectAllFromByGroup(db *gorm.DB, orderBy, order string, pagination *Pagina
 		orderBy = "id"
 	}
 	if pagination == nil {
-		tx := db.Order(orderBy+" "+order).Where(query, args...).Group(groupColumn).Find(receiver)
+		tx := db.Order(orderBy+" "+order).Where(query, args...).Group(groupColumn + ", id").Find(receiver)
 		return PaginationResponse{}, tx.Error
 	}
 	if pagination.Page <= 0 {
@@ -104,7 +104,7 @@ func SelectAllFromByGroup(db *gorm.DB, orderBy, order string, pagination *Pagina
 
 	totalPages := int(math.Ceil(float64(count) / float64(pagination.Limit)))
 
-	tx := db.Limit(pagination.Limit).Offset((pagination.Page-1)*pagination.Limit).Order(orderBy+" "+order).Where(query, args...).Group(groupColumn).Find(receiver)
+	tx := db.Limit(pagination.Limit).Offset((pagination.Page-1)*pagination.Limit).Order(orderBy+" "+order).Where(query, args...).Group(groupColumn + ", id").Find(receiver)
 	return PaginationResponse{
 		CurrentPage: pagination.Page,
 		PageCount:   int(tx.RowsAffected),

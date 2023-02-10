@@ -15,6 +15,12 @@ import (
 func (base *Controller) ListTransactionsByID(c *gin.Context) {
 	transactionID := c.Param("id")
 
+	if transactionID == "" {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", "id not provided", c.Params, nil)
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
 	transactions, code, err := transactions.ListTransactionsByIDService(base.ExtReq, base.Logger, base.Db, transactionID)
 	if err != nil {
 		rd := utility.BuildErrorResponse(code, "error", err.Error(), err, nil)
