@@ -2,6 +2,7 @@ package models
 
 import (
 	"fmt"
+	"net/http"
 	"time"
 
 	"github.com/vesicash/transactions-ms/pkg/repository/storage/postgresql"
@@ -23,12 +24,50 @@ type TransactionParty struct {
 	Status               string    `gorm:"column:status; type:varchar(255); not null;default:created" json:"status"`
 }
 
+type UpdateTransactionPartiesRequest struct {
+	TransactionID string           `json:"transaction_id" validate:"required" pgvalidate:"exists=transaction$transactions$transaction_id"`
+	Parties       map[string]Party `json:"parties"  validate:"required"`
+}
+type UpdateTransactionPartyStatusRequest struct {
+	TransactionID string `json:"transaction_id" validate:"required" pgvalidate:"exists=transaction$transactions$transaction_id"`
+	AccountID     int    `json:"account_id" validate:"required"  pgvalidate:"exists=auth$business_profiles$account_id"`
+	Status        string `json:"status" validate:"required"`
+}
+type AssignTransactionBuyerRequest struct {
+	TransactionID string `json:"transaction_id" pgvalidate:"exists=transaction$transactions$transaction_id"`
+	UssdCode      int    `json:"ussd_code" pgvalidate:"exists=transaction$transactions$trans_ussd_code"`
+	PhoneNumber   string `json:"phone_number" validate:"required"`
+}
+
 func (t *TransactionParty) CreateTransactionParty(db *gorm.DB) error {
 	err := postgresql.CreateOneRecord(db, &t)
 	if err != nil {
 		return fmt.Errorf("transaction party creation failed: %v", err.Error())
 	}
 	return nil
+}
+
+func (t *TransactionParty) GetTransactionPartyByTransactionPartiesIDAndRole(db *gorm.DB) (int, error) {
+	err, nilErr := postgresql.SelectOneFromDb(db, &t, "transaction_parties_id = ? and role = ?", t.TransactionPartiesID, t.Role)
+	if nilErr != nil {
+		return http.StatusBadRequest, nilErr
+	}
+
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
+	return http.StatusOK, nil
+}
+func (t *TransactionParty) GetTransactionPartyByTransactionIDAndAccountID(db *gorm.DB) (int, error) {
+	err, nilErr := postgresql.SelectOneFromDb(db, &t, "transaction_id = ? and account_id = ?", t.TransactionID, t.AccountID)
+	if nilErr != nil {
+		return http.StatusBadRequest, nilErr
+	}
+
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
+	return http.StatusOK, nil
 }
 
 func (t *TransactionParty) GetAllByTransactionID(db *gorm.DB) ([]TransactionParty, error) {
@@ -81,4 +120,9 @@ func (t *TransactionParty) GetAllByAndQueriesForUniqueValue(db *gorm.DB, Created
 		return details, totalPages, err
 	}
 	return details, totalPages, nil
+}
+
+func (t *TransactionParty) UpdateAllFields(db *gorm.DB) error {
+	_, err := postgresql.SaveAllFields(db, &t)
+	return err
 }

@@ -66,6 +66,7 @@ var (
 	InitBusinessCharge string = "init_business_charge"
 	CreatePayment      string = "create_payment"
 	ListPayment        string = "list_payment"
+	SignupUser         string = "signup_user"
 )
 
 func (er ExternalRequest) SendExternalRequest(name string, data interface{}) (interface{}, error) {
@@ -409,7 +410,7 @@ func (er ExternalRequest) SendExternalRequest(name string, data interface{}) (in
 				Name:         name,
 				Path:         fmt.Sprintf("%v/v2/payment/create", config.Microservices.Payment),
 				Method:       "POST",
-				SuccessCode:  200,
+				SuccessCode:  201,
 				DecodeMethod: JsonDecodeMethod,
 				RequestData:  data,
 				Logger:       er.Logger,
@@ -426,6 +427,17 @@ func (er ExternalRequest) SendExternalRequest(name string, data interface{}) (in
 				Logger:       er.Logger,
 			}
 			return obj.ListPayment()
+		case "signup_user":
+			obj := auth.RequestObj{
+				Name:         name,
+				Path:         fmt.Sprintf("%v/v2/auth/signup", config.Microservices.Auth),
+				Method:       "POST",
+				SuccessCode:  201,
+				DecodeMethod: JsonDecodeMethod,
+				RequestData:  data,
+				Logger:       er.Logger,
+			}
+			return obj.SignupUser()
 		default:
 			return nil, fmt.Errorf("request not found")
 		}

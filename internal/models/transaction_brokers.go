@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"net/http"
 	"time"
 
@@ -21,6 +22,15 @@ type TransactionBroker struct {
 	IsBuyerAccepted     bool      `gorm:"column:is_buyer_accepted; type:bool; default:false" json:"is_buyer_accepted"`
 }
 
+type UpdateTransactionBrokerRequest struct {
+	TransactionID      string `json:"transaction_id" validate:"required" pgvalidate:"exists=transaction$transactions$transaction_id"`
+	BrokerCharge       string `json:"broker_charge"`
+	BrokerChargeBearer string `json:"broker_charge_bearer"`
+	BrokerChargeType   string `json:"broker_charge_type"`
+	IsSellerAccepted   *bool  `json:"is_seller_accepted"`
+	IsBuyerAccepted    *bool  `json:"is_buyer_accepted"`
+}
+
 func (t *TransactionBroker) GetTransactionBrokerByTransactionID(db *gorm.DB) (int, error) {
 	err, nilErr := postgresql.SelectOneFromDb(db, &t, "transaction_id = ?", t.TransactionID)
 	if nilErr != nil {
@@ -31,4 +41,17 @@ func (t *TransactionBroker) GetTransactionBrokerByTransactionID(db *gorm.DB) (in
 		return http.StatusInternalServerError, err
 	}
 	return http.StatusOK, nil
+}
+
+func (t *TransactionBroker) UpdateAllFields(db *gorm.DB) error {
+	_, err := postgresql.SaveAllFields(db, &t)
+	return err
+}
+
+func (t *TransactionBroker) CreateTransactionBroker(db *gorm.DB) error {
+	err := postgresql.CreateOneRecord(db, &t)
+	if err != nil {
+		return fmt.Errorf("transaction broker creation failed: %v", err.Error())
+	}
+	return nil
 }
