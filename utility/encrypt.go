@@ -1,7 +1,9 @@
 package utility
 
 import (
+	"crypto/md5"
 	"crypto/sha1"
+	"encoding/hex"
 	"fmt"
 
 	"golang.org/x/crypto/bcrypt"
@@ -25,4 +27,9 @@ func ShaHash(str string) (string, error) {
 
 	getSha1 := passSha1.Sum(nil)
 	return fmt.Sprintf("%x", getSha1), nil
+}
+
+func Md5(text string) string {
+	hash := md5.Sum([]byte(text))
+	return hex.EncodeToString(hash[:])
 }

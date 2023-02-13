@@ -10,6 +10,7 @@ type Configuration struct {
 	Appruve       Appruve
 	Rave          Rave
 	IPStack       IPStack
+	OnePipe       OnePipe
 }
 
 type BaseConfig struct {
@@ -95,6 +96,11 @@ type BaseConfig struct {
 
 	IPSTACK_KEY      string `mapstructure:"IPSTACK_KEY"`
 	IPSTACK_BASE_URL string `mapstructure:"IPSTACK_BASE_URL"`
+
+	ONEPIPE_API_KEY           string `mapstructure:"ONEPIPE_API_KEY"`
+	ONEPIPE_SECRET_KEY        string `mapstructure:"ONEPIPE_SECRET_KEY"`
+	ONEPIPE_BASE_URL          string `mapstructure:"ONEPIPE_BASE_URL"`
+	ONEPIPE_VESICASH_BASE_URL string `mapstructure:"ONEPIPE_VESICASH_BASE_URL"`
 }
 
 func (config *BaseConfig) SetupConfigurationn() *Configuration {
@@ -191,6 +197,12 @@ func (config *BaseConfig) SetupConfigurationn() *Configuration {
 		IPStack: IPStack{
 			Key:     config.IPSTACK_KEY,
 			BaseUrl: config.IPSTACK_BASE_URL,
+		},
+		OnePipe: OnePipe{
+			ApiKey:          config.ONEPIPE_API_KEY,
+			SecretKey:       config.ONEPIPE_SECRET_KEY,
+			BaseUrl:         config.ONEPIPE_BASE_URL,
+			VesicashBaseUrl: config.ONEPIPE_VESICASH_BASE_URL,
 		},
 	}
 }
