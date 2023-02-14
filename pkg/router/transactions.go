@@ -28,6 +28,12 @@ func Transaction(r *gin.Engine, ApiVersion string, validator *validator.Validate
 		transactionsAuthUrl.DELETE("/delete/:id", transaction.DeleteTransaction)
 		transactionsAuthUrl.POST("/listByUser", transaction.ListTransactionsByUser)
 		transactionsAuthUrl.GET("list/archived", transaction.ListArchivedTransactions)
+		transactionsAuthUrl.POST("/send", transaction.SendTransaction)
+		transactionsAuthUrl.POST("/dispute", transaction.CreateDispute)
+		transactionsAuthUrl.GET("/dispute/fetch/:transaction_id", transaction.GetDisputeByTransactionID)
+		transactionsAuthUrl.PATCH("/dispute/update", transaction.UpdateDispute)
+		transactionsAuthUrl.GET("/list/user_disputes", transaction.GetDisputeByUser)
+
 	}
 
 	transactionsApiUrl := r.Group(fmt.Sprintf("%v/transactions", ApiVersion), middleware.Authorize(db, extReq, middleware.ApiType))
@@ -41,6 +47,11 @@ func Transaction(r *gin.Engine, ApiVersion string, validator *validator.Validate
 		transactionsApiUrl.PATCH("/parties/update-status", transaction.UpdateTransactionPartyStatus)
 		transactionsApiUrl.POST("/assign/buyer", transaction.AssignTransactionBuyer)
 		transactionsApiUrl.POST("/broker/update", transaction.UpdateTransactionBroker)
+		transactionsApiUrl.POST("/check-amount", transaction.CheckTransactionAmount)
+		transactionsApiUrl.POST("/accept", transaction.AcceptTransaction)
+		transactionsApiUrl.POST("/reject", transaction.RejectTransaction)
+		transactionsApiUrl.POST("/reject_delivery", transaction.RejectTransactionDelivery)
+
 	}
 
 	transactionsAppUrl := r.Group(fmt.Sprintf("%v/transactions", ApiVersion), middleware.Authorize(db, extReq, middleware.AppType))

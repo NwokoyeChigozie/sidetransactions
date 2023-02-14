@@ -181,6 +181,34 @@ func CreateTransactionService(extReq request.ExternalRequest, logger *utility.Lo
 	}, http.StatusOK, nil
 }
 
+func CheckTransactionAmountService(extReq request.ExternalRequest, logger *utility.Logger, db postgresql.Databases, transactionID string) (string, int, error) {
+	var (
+		transaction = models.Transaction{TransactionID: transactionID}
+	)
+	code, err := transaction.GetTransactionByTransactionID(db.Transaction)
+	if err != nil {
+		return "", code, err
+	}
+
+	transactionResponse, code, err := ListTransactionsByIDService(extReq, logger, db, transactionID)
+	if err != nil {
+		return "", code, err
+	}
+
+	transactionAmountToBePaid := transactionResponse.TotalAmount
+	totalAmountPaid := transaction.AmountPaid + transaction.EscrowCharge
+	diff := int(totalAmountPaid - transactionAmountToBePaid)
+
+	if diff > 0 {
+		return "overpaid", http.StatusOK, nil
+	} else if diff < 0 {
+		return "underpaid", http.StatusOK, nil
+	} else {
+		return "paid", http.StatusOK, nil
+	}
+
+}
+
 func getEscrowCharge(businessCharge external_models.BusinessCharge, totalAmountForMilestones float64) float64 {
 	var (
 		charge float64 = 0

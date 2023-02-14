@@ -73,6 +73,13 @@ type EditTransactionRequest struct {
 	Currency         string  `json:"currency"`
 	GracePeriod      string  `json:"grace_period"`
 }
+type OnlyTransactionIDRequiredRequest struct {
+	TransactionID string `json:"transaction_id" validate:"required" pgvalidate:"exists=transaction$transactions$transaction_id"`
+}
+type RejectTransactionRequest struct {
+	TransactionID string `json:"transaction_id" validate:"required" pgvalidate:"exists=transaction$transactions$transaction_id"`
+	Reason        string `json:"reason"`
+}
 
 type Party struct {
 	AccountID    int              `json:"account_id"`
