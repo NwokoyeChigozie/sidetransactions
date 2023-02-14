@@ -12,6 +12,7 @@ func AuthMigrationModels() []interface{} {
 		models.TransactionDispute{},
 		models.TransactionFile{},
 		models.TransactionParty{},
+		models.TransactionsRejected{},
 		models.Transaction{},
 	}
 }

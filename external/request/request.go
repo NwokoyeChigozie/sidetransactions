@@ -67,6 +67,12 @@ var (
 	CreatePayment      string = "create_payment"
 	ListPayment        string = "list_payment"
 	SignupUser         string = "signup_user"
+
+	SendNewTransactionNotification               string = "send_new_transaction_notification"
+	SendTransactionAcceptedNotification          string = "send_transaction_accepted_notification"
+	SendTransactionRejectedNotification          string = "send_transaction_rejected_notification"
+	SendTransactionDeliveredRejectedNotification string = "send_transaction_delivered_rejected_notification"
+	SendDisputeOpenedNotification                string = "send_dispute_opened_notification"
 )
 
 func (er ExternalRequest) SendExternalRequest(name string, data interface{}) (interface{}, error) {
@@ -438,6 +444,61 @@ func (er ExternalRequest) SendExternalRequest(name string, data interface{}) (in
 				Logger:       er.Logger,
 			}
 			return obj.SignupUser()
+		case "send_new_transaction_notification":
+			obj := notification.RequestObj{
+				Name:         name,
+				Path:         fmt.Sprintf("%v/email/send/new_transaction", config.Microservices.Notification),
+				Method:       "POST",
+				SuccessCode:  200,
+				DecodeMethod: JsonDecodeMethod,
+				RequestData:  data,
+				Logger:       er.Logger,
+			}
+			return obj.SendNewTransactionNotification()
+		case "send_transaction_accepted_notification":
+			obj := notification.RequestObj{
+				Name:         name,
+				Path:         fmt.Sprintf("%v/email/send/transaction_accepted", config.Microservices.Notification),
+				Method:       "POST",
+				SuccessCode:  200,
+				DecodeMethod: JsonDecodeMethod,
+				RequestData:  data,
+				Logger:       er.Logger,
+			}
+			return obj.SendTransactionAcceptedNotification()
+		case "send_transaction_rejected_notification":
+			obj := notification.RequestObj{
+				Name:         name,
+				Path:         fmt.Sprintf("%v/email/send/transaction_rejected", config.Microservices.Notification),
+				Method:       "POST",
+				SuccessCode:  200,
+				DecodeMethod: JsonDecodeMethod,
+				RequestData:  data,
+				Logger:       er.Logger,
+			}
+			return obj.SendTransactionRejectedNotification()
+		case "send_transaction_delivered_rejected_notification":
+			obj := notification.RequestObj{
+				Name:         name,
+				Path:         fmt.Sprintf("%v/email/send/transaction_delivered_rejected", config.Microservices.Notification),
+				Method:       "POST",
+				SuccessCode:  200,
+				DecodeMethod: JsonDecodeMethod,
+				RequestData:  data,
+				Logger:       er.Logger,
+			}
+			return obj.SendTransactionDeliveredRejectedNotification()
+		case "send_dispute_opened_notification":
+			obj := notification.RequestObj{
+				Name:         name,
+				Path:         fmt.Sprintf("%v/email/send/dispute_opened", config.Microservices.Notification),
+				Method:       "POST",
+				SuccessCode:  200,
+				DecodeMethod: JsonDecodeMethod,
+				RequestData:  data,
+				Logger:       er.Logger,
+			}
+			return obj.SendDisputeOpenedNotification()
 		default:
 			return nil, fmt.Errorf("request not found")
 		}

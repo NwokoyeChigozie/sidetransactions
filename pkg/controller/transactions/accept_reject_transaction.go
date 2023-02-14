@@ -10,9 +10,9 @@ import (
 	"github.com/vesicash/transactions-ms/utility"
 )
 
-func (base *Controller) CreateTransaction(c *gin.Context) {
+func (base *Controller) AcceptTransaction(c *gin.Context) {
 	var (
-		req models.CreateTransactionRequest
+		req models.OnlyTransactionIDRequiredRequest
 	)
 
 	err := c.ShouldBind(&req)
@@ -44,21 +44,21 @@ func (base *Controller) CreateTransaction(c *gin.Context) {
 		return
 	}
 
-	transaction, code, err := transactions.CreateTransactionService(base.ExtReq, base.Logger, base.Db, req, *user)
+	code, err := transactions.AcceptTransactionService(base.ExtReq, base.Logger, base.Db, req.TransactionID, *user)
 	if err != nil {
 		rd := utility.BuildErrorResponse(code, "error", err.Error(), err, nil)
 		c.JSON(code, rd)
 		return
 	}
 
-	rd := utility.BuildSuccessResponse(http.StatusCreated, "Created", transaction)
-	c.JSON(http.StatusCreated, rd)
+	rd := utility.BuildSuccessResponse(http.StatusOK, "Transaction Accepted", nil)
+	c.JSON(http.StatusOK, rd)
 
 }
 
-func (base *Controller) CheckTransactionAmount(c *gin.Context) {
+func (base *Controller) RejectTransaction(c *gin.Context) {
 	var (
-		req models.OnlyTransactionIDRequiredRequest
+		req models.RejectTransactionRequest
 	)
 
 	err := c.ShouldBind(&req)
@@ -83,14 +83,67 @@ func (base *Controller) CheckTransactionAmount(c *gin.Context) {
 		return
 	}
 
-	status, code, err := transactions.CheckTransactionAmountService(base.ExtReq, base.Logger, base.Db, req.TransactionID)
+	user := models.MyIdentity
+	if user == nil {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", "error retrieving authenticated user", err, nil)
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	code, err := transactions.RejectTransactionService(base.ExtReq, base.Logger, base.Db, req, *user)
 	if err != nil {
 		rd := utility.BuildErrorResponse(code, "error", err.Error(), err, nil)
 		c.JSON(code, rd)
 		return
 	}
 
-	rd := utility.BuildSuccessResponse(http.StatusOK, "successful", status)
-	c.JSON(http.StatusCreated, rd)
+	rd := utility.BuildSuccessResponse(http.StatusOK, "Transaction Rejected", nil)
+	c.JSON(http.StatusOK, rd)
+
+}
+
+func (base *Controller) RejectTransactionDelivery(c *gin.Context) {
+	var (
+		req models.RejectTransactionRequest
+	)
+
+	err := c.ShouldBind(&req)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", "Failed to parse request body", err, nil)
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	err = base.Validator.Struct(&req)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", "Validation failed", utility.ValidationResponse(err, base.Validator), nil)
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	vr := postgresql.ValidateRequestM{Logger: base.Logger, Test: base.ExtReq.Test}
+	err = vr.ValidateRequest(req)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", err.Error(), err, nil)
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	user := models.MyIdentity
+	if user == nil {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", "error retrieving authenticated user", err, nil)
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	code, err := transactions.RejectTransactionDeliveryService(base.ExtReq, base.Logger, base.Db, req, *user)
+	if err != nil {
+		rd := utility.BuildErrorResponse(code, "error", err.Error(), err, nil)
+		c.JSON(code, rd)
+		return
+	}
+
+	rd := utility.BuildSuccessResponse(http.StatusOK, "Delivery Rejected", nil)
+	c.JSON(http.StatusOK, rd)
 
 }
