@@ -41,6 +41,7 @@ func Transaction(r *gin.Engine, ApiVersion string, validator *validator.Validate
 		transactionsAuthUrl.POST("/approve/due_date_extension", transaction.ApproveDueDateExtension)
 		transactionsAuthUrl.POST("/satisfied", transaction.Satisfied)
 		transactionsAuthUrl.PATCH("/updateStatus", transaction.UpdateTransactionStatus)
+		transactionsAuthUrl.PATCH("/import", transaction.ImportTransactions)
 
 	}
 

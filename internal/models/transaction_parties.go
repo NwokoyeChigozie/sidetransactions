@@ -46,6 +46,13 @@ func (t *TransactionParty) CreateTransactionParty(db *gorm.DB) error {
 	}
 	return nil
 }
+func (t *TransactionParty) CreateTransactionsParties(db *gorm.DB, parties []TransactionParty) ([]TransactionParty, error) {
+	err := postgresql.CreateOneRecord(db, &parties)
+	if err != nil {
+		return parties, fmt.Errorf("transaction creation failed: %v", err.Error())
+	}
+	return parties, nil
+}
 
 func (t *TransactionParty) GetTransactionPartyByTransactionPartiesIDAndRole(db *gorm.DB) (int, error) {
 	err, nilErr := postgresql.SelectOneFromDb(db, &t, "transaction_parties_id = ? and role = ?", t.TransactionPartiesID, t.Role)

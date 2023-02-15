@@ -62,6 +62,22 @@ func GetUserWithAccountID(extReq request.ExternalRequest, accountID int) (extern
 	}
 	return us, nil
 }
+func GetUserWithEmail(extReq request.ExternalRequest, email string) (external_models.User, error) {
+	usItf, err := extReq.SendExternalRequest(request.GetUserReq, external_models.GetUserRequestModel{EmailAddress: email})
+	if err != nil {
+		return external_models.User{}, err
+	}
+
+	us, ok := usItf.(external_models.User)
+	if !ok {
+		return external_models.User{}, fmt.Errorf("response data format error")
+	}
+
+	if us.ID == 0 {
+		return external_models.User{}, fmt.Errorf("user not found")
+	}
+	return us, nil
+}
 func GetUserWithPhone(extReq request.ExternalRequest, phone string) (external_models.User, error) {
 	usItf, err := extReq.SendExternalRequest(request.GetUserReq, external_models.GetUserRequestModel{PhoneNumber: phone})
 	if err != nil {
@@ -127,6 +143,26 @@ func GetCountryByNameOrCode(extReq request.ExternalRequest, logger *utility.Logg
 
 	countryInterface, err := extReq.SendExternalRequest(request.GetCountry, external_models.GetCountryModel{
 		Name: NameOrCode,
+	})
+
+	if err != nil {
+		logger.Info(err.Error())
+		return external_models.Country{}, fmt.Errorf("Your country could not be resolved, please update your profile.")
+	}
+	country, ok := countryInterface.(external_models.Country)
+	if !ok {
+		return external_models.Country{}, fmt.Errorf("response data format error")
+	}
+	if country.ID == 0 {
+		return external_models.Country{}, fmt.Errorf("Your country could not be resolved, please update your profile")
+	}
+
+	return country, nil
+}
+func getCountryByCurrency(extReq request.ExternalRequest, logger *utility.Logger, currencyCode string) (external_models.Country, error) {
+
+	countryInterface, err := extReq.SendExternalRequest(request.GetCountry, external_models.GetCountryModel{
+		CurrencyCode: currencyCode,
 	})
 
 	if err != nil {
