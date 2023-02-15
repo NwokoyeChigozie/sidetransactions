@@ -16,3 +16,7 @@ type TransactionIDAccountIDRequestModel struct {
 	TransactionId string `json:"transaction_id"`
 	AccountId     uint   `json:"account_id"`
 }
+type DueDateExtensionProposalRequestModel struct {
+	TransactionId string `json:"transaction_id"`
+	Note          string `json:"note"`
+}
