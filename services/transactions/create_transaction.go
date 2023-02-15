@@ -514,36 +514,6 @@ func resolveTransactionFiles(files []models.File, transactionID string, accountI
 	return transactionFiles, nil
 }
 
-func GetTransactionStatus(index string) string {
-	dataMap := map[string]string{
-		"":        "Draft",
-		"sac":     "Sent - Awaiting Confirmation",
-		"sr":      "Sent - Rejected",
-		"af":      "Accepted - Funded",
-		"anf":     "Accepted - Not Funded",
-		"fr":      "Funded - Rejected",
-		"ip":      "In Progress",
-		"d":       "Delivered",
-		"da":      "Delivered - Accepted",
-		"dr":      "Delivered - Rejected",
-		"cdp":     "Closed - Disbursement Pending",
-		"cmdp":    "Closed - Manual Disbursement Pending",
-		"cdc":     "Closed - Disbursement Complete",
-		"cd":      "Closed - Disputed",
-		"cnf":     "Closed - Not Funded",
-		"closed":  "Closed",
-		"draft":   "Draft",
-		"active":  "Active",
-		"cr":      "Closed - Refunded",
-		"deleted": "Deleted",
-	}
-	status := dataMap[strings.ToLower(index)]
-	if status == "" {
-		status = dataMap[""]
-	}
-	return status
-}
-
 func validatePartiesAndMilestones(tType string, parties []models.Party, milestones []models.MileStone) error {
 	for _, v := range parties {
 		if v.Role == "" {

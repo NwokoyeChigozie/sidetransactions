@@ -33,6 +33,14 @@ func Transaction(r *gin.Engine, ApiVersion string, validator *validator.Validate
 		transactionsAuthUrl.GET("/dispute/fetch/:transaction_id", transaction.GetDisputeByTransactionID)
 		transactionsAuthUrl.PATCH("/dispute/update", transaction.UpdateDispute)
 		transactionsAuthUrl.GET("/list/user_disputes", transaction.GetDisputeByUser)
+		transactionsAuthUrl.POST("/accept", transaction.AcceptTransaction)
+		transactionsAuthUrl.POST("/delivered", transaction.TransactionDelivered)
+		transactionsAuthUrl.POST("/reject", transaction.RejectTransaction)
+		transactionsAuthUrl.POST("/reject_delivery", transaction.RejectTransactionDelivery)
+		transactionsAuthUrl.POST("/request/due_date_extension", transaction.RequestDueDateExtension)
+		transactionsAuthUrl.POST("/approve/due_date_extension", transaction.ApproveDueDateExtension)
+		transactionsAuthUrl.POST("/satisfied", transaction.Satisfied)
+		transactionsAuthUrl.PATCH("/updateStatus", transaction.UpdateTransactionStatus)
 
 	}
 
@@ -48,9 +56,10 @@ func Transaction(r *gin.Engine, ApiVersion string, validator *validator.Validate
 		transactionsApiUrl.POST("/assign/buyer", transaction.AssignTransactionBuyer)
 		transactionsApiUrl.POST("/broker/update", transaction.UpdateTransactionBroker)
 		transactionsApiUrl.POST("/check-amount", transaction.CheckTransactionAmount)
-		transactionsApiUrl.POST("/accept", transaction.AcceptTransaction)
-		transactionsApiUrl.POST("/reject", transaction.RejectTransaction)
-		transactionsApiUrl.POST("/reject_delivery", transaction.RejectTransactionDelivery)
+		transactionsApiUrl.POST("/escrowcharge", transaction.GetEscrowCharge)
+		transactionsApiUrl.GET("/rates", transaction.ListRates)
+		transactionsApiUrl.GET("/exchange-transaction/:account_id", transaction.ListExchangeTransactionByAccountID)
+		transactionsApiUrl.GET("exchange-transaction/:exchange_id/show", transaction.GetExchangeTransactionByID)
 
 	}
 

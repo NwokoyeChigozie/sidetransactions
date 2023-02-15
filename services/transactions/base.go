@@ -177,3 +177,58 @@ func SignupUserWithPhone(extReq request.ExternalRequest, phone string) (external
 	}
 	return us, nil
 }
+
+func GetTransactionStatus(index string) string {
+	dataMap := map[string]string{
+		"":        "Draft",
+		"sac":     "Sent - Awaiting Confirmation",
+		"sr":      "Sent - Rejected",
+		"af":      "Accepted - Funded",
+		"anf":     "Accepted - Not Funded",
+		"fr":      "Funded - Rejected",
+		"ip":      "In Progress",
+		"d":       "Delivered",
+		"da":      "Delivered - Accepted",
+		"dr":      "Delivered - Rejected",
+		"cdp":     "Closed - Disbursement Pending",
+		"cmdp":    "Closed - Manual Disbursement Pending",
+		"cdc":     "Closed - Disbursement Complete",
+		"cd":      "Closed - Disputed",
+		"cnf":     "Closed - Not Funded",
+		"closed":  "Closed",
+		"draft":   "Draft",
+		"active":  "Active",
+		"cr":      "Closed - Refunded",
+		"deleted": "Deleted",
+	}
+	status := dataMap[strings.ToLower(index)]
+	if status == "" {
+		status = dataMap[""]
+	}
+	return status
+}
+
+func CheckTransactionStatus(index string) bool {
+	dataMap := map[string]string{
+		"sac":     "Sent - Awaiting Confirmation",
+		"sr":      "Sent - Rejected",
+		"af":      "Accepted - Funded",
+		"anf":     "Accepted - Not Funded",
+		"fr":      "Funded - Rejected",
+		"ip":      "In Progress",
+		"d":       "Delivered",
+		"da":      "Delivered - Accepted",
+		"dr":      "Delivered - Rejected",
+		"cdp":     "Closed - Disbursement Pending",
+		"cmdp":    "Closed - Manual Disbursement Pending",
+		"cdc":     "Closed - Disbursement Complete",
+		"cd":      "Closed - Disputed",
+		"cnf":     "Closed - Not Funded",
+		"closed":  "Closed",
+		"draft":   "Draft",
+		"active":  "Active",
+		"cr":      "Closed - Refunded",
+		"deleted": "Deleted",
+	}
+	return dataMap[strings.ToLower(index)] != ""
+}

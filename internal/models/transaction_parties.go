@@ -30,7 +30,7 @@ type UpdateTransactionPartiesRequest struct {
 }
 type UpdateTransactionPartyStatusRequest struct {
 	TransactionID string `json:"transaction_id" validate:"required" pgvalidate:"exists=transaction$transactions$transaction_id"`
-	AccountID     int    `json:"account_id" validate:"required"  pgvalidate:"exists=auth$business_profiles$account_id"`
+	AccountID     int    `json:"account_id" validate:"required"  pgvalidate:"exists=auth$users$account_id"`
 	Status        string `json:"status" validate:"required"`
 }
 type AssignTransactionBuyerRequest struct {

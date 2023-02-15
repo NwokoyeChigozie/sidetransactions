@@ -73,6 +73,10 @@ var (
 	SendTransactionRejectedNotification          string = "send_transaction_rejected_notification"
 	SendTransactionDeliveredRejectedNotification string = "send_transaction_delivered_rejected_notification"
 	SendDisputeOpenedNotification                string = "send_dispute_opened_notification"
+	SendTransactionDeliveredNotification         string = "send_transaction_delivered_notification"
+	SendDueDateProposalNotification              string = "send_due_date_proposal_notification"
+	SendDueDateExtendedNotification              string = "send_due_date_extended_notification"
+	SendTransactionDeliveredAcceptedNotification string = "send_transaction_delivered_accepted_notification"
 )
 
 func (er ExternalRequest) SendExternalRequest(name string, data interface{}) (interface{}, error) {
@@ -499,6 +503,50 @@ func (er ExternalRequest) SendExternalRequest(name string, data interface{}) (in
 				Logger:       er.Logger,
 			}
 			return obj.SendDisputeOpenedNotification()
+		case "send_transaction_delivered_notification":
+			obj := notification.RequestObj{
+				Name:         name,
+				Path:         fmt.Sprintf("%v/email/send/transaction_delivered", config.Microservices.Notification),
+				Method:       "POST",
+				SuccessCode:  200,
+				DecodeMethod: JsonDecodeMethod,
+				RequestData:  data,
+				Logger:       er.Logger,
+			}
+			return obj.SendTransactionDeliveredNotification()
+		case "send_due_date_proposal_notification":
+			obj := notification.RequestObj{
+				Name:         name,
+				Path:         fmt.Sprintf("%v/email/send/due_date_proposal", config.Microservices.Notification),
+				Method:       "POST",
+				SuccessCode:  200,
+				DecodeMethod: JsonDecodeMethod,
+				RequestData:  data,
+				Logger:       er.Logger,
+			}
+			return obj.SendDueDateProposalNotification()
+		case "send_due_date_extended_notification":
+			obj := notification.RequestObj{
+				Name:         name,
+				Path:         fmt.Sprintf("%v/email/send/due_date_extended", config.Microservices.Notification),
+				Method:       "POST",
+				SuccessCode:  200,
+				DecodeMethod: JsonDecodeMethod,
+				RequestData:  data,
+				Logger:       er.Logger,
+			}
+			return obj.SendDueDateExtendedNotification()
+		case "send_transaction_delivered_accepted_notification":
+			obj := notification.RequestObj{
+				Name:         name,
+				Path:         fmt.Sprintf("%v/email/send/transaction_delivered_accepted", config.Microservices.Notification),
+				Method:       "POST",
+				SuccessCode:  200,
+				DecodeMethod: JsonDecodeMethod,
+				RequestData:  data,
+				Logger:       er.Logger,
+			}
+			return obj.SendTransactionDeliveredAcceptedNotification()
 		default:
 			return nil, fmt.Errorf("request not found")
 		}

@@ -80,6 +80,25 @@ type RejectTransactionRequest struct {
 	TransactionID string `json:"transaction_id" validate:"required" pgvalidate:"exists=transaction$transactions$transaction_id"`
 	Reason        string `json:"reason"`
 }
+type TransactionDeliveredRequest struct {
+	TransactionID string `json:"transaction_id" validate:"required" pgvalidate:"exists=transaction$transactions$transaction_id"`
+	MilestoneID   string `json:"milestone_id" validate:"required" pgvalidate:"exists=transaction$transactions$milestone_id"`
+}
+type UpdateTransactionStatusRequest struct {
+	TransactionID string `json:"transaction_id" validate:"required" pgvalidate:"exists=transaction$transactions$transaction_id"`
+	MilestoneID   string `json:"milestone_id" validate:"required" pgvalidate:"exists=transaction$transactions$milestone_id"`
+	Status        string `json:"status"`
+}
+type ApproveDueDateExtensionRequest struct {
+	TransactionID    string `json:"transaction_id" validate:"required" pgvalidate:"exists=transaction$transactions$transaction_id"`
+	MilestoneID      string `json:"milestone_id" validate:"required" pgvalidate:"exists=transaction$transactions$milestone_id"`
+	DueDate          string `json:"due_date" validate:"required"`
+	InspectionPeriod int    `json:"inspection_period" validate:"required"`
+}
+type DueDateExtensionRequest struct {
+	TransactionID string `json:"transaction_id" validate:"required" pgvalidate:"exists=transaction$transactions$transaction_id"`
+	Note          string `json:"note" validate:"required" `
+}
 
 type Party struct {
 	AccountID    int              `json:"account_id"`
@@ -182,6 +201,17 @@ func (t *Transaction) UpdateAllFields(db *gorm.DB) error {
 
 func (t *Transaction) GetTransactionByTransactionID(db *gorm.DB) (int, error) {
 	err, nilErr := postgresql.SelectOneFromDb(db, &t, "transaction_id = ?", t.TransactionID)
+	if nilErr != nil {
+		return http.StatusBadRequest, nilErr
+	}
+
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
+	return http.StatusOK, nil
+}
+func (t *Transaction) GetTransactionByTransactionIDAndMilestoneID(db *gorm.DB) (int, error) {
+	err, nilErr := postgresql.SelectOneFromDb(db, &t, "transaction_id = ? and milestone_id = ?", t.TransactionID, t.MilestoneID)
 	if nilErr != nil {
 		return http.StatusBadRequest, nilErr
 	}
