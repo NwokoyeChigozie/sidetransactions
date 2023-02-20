@@ -34,7 +34,7 @@ func UpdateTransactionStatusService(extReq request.ExternalRequest, logger *util
 
 	if req.Status == "sr" {
 		mainTransaction := models.Transaction{TransactionID: req.TransactionID}
-		code, err := mainTransaction.GetTransactionByTransactionIDAndMilestoneID(db.Transaction)
+		code, err := mainTransaction.GetTransactionByTransactionID(db.Transaction)
 		if err != nil {
 			return code, err
 		}
@@ -64,7 +64,7 @@ func UpdateTransactionStatusService(extReq request.ExternalRequest, logger *util
 			milestoneName = ""
 		}
 		transactionMessage = fmt.Sprintf("has rejected delivered %s transaction", milestoneName)
-	} else if status == GetTransactionStatus("dr") {
+	} else if status == GetTransactionStatus("d") {
 		if transaction.Type == "oneoff" {
 			tType = "current"
 		} else {

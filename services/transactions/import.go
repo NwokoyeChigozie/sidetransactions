@@ -6,7 +6,6 @@ import (
 	"io"
 	"math"
 	"net/http"
-	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -21,8 +20,9 @@ import (
 
 func ImportTransactions(c *gin.Context, extReq request.ExternalRequest, logger *utility.Logger, db postgresql.Databases, user external_models.User) ([]models.Transaction, int, error) {
 	var (
-		columnLength = 10
+		columnLength = 11
 		transactions = []models.Transaction{}
+		mg512        = 512
 	)
 	code, err := ValidateUploadRequest(c, logger)
 	if err != nil {
@@ -42,27 +42,22 @@ func ImportTransactions(c *gin.Context, extReq request.ExternalRequest, logger *
 
 	defer src.Close()
 
-	// Create a temporary file
-	dst, err := os.CreateTemp("", "upload-*.csv")
+	buff := make([]byte, mg512)
+
+	_, err = src.Read(buff)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return []models.Transaction{}, http.StatusInternalServerError, err
 	}
 
-	defer os.Remove(dst.Name())
-	defer dst.Close()
-
-	// Copy the uploaded file to the temporary file
-	_, err = io.Copy(dst, src)
+	_, err = src.Seek(0, io.SeekStart)
 	if err != nil {
 		return []models.Transaction{}, http.StatusInternalServerError, err
 	}
 
 	// Parse the CSV file
-	reader := csv.NewReader(dst)
+	reader := csv.NewReader(src)
 	rows, err := reader.ReadAll()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return []models.Transaction{}, http.StatusInternalServerError, err
 	}
 
@@ -197,6 +192,7 @@ func ImportTransactions(c *gin.Context, extReq request.ExternalRequest, logger *
 				if err != nil {
 					return transactions, http.StatusInternalServerError, err
 				}
+				transactions = append(transactions, transaction)
 
 			}
 
@@ -212,7 +208,7 @@ func ValidateUploadRequest(c *gin.Context, logger *utility.Logger) (int, error) 
 		maxSize          = 2097152
 		maxSizeString    = fmt.Sprintf("%vMB", int(math.Floor(float64(maxSize)/1000000)))
 		mg512            = 512
-		allowedExtension = []string{"csv"}
+		allowedExtension = []string{".csv"}
 	)
 
 	fileHeader, err := c.FormFile("file")

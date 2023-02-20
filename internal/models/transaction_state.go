@@ -3,6 +3,7 @@ package models
 import (
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/vesicash/transactions-ms/pkg/repository/storage/postgresql"
@@ -20,7 +21,7 @@ type TransactionState struct {
 }
 
 func (t *TransactionState) GetTransactionStateByTransactionIDAndStatus(db *gorm.DB) (int, error) {
-	err, nilErr := postgresql.SelectOneFromDb(db, &t, "transaction_id = ? and status=?", t.TransactionID, t.Status)
+	err, nilErr := postgresql.SelectOneFromDb(db, &t, "transaction_id = ? and LOWER(status)=?", t.TransactionID, strings.ToLower(t.Status))
 	if nilErr != nil {
 		return http.StatusBadRequest, nilErr
 	}

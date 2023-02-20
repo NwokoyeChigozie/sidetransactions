@@ -173,7 +173,7 @@ func ListTransactionsService(extReq request.ExternalRequest, logger *utility.Log
 
 	if req.Status != "" {
 		transaction.Status = req.Status
-	} else {
+	} else if req.StatusCode != "" {
 		transaction.Status = GetTransactionStatus(req.StatusCode)
 	}
 
@@ -206,7 +206,7 @@ func ListTransactionsByBusinessService(extReq request.ExternalRequest, logger *u
 
 	if req.Status != "" {
 		transaction.Status = req.Status
-	} else {
+	} else if req.StatusCode != "" {
 		transaction.Status = GetTransactionStatus(req.StatusCode)
 	}
 
@@ -248,7 +248,7 @@ func ListByBusinessFromMondayToThursdayService(extReq request.ExternalRequest, l
 
 	if req.Status != "" {
 		transaction.Status = req.Status
-	} else {
+	} else if req.StatusCode != "" {
 		transaction.Status = GetTransactionStatus(req.StatusCode)
 	}
 
@@ -296,13 +296,17 @@ func ListTransactionsByUserService(extReq request.ExternalRequest, logger *utili
 	}
 
 	for _, tp := range transactionParties {
-		lTransaction := models.Transaction{TransactionID: tp.TransactionID, IsPaylinked: req.Paylinked, Status: GetTransactionStatus(req.StatusCode)}
+		statusC := ""
+		if req.StatusCode != "" {
+			statusC = GetTransactionStatus(req.StatusCode)
+		}
+		lTransaction := models.Transaction{TransactionID: tp.TransactionID, IsPaylinked: req.Paylinked, Status: statusC}
 		code, err := lTransaction.GetLatestByAndQueries(db.Transaction, req.Paylinked, "")
 		if err != nil {
 			if code == http.StatusInternalServerError {
 				return []models.TransactionByIDResponse{}, postgresql.PaginationResponse{}, code, err
 			}
-			logger.Error("error getting lastest transaction byy transaction id", err.Error())
+			logger.Error("error getting latest transaction by transaction id", err.Error())
 		} else {
 			transactions = append(transactions, lTransaction)
 		}

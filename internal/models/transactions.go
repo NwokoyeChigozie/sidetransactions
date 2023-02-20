@@ -3,6 +3,7 @@ package models
 import (
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/vesicash/transactions-ms/pkg/repository/storage/postgresql"
@@ -20,7 +21,7 @@ type Transaction struct {
 	Type             string    `gorm:"column:type; type:varchar(255); not null; comment: Transaction Type: product, service[oneoff], service[milestone]" json:"type"`
 	Description      string    `gorm:"column:description; type:text; not null; comment: " json:"description"`
 	Amount           float64   `gorm:"column:amount; type:decimal(20,2); not null; comment:" json:"amount"`
-	Status           string    `gorm:"column:status; type:varchar(255); default: draft; comment: Transaction Status" json:"status"`
+	Status           string    `gorm:"column:status; type:varchar(255); default: Draft; comment: Transaction Status" json:"status"`
 	Quantity         int       `gorm:"column:quantity; type:int" json:"quantity"`
 	InspectionPeriod string    `gorm:"column:inspection_period; type:varchar(255); comment: " json:"inspection_period"`
 	DueDate          string    `gorm:"column:due_date; type:varchar(255); comment: " json:"due_date"`
@@ -270,7 +271,7 @@ func (t *Transaction) GetAllByAndQueries(db *gorm.DB, usePaylinked bool, Created
 		query = addQuery(query, fmt.Sprintf("business_id = %v", t.BusinessID), "AND")
 	}
 	if t.Status != "" {
-		query = addQuery(query, fmt.Sprintf("status = '%v'", t.Status), "AND")
+		query = addQuery(query, fmt.Sprintf("LOWER(status) = '%v'", strings.ToLower(t.Status)), "AND")
 	}
 
 	if usePaylinked {
@@ -306,7 +307,7 @@ func (t *Transaction) GetLatestByAndQueries(db *gorm.DB, usePaylinked bool, Crea
 		query = addQuery(query, fmt.Sprintf("business_id = %v", t.BusinessID), "AND")
 	}
 	if t.Status != "" {
-		query = addQuery(query, fmt.Sprintf("status = '%v'", t.Status), "AND")
+		query = addQuery(query, fmt.Sprintf("LOWER(status) = '%v'", strings.ToLower(t.Status)), "AND")
 	}
 
 	if usePaylinked {

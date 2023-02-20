@@ -192,13 +192,13 @@ func ListPayment(extReq request.ExternalRequest, transactionID string) (external
 	}
 
 	if payment.ID == 0 {
-		return external_models.ListPayment{}, fmt.Errorf("payment creation failed")
+		return external_models.ListPayment{}, fmt.Errorf("payment listing failed")
 	}
 	return payment, nil
 }
 
-func SignupUserWithPhone(extReq request.ExternalRequest, phone string) (external_models.User, error) {
-	usItf, err := extReq.SendExternalRequest(request.SignupUser, external_models.CreateUserRequestModel{PhoneNumber: phone})
+func SignupUserWithPhone(extReq request.ExternalRequest, phone, accountType string) (external_models.User, error) {
+	usItf, err := extReq.SendExternalRequest(request.SignupUser, external_models.CreateUserRequestModel{PhoneNumber: phone, AccountType: accountType})
 	if err != nil {
 		return external_models.User{}, err
 	}
@@ -207,6 +207,8 @@ func SignupUserWithPhone(extReq request.ExternalRequest, phone string) (external
 	if !ok {
 		return external_models.User{}, fmt.Errorf("response data format error")
 	}
+	fmt.Println("user", us)
+	fmt.Println("user.id", us.ID)
 
 	if us.ID == 0 {
 		return external_models.User{}, fmt.Errorf("user not found")

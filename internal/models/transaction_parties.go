@@ -3,6 +3,7 @@ package models
 import (
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/vesicash/transactions-ms/pkg/repository/storage/postgresql"
@@ -19,7 +20,7 @@ type TransactionParty struct {
 	DeletedAt            time.Time `gorm:"column:deleted_at" json:"deleted_at"`
 	CreatedAt            time.Time `gorm:"column:created_at; autoCreateTime" json:"created_at"`
 	UpdatedAt            time.Time `gorm:"column:updated_at; autoUpdateTime" json:"updated_at"`
-	RoleCapabilities     jsonmap   `gorm:"column:role_capabilities; type:varchar(250); default: '{\"view\"}'; comment: view|manage" json:"role_capabilities"`
+	RoleCapabilities     jsonmap   `gorm:"column:role_capabilities; type:varchar(250); default: '{\"can_view\":true,\"can_receive\":false,\"mark_as_done\":false,\"approve\":true}'; comment: view|manage" json:"role_capabilities"`
 	RoleDescription      string    `gorm:"column:role_description; type:text" json:"role_description"`
 	Status               string    `gorm:"column:status; type:varchar(255); not null;default:created" json:"status"`
 }
@@ -65,6 +66,17 @@ func (t *TransactionParty) GetTransactionPartyByTransactionPartiesIDAndRole(db *
 	}
 	return http.StatusOK, nil
 }
+func (t *TransactionParty) GetTransactionPartyByTransactionIDAndRole(db *gorm.DB) (int, error) {
+	err, nilErr := postgresql.SelectOneFromDb(db, &t, "transaction_id = ? and role = ?", t.TransactionID, t.Role)
+	if nilErr != nil {
+		return http.StatusBadRequest, nilErr
+	}
+
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
+	return http.StatusOK, nil
+}
 func (t *TransactionParty) GetTransactionPartyByTransactionIDAndAccountID(db *gorm.DB) (int, error) {
 	err, nilErr := postgresql.SelectOneFromDb(db, &t, "transaction_id = ? and account_id = ?", t.TransactionID, t.AccountID)
 	if nilErr != nil {
@@ -101,6 +113,9 @@ func (t *TransactionParty) GetAllByAndQueriesForUniqueValue(db *gorm.DB, Created
 		query   = ``
 	)
 
+	if t.AccountID != 0 {
+		query = addQuery(query, fmt.Sprintf("account_id = %v", t.AccountID), "AND")
+	}
 	if t.TransactionID != "" {
 		query = addQuery(query, fmt.Sprintf("transaction_id = '%v'", t.TransactionID), "AND")
 	}
@@ -114,7 +129,7 @@ func (t *TransactionParty) GetAllByAndQueriesForUniqueValue(db *gorm.DB, Created
 		query = addQuery(query, fmt.Sprintf("role = '%v'", t.Role), "AND")
 	}
 	if t.Status != "" {
-		query = addQuery(query, fmt.Sprintf("status = '%v'", t.Status), "AND")
+		query = addQuery(query, fmt.Sprintf("LOWER(status) = '%v'", strings.ToLower(t.Status)), "AND")
 	}
 
 	if CreatedAtInterval != "" {

@@ -20,9 +20,9 @@ type Pagination struct {
 	Limit int
 }
 type PaginationResponse struct {
-	CurrentPage int `json:"current_page"`
-	PageCount   int `json:"page_count"`
-	TotalCount  int `json:"total_count"`
+	CurrentPage     int `json:"current_page"`
+	PageCount       int `json:"page_count"`
+	TotalPagesCount int `json:"total_pages_count"`
 }
 
 func GetPagination(c *gin.Context) Pagination {
@@ -93,12 +93,12 @@ func SelectAllFromByGroup(db *gorm.DB, orderBy, order string, pagination *Pagina
 	}
 
 	var count int64
-	err := db.Model(receiver).Count(&count).Error
+	err := db.Model(receiver).Where(query, args...).Group(groupColumn + ", id").Count(&count).Error
 	if err != nil {
 		return PaginationResponse{
-			CurrentPage: pagination.Page,
-			PageCount:   pagination.Limit,
-			TotalCount:  0,
+			CurrentPage:     pagination.Page,
+			PageCount:       pagination.Limit,
+			TotalPagesCount: 0,
 		}, err
 	}
 
@@ -106,9 +106,9 @@ func SelectAllFromByGroup(db *gorm.DB, orderBy, order string, pagination *Pagina
 
 	tx := db.Limit(pagination.Limit).Offset((pagination.Page-1)*pagination.Limit).Order(orderBy+" "+order).Where(query, args...).Group(groupColumn + ", id").Find(receiver)
 	return PaginationResponse{
-		CurrentPage: pagination.Page,
-		PageCount:   int(tx.RowsAffected),
-		TotalCount:  totalPages,
+		CurrentPage:     pagination.Page,
+		PageCount:       int(tx.RowsAffected),
+		TotalPagesCount: totalPages,
 	}, tx.Error
 }
 
@@ -128,12 +128,12 @@ func SelectAllFromDbOrderByPaginated(db *gorm.DB, orderBy, order string, paginat
 	}
 
 	var count int64
-	err := db.Model(receiver).Count(&count).Error
+	err := db.Model(receiver).Where(query, args...).Count(&count).Error
 	if err != nil {
 		return PaginationResponse{
-			CurrentPage: pagination.Page,
-			PageCount:   pagination.Limit,
-			TotalCount:  0,
+			CurrentPage:     pagination.Page,
+			PageCount:       pagination.Limit,
+			TotalPagesCount: 0,
 		}, err
 	}
 
@@ -141,9 +141,9 @@ func SelectAllFromDbOrderByPaginated(db *gorm.DB, orderBy, order string, paginat
 
 	tx := db.Limit(pagination.Limit).Offset((pagination.Page-1)*pagination.Limit).Order(orderBy+" "+order).Where(query, args...).Find(receiver)
 	return PaginationResponse{
-		CurrentPage: pagination.Page,
-		PageCount:   int(tx.RowsAffected),
-		TotalCount:  totalPages,
+		CurrentPage:     pagination.Page,
+		PageCount:       int(tx.RowsAffected),
+		TotalPagesCount: totalPages,
 	}, tx.Error
 }
 

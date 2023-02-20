@@ -34,7 +34,7 @@ func CreateTransactionService(extReq request.ExternalRequest, logger *utility.Lo
 		transactionDisputeHandler = req.DisputeHandler
 	)
 	if businessID == 0 {
-		businessID = int(user.AccountID)
+		businessID = int(user.BusinessId)
 	}
 
 	if transactionDescription == "" {
