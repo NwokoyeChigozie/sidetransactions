@@ -48,8 +48,8 @@ func (base *Controller) GetExchangeTransactionByID(c *gin.Context) {
 
 	id, err := strconv.Atoi(idString)
 	if err != nil {
-		rd := utility.BuildErrorResponse(http.StatusInternalServerError, "error", "invalid echange id", err, nil)
-		c.JSON(http.StatusInternalServerError, rd)
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", "invalid echange id", err, nil)
+		c.JSON(http.StatusBadRequest, rd)
 		return
 	}
 

@@ -99,6 +99,28 @@ func (er ExternalRequest) SendExternalRequest(name string, data interface{}) (in
 		return auth_mocks.InitBusinessCharge(er.Logger, data)
 	case "create_payment":
 		return payment_mocks.CreatePayment(er.Logger, data)
+	case "list_payment":
+		return payment_mocks.ListPayment(er.Logger, data)
+	case "signup_user":
+		return auth_mocks.SignupUser(er.Logger, data)
+	case "send_new_transaction_notification":
+		return notification_mocks.SendNewTransactionNotification(er.Logger, data)
+	case "send_transaction_accepted_notification":
+		return notification_mocks.SendTransactionAcceptedNotification(er.Logger, data)
+	case "send_transaction_rejected_notification":
+		return notification_mocks.SendTransactionRejectedNotification(er.Logger, data)
+	case "send_transaction_delivered_rejected_notification":
+		return notification_mocks.SendTransactionDeliveredRejectedNotification(er.Logger, data)
+	case "send_dispute_opened_notification":
+		return notification_mocks.SendDisputeOpenedNotification(er.Logger, data)
+	case "send_transaction_delivered_notification":
+		return notification_mocks.SendTransactionDeliveredNotification(er.Logger, data)
+	case "send_due_date_proposal_notification":
+		return notification_mocks.SendDueDateProposalNotification(er.Logger, data)
+	case "send_due_date_extended_notification":
+		return notification_mocks.SendDueDateExtendedNotification(er.Logger, data)
+	case "send_transaction_delivered_accepted_notification":
+		return notification_mocks.SendTransactionDeliveredAcceptedNotification(er.Logger, data)
 	default:
 		return nil, fmt.Errorf("request not found")
 	}

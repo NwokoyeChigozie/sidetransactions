@@ -32,6 +32,14 @@ type ExchangeTransactionWithRate struct {
 	Date            string  `json:"date"`
 }
 
+func (t *ExchangeTransaction) CreateExchangeTransaction(db *gorm.DB) error {
+	err := postgresql.CreateOneRecord(db, &t)
+	if err != nil {
+		return fmt.Errorf("exchange transaction creation failed: %v", err.Error())
+	}
+	return nil
+}
+
 func (e *ExchangeTransaction) GetAllByAccountID(db *gorm.DB) ([]ExchangeTransaction, error) {
 	details := []ExchangeTransaction{}
 	err := postgresql.SelectAllFromDb(db, "desc", &details, "account_id = ?", e.AccountID)

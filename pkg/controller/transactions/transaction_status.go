@@ -51,6 +51,6 @@ func (base *Controller) UpdateTransactionStatus(c *gin.Context) {
 	}
 
 	rd := utility.BuildSuccessResponse(http.StatusOK, "Transaction Status Updated", nil)
-	c.JSON(http.StatusCreated, rd)
+	c.JSON(http.StatusOK, rd)
 
 }

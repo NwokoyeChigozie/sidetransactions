@@ -111,7 +111,7 @@ func CreateTransactionUser(t *testing.T, db postgresql.Databases, validator *val
 				},
 			},
 			{
-				AccountID:    utility.GetRandomNumbersInRange(1000000000, 9999999999),
+				AccountID:    accountID,
 				EmailAddress: "sus@gmail.com",
 				PhoneNumber:  "+2349876473847",
 				Role:         "seller",
