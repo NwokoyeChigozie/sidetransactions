@@ -50,7 +50,7 @@ func SatisfiedService(extReq request.ExternalRequest, logger *utility.Logger, db
 	}
 
 	buyerParty := models.TransactionParty{TransactionID: transactionID, Role: "buyer"}
-	code, err = buyerParty.GetTransactionPartyByTransactionPartiesIDAndRole(db.Transaction)
+	code, err = buyerParty.GetTransactionPartyByTransactionIDAndRole(db.Transaction)
 	if err != nil {
 		return code, fmt.Errorf("buyer not found: %v", err.Error())
 	}

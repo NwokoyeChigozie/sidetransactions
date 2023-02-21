@@ -1,6 +1,7 @@
 package utility
 
 import (
+	"fmt"
 	"reflect"
 	"strconv"
 	"time"
@@ -12,6 +13,21 @@ func FormatDate(date, currentISOFormat, newISOFormat string) (string, error) {
 		return date, err
 	}
 	return t.Format(newISOFormat), nil
+}
+func FormatDateSpecialCase(t time.Time) string {
+	day := t.Day()
+	var suffix string
+	switch {
+	case day%10 == 1 && day != 11:
+		suffix = "st"
+	case day%10 == 2 && day != 12:
+		suffix = "nd"
+	case day%10 == 3 && day != 13:
+		suffix = "rd"
+	default:
+		suffix = "th"
+	}
+	return t.Format(fmt.Sprintf("2%s January, 2006", suffix))
 }
 
 func GetUnixTime(date, currentISOFormat, newISOFormat string) (int, error) {

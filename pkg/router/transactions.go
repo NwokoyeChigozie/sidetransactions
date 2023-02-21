@@ -27,7 +27,7 @@ func Transaction(r *gin.Engine, ApiVersion string, validator *validator.Validate
 		transactionsAuthUrl.PATCH("/edit", transaction.EditTransaction)
 		transactionsAuthUrl.DELETE("/delete/:id", transaction.DeleteTransaction)
 		transactionsAuthUrl.POST("/listByUser", transaction.ListTransactionsByUser)
-		transactionsAuthUrl.GET("list/archived", transaction.ListArchivedTransactions)
+		transactionsAuthUrl.GET("/list/archived", transaction.ListArchivedTransactions)
 		transactionsAuthUrl.POST("/send", transaction.SendTransaction)
 		transactionsAuthUrl.POST("/dispute", transaction.CreateDispute)
 		transactionsAuthUrl.GET("/dispute/fetch/:transaction_id", transaction.GetDisputeByTransactionID)
@@ -41,6 +41,7 @@ func Transaction(r *gin.Engine, ApiVersion string, validator *validator.Validate
 		transactionsAuthUrl.POST("/approve/due_date_extension", transaction.ApproveDueDateExtension)
 		transactionsAuthUrl.POST("/satisfied", transaction.Satisfied)
 		transactionsAuthUrl.PATCH("/updateStatus", transaction.UpdateTransactionStatus)
+		transactionsAuthUrl.POST("/import", transaction.ImportTransactions)
 
 	}
 
@@ -54,12 +55,12 @@ func Transaction(r *gin.Engine, ApiVersion string, validator *validator.Validate
 		transactionsApiUrl.PATCH("/parties/update", transaction.UpdateTransactionParties)
 		transactionsApiUrl.PATCH("/parties/update-status", transaction.UpdateTransactionPartyStatus)
 		transactionsApiUrl.POST("/assign/buyer", transaction.AssignTransactionBuyer)
-		transactionsApiUrl.POST("/broker/update", transaction.UpdateTransactionBroker)
+		transactionsApiUrl.PATCH("/broker/update", transaction.UpdateTransactionBroker)
 		transactionsApiUrl.POST("/check-amount", transaction.CheckTransactionAmount)
 		transactionsApiUrl.POST("/escrowcharge", transaction.GetEscrowCharge)
 		transactionsApiUrl.GET("/rates", transaction.ListRates)
 		transactionsApiUrl.GET("/exchange-transaction/:account_id", transaction.ListExchangeTransactionByAccountID)
-		transactionsApiUrl.GET("exchange-transaction/:exchange_id/show", transaction.GetExchangeTransactionByID)
+		transactionsApiUrl.GET("exchange-transaction/show/:exchange_id", transaction.GetExchangeTransactionByID)
 
 	}
 

@@ -115,9 +115,9 @@ func AssignTransactionBuyerService(extReq request.ExternalRequest, logger *utili
 
 	user, err := GetUserWithPhone(extReq, phoneNumber)
 	if err != nil {
-		us, er := SignupUserWithPhone(extReq, phoneNumber)
-		if err != nil {
-			return http.StatusBadRequest, fmt.Errorf("Oops, No User exist with that phone number. %v. %v", err, er)
+		us, er := SignupUserWithPhone(extReq, phoneNumber, "individual")
+		if er != nil {
+			return http.StatusBadRequest, fmt.Errorf("oops, No User exist with that phone number. %v. %v", err, er)
 		}
 		user = us
 	}
@@ -144,7 +144,7 @@ func AssignTransactionBuyerService(extReq request.ExternalRequest, logger *utili
 				return code, err
 			}
 			party.AccountID = int(user.AccountID)
-			party.TransactionID = party.TransactionID
+			party.TransactionID = transaction.TransactionID
 			party.TransactionPartiesID = transaction.PartiesID
 			party.Role = "buyer"
 			err = party.CreateTransactionParty(db.Transaction)
@@ -173,7 +173,7 @@ func UpdateTransactionBrokerService(extReq request.ExternalRequest, logger *util
 		if code == http.StatusInternalServerError {
 			return code, err
 		}
-		return http.StatusBadRequest, fmt.Errorf("there is broker for this transaction")
+		return http.StatusBadRequest, fmt.Errorf("there is no broker for this transaction")
 
 	}
 

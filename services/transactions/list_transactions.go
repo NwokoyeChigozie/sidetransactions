@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"sync"
 
 	"github.com/vesicash/transactions-ms/external/external_models"
 	"github.com/vesicash/transactions-ms/external/request"
@@ -85,25 +86,48 @@ func ListTransactionsByIDService(extReq request.ExternalRequest, logger *utility
 	transactionReponse.Files = transactionFiles
 	milestones := map[int][]models.MilestonesResponse{}
 
+	type chanData struct {
+		MileStoneSlice []models.MilestonesResponse
+		Index          int
+		Err            error
+	}
+
+	var wg sync.WaitGroup
+	ch := make(chan chanData)
+	wg.Add(len(transactions))
 	for i, t := range transactions {
-		totalAmount, mileSresponse := resolveTransactionForAmountAndMilestoneResponse(extReq, i, t)
-		transactionReponse.TotalAmount = totalAmount
-		currentArray := milestones[i]
-		currentArray = append(currentArray, mileSresponse)
-		milestones[i] = currentArray
+		go func(extReq request.ExternalRequest, db postgresql.Databases, index int, transaction models.Transaction, currentMileStoneSlice []models.MilestonesResponse, ch chan chanData, wg *sync.WaitGroup) {
+			defer wg.Done()
+			response := chanData{MileStoneSlice: currentMileStoneSlice, Index: index}
+			totalAmount, mileSresponse := resolveTransactionForAmountAndMilestoneResponse(extReq, index, transaction)
+			transactionReponse.TotalAmount = totalAmount
+			currentMileStoneSlice = append(currentMileStoneSlice, mileSresponse)
 
-		otherTransactions, err := t.GetAllOthersByIDAndPartiesID(db.Transaction)
-		if err != nil {
-			logger.Info("error getting other transactions", err.Error())
+			otherTransactions, err := transaction.GetAllOthersByIDAndPartiesID(db.Transaction)
+			if err != nil {
+				response.Err = err
+			}
+
+			for oi, ot := range otherTransactions {
+				_, otherMileSresponse := resolveTransactionForAmountAndMilestoneResponse(extReq, oi, ot)
+				currentMileStoneSlice = append(currentMileStoneSlice, otherMileSresponse)
+			}
+			response.MileStoneSlice = currentMileStoneSlice
+
+			ch <- response
+		}(extReq, db, i, t, milestones[i], ch, &wg)
+
+	}
+	go func() {
+		defer close(ch)
+		wg.Wait()
+	}()
+
+	for data := range ch {
+		if data.Err != nil {
+			logger.Info("error getting other transactions", data.Err.Error())
 		}
-
-		for oi, ot := range otherTransactions {
-			_, otherMileSresponse := resolveTransactionForAmountAndMilestoneResponse(extReq, oi, ot)
-			currentArray := milestones[i]
-			currentArray = append(currentArray, otherMileSresponse)
-			milestones[i] = currentArray
-		}
-
+		milestones[data.Index] = data.MileStoneSlice
 	}
 
 	transactionBroker := models.TransactionBroker{TransactionID: transactionID}
@@ -148,7 +172,6 @@ func ListTransactionsByIDService(extReq request.ExternalRequest, logger *utility
 	transactionReponse.DueDateFormatted = dDateFormatted
 	transactionReponse.TransactionClosedAt = transactionState.CreatedAt
 	transactionReponse.IsDisputed = isDisputed
-
 	return transactionReponse, http.StatusOK, nil
 }
 
@@ -173,7 +196,7 @@ func ListTransactionsService(extReq request.ExternalRequest, logger *utility.Log
 
 	if req.Status != "" {
 		transaction.Status = req.Status
-	} else {
+	} else if req.StatusCode != "" {
 		transaction.Status = GetTransactionStatus(req.StatusCode)
 	}
 
@@ -184,14 +207,39 @@ func ListTransactionsService(extReq request.ExternalRequest, logger *utility.Log
 
 	var transactionsResponses []models.TransactionByIDResponse
 
-	for _, t := range transactions {
-		transactionResponse, _, err := ListTransactionsByIDService(extReq, logger, db, t.TransactionID)
-		if err != nil {
-			logger.Error("list transaction by id error", err.Error())
-		} else {
-			transactionsResponses = append(transactionsResponses, transactionResponse)
-		}
+	type chanData struct {
+		TransactionResponse models.TransactionByIDResponse
+		Err                 error
+	}
 
+	var wg sync.WaitGroup
+	ch := make(chan chanData)
+	wg.Add(len(transactions))
+	for _, t := range transactions {
+		go func(extReq request.ExternalRequest, logger *utility.Logger, db postgresql.Databases, transactionID string, ch chan chanData, wg *sync.WaitGroup) {
+			defer wg.Done()
+			response := chanData{}
+			transactionResponse, _, err := ListTransactionsByIDService(extReq, logger, db, transactionID)
+			if err != nil {
+				response.Err = err
+			} else {
+				response.TransactionResponse = transactionResponse
+			}
+			ch <- response
+		}(extReq, logger, db, t.TransactionID, ch, &wg)
+	}
+
+	go func() {
+		defer close(ch)
+		wg.Wait()
+	}()
+
+	for data := range ch {
+		if data.Err != nil {
+			logger.Error("list transaction by id error", data.Err.Error())
+		} else {
+			transactionsResponses = append(transactionsResponses, data.TransactionResponse)
+		}
 	}
 
 	return transactionsResponses, pagination, http.StatusOK, nil
@@ -206,7 +254,7 @@ func ListTransactionsByBusinessService(extReq request.ExternalRequest, logger *u
 
 	if req.Status != "" {
 		transaction.Status = req.Status
-	} else {
+	} else if req.StatusCode != "" {
 		transaction.Status = GetTransactionStatus(req.StatusCode)
 	}
 
@@ -217,24 +265,48 @@ func ListTransactionsByBusinessService(extReq request.ExternalRequest, logger *u
 
 	var transactionsResponses []models.TransactionByIDResponse
 
+	type chanData struct {
+		TransactionResponse models.TransactionByIDResponse
+		Err                 error
+	}
+	var wg sync.WaitGroup
+	ch := make(chan chanData)
+	wg.Add(len(transactions))
 	for _, t := range transactions {
-		transactionResponse, _, err := ListTransactionsByIDService(extReq, logger, db, t.TransactionID)
-		if err != nil {
-			logger.Error("list transaction by id error", err.Error())
-		} else {
-			payment, err := ListPayment(extReq, t.TransactionID)
+		go func(extReq request.ExternalRequest, logger *utility.Logger, db postgresql.Databases, transactionID string, ch chan chanData, wg *sync.WaitGroup) {
+			defer wg.Done()
+			response := chanData{}
+			transactionResponse, _, err := ListTransactionsByIDService(extReq, logger, db, transactionID)
 			if err != nil {
-				transactionResponse.TotalAmount = 0
-				transactionResponse.EscrowCharge = 0
-				logger.Error("list payment by transaction id error", err.Error())
+				response.Err = err
 			} else {
-				transactionResponse.TotalAmount = payment.TotalAmount
-				transactionResponse.EscrowCharge = payment.EscrowCharge
+				payment, err := ListPayment(extReq, t.TransactionID)
+				if err != nil {
+					transactionResponse.TotalAmount = 0
+					transactionResponse.EscrowCharge = 0
+					logger.Error("list payment by transaction id error", err.Error())
+				} else {
+					transactionResponse.TotalAmount = payment.TotalAmount
+					transactionResponse.EscrowCharge = payment.EscrowCharge
+				}
+				response.TransactionResponse = transactionResponse
 			}
+			ch <- response
+		}(extReq, logger, db, t.TransactionID, ch, &wg)
 
-			transactionsResponses = append(transactionsResponses, transactionResponse)
+	}
+
+	go func() {
+		defer close(ch)
+		wg.Wait()
+	}()
+
+	for data := range ch {
+		if data.Err != nil {
+			logger.Error("list transaction by id error or list payment by transaction id error", data.Err.Error())
+		} else {
+			transactionsResponses = append(transactionsResponses, data.TransactionResponse)
 		}
-
 	}
 
 	return transactionsResponses, pagination, http.StatusOK, nil
@@ -248,7 +320,7 @@ func ListByBusinessFromMondayToThursdayService(extReq request.ExternalRequest, l
 
 	if req.Status != "" {
 		transaction.Status = req.Status
-	} else {
+	} else if req.StatusCode != "" {
 		transaction.Status = GetTransactionStatus(req.StatusCode)
 	}
 
@@ -259,24 +331,48 @@ func ListByBusinessFromMondayToThursdayService(extReq request.ExternalRequest, l
 
 	var transactionsResponses []models.TransactionByIDResponse
 
+	type chanData struct {
+		TransactionResponse models.TransactionByIDResponse
+		Err                 error
+	}
+	var wg sync.WaitGroup
+	ch := make(chan chanData)
+	wg.Add(len(transactions))
 	for _, t := range transactions {
-		transactionResponse, _, err := ListTransactionsByIDService(extReq, logger, db, t.TransactionID)
-		if err != nil {
-			logger.Error("list transaction by id error", err.Error())
-		} else {
-			payment, err := ListPayment(extReq, t.TransactionID)
+		go func(extReq request.ExternalRequest, logger *utility.Logger, db postgresql.Databases, transactionID string, ch chan chanData, wg *sync.WaitGroup) {
+			defer wg.Done()
+			response := chanData{}
+			transactionResponse, _, err := ListTransactionsByIDService(extReq, logger, db, transactionID)
 			if err != nil {
-				transactionResponse.TotalAmount = 0
-				transactionResponse.EscrowCharge = 0
-				logger.Error("list payment by transaction id error", err.Error())
+				response.Err = err
 			} else {
-				transactionResponse.TotalAmount = payment.TotalAmount
-				transactionResponse.EscrowCharge = payment.EscrowCharge
+				payment, err := ListPayment(extReq, t.TransactionID)
+				if err != nil {
+					transactionResponse.TotalAmount = 0
+					transactionResponse.EscrowCharge = 0
+					logger.Error("list payment by transaction id error", err.Error())
+				} else {
+					transactionResponse.TotalAmount = payment.TotalAmount
+					transactionResponse.EscrowCharge = payment.EscrowCharge
+				}
+				response.TransactionResponse = transactionResponse
 			}
+			ch <- response
+		}(extReq, logger, db, t.TransactionID, ch, &wg)
 
-			transactionsResponses = append(transactionsResponses, transactionResponse)
+	}
+
+	go func() {
+		defer close(ch)
+		wg.Wait()
+	}()
+
+	for data := range ch {
+		if data.Err != nil {
+			logger.Error("list transaction by id error or list payment by transaction id error", data.Err.Error())
+		} else {
+			transactionsResponses = append(transactionsResponses, data.TransactionResponse)
 		}
-
 	}
 
 	return transactionsResponses, pagination, http.StatusOK, nil
@@ -290,32 +386,62 @@ func ListTransactionsByUserService(extReq request.ExternalRequest, logger *utili
 		transactionParty      = models.TransactionParty{AccountID: int(user.AccountID), Role: req.Role}
 	)
 
-	transactionParties, pagination, err := transactionParty.GetAllByAndQueriesForUniqueValue(db.Transaction, "", "id", "desc", "transaction_id", paginator)
+	statusC := ""
+	if req.StatusCode != "" {
+		statusC = GetTransactionStatus(req.StatusCode)
+	}
+
+	transactionParties, pagination, err := transactionParty.GetAllByAndQueriesForUniqueValueForTransactionStatus(db.Transaction, "", "id", "desc", "transaction_id", statusC, paginator)
 	if err != nil {
 		return []models.TransactionByIDResponse{}, postgresql.PaginationResponse{}, http.StatusInternalServerError, err
 	}
 
 	for _, tp := range transactionParties {
-		lTransaction := models.Transaction{TransactionID: tp.TransactionID, IsPaylinked: req.Paylinked, Status: GetTransactionStatus(req.StatusCode)}
+		lTransaction := models.Transaction{TransactionID: tp.TransactionID, IsPaylinked: req.Paylinked, Status: statusC}
 		code, err := lTransaction.GetLatestByAndQueries(db.Transaction, req.Paylinked, "")
 		if err != nil {
 			if code == http.StatusInternalServerError {
 				return []models.TransactionByIDResponse{}, postgresql.PaginationResponse{}, code, err
 			}
-			logger.Error("error getting lastest transaction byy transaction id", err.Error())
+			logger.Error("error getting latest transaction by transaction id", err.Error())
 		} else {
 			transactions = append(transactions, lTransaction)
 		}
 	}
 
-	for _, t := range transactions {
-		transactionResponse, _, err := ListTransactionsByIDService(extReq, logger, db, t.TransactionID)
-		if err != nil {
-			logger.Error("list transaction by id error", err.Error())
-		} else {
-			transactionsResponses = append(transactionsResponses, transactionResponse)
-		}
+	type chanData struct {
+		TransactionResponse models.TransactionByIDResponse
+		Err                 error
+	}
 
+	var wg sync.WaitGroup
+	ch := make(chan chanData)
+	wg.Add(len(transactions))
+	for _, t := range transactions {
+		go func(extReq request.ExternalRequest, logger *utility.Logger, db postgresql.Databases, transactionID string, ch chan chanData, wg *sync.WaitGroup) {
+			defer wg.Done()
+			response := chanData{}
+			transactionResponse, _, err := ListTransactionsByIDService(extReq, logger, db, transactionID)
+			if err != nil {
+				response.Err = err
+			} else {
+				response.TransactionResponse = transactionResponse
+			}
+			ch <- response
+		}(extReq, logger, db, t.TransactionID, ch, &wg)
+	}
+
+	go func() {
+		defer close(ch)
+		wg.Wait()
+	}()
+
+	for data := range ch {
+		if data.Err != nil {
+			logger.Error("list transaction by id error", data.Err.Error())
+		} else {
+			transactionsResponses = append(transactionsResponses, data.TransactionResponse)
+		}
 	}
 
 	return transactionsResponses, pagination, http.StatusOK, nil
@@ -329,7 +455,7 @@ func ListArchivedTransactionsService(extReq request.ExternalRequest, logger *uti
 		transactionParty      = models.TransactionParty{AccountID: int(user.AccountID), Role: "sender"}
 	)
 
-	transactionParties, pagination, err := transactionParty.GetAllByAndQueriesForUniqueValue(db.Transaction, "", "id", "desc", "transaction_id", paginator)
+	transactionParties, pagination, err := transactionParty.GetAllByAndQueriesForUniqueValueForTransactionStatus(db.Transaction, "", "id", "desc", "transaction_id", "Deleted", paginator)
 	if err != nil {
 		return []models.TransactionByIDResponse{}, postgresql.PaginationResponse{}, http.StatusInternalServerError, err
 	}
@@ -347,14 +473,39 @@ func ListArchivedTransactionsService(extReq request.ExternalRequest, logger *uti
 		}
 	}
 
-	for _, t := range transactions {
-		transactionResponse, _, err := ListTransactionsByIDService(extReq, logger, db, t.TransactionID)
-		if err != nil {
-			logger.Error("list transaction by id error", err.Error())
-		} else {
-			transactionsResponses = append(transactionsResponses, transactionResponse)
-		}
+	type chanData struct {
+		TransactionResponse models.TransactionByIDResponse
+		Err                 error
+	}
 
+	var wg sync.WaitGroup
+	ch := make(chan chanData)
+	wg.Add(len(transactions))
+	for _, t := range transactions {
+		go func(extReq request.ExternalRequest, logger *utility.Logger, db postgresql.Databases, transactionID string, ch chan chanData, wg *sync.WaitGroup) {
+			defer wg.Done()
+			response := chanData{}
+			transactionResponse, _, err := ListTransactionsByIDService(extReq, logger, db, transactionID)
+			if err != nil {
+				response.Err = err
+			} else {
+				response.TransactionResponse = transactionResponse
+			}
+			ch <- response
+		}(extReq, logger, db, t.TransactionID, ch, &wg)
+	}
+
+	go func() {
+		defer close(ch)
+		wg.Wait()
+	}()
+
+	for data := range ch {
+		if data.Err != nil {
+			logger.Error("list transaction by id error", data.Err.Error())
+		} else {
+			transactionsResponses = append(transactionsResponses, data.TransactionResponse)
+		}
 	}
 
 	return transactionsResponses, pagination, http.StatusOK, nil
@@ -375,7 +526,7 @@ func resolveTransactionForAmountAndMilestoneResponse(extReq request.ExternalRequ
 		totalAmount, _ = strconv.ParseFloat(titleSlice[2], 64)
 	}
 
-	if len(titleSlice) > 0 {
+	if len(titleSlice) > 1 {
 		title = titleSlice[1]
 	}
 
@@ -427,35 +578,72 @@ func getPartiesAndMembersFromParties(extReq request.ExternalRequest, parties []m
 	var (
 		partiess = map[string]models.TransactionParty{}
 		members  = []models.PartyResponse{}
+		wg       sync.WaitGroup
 	)
+	type chanData struct {
+		Member models.PartyResponse
+		Err    error
+	}
+
+	ch := make(chan chanData)
+	wg.Add(len(parties))
 	for _, p := range parties {
-		user, _ := GetUserWithAccountID(extReq, p.AccountID)
 		partiess[p.Role] = p
-		accountName := ""
-		if user.ID != 0 {
-			accountName = user.Lastname + " " + user.Firstname
-		}
-		var roleCapabilities models.PartyAccessLevel
+		go func(party models.TransactionParty, ch chan chanData, wg *sync.WaitGroup) {
+			defer wg.Done()
+			user, _ := GetUserWithAccountID(extReq, party.AccountID)
+			accountName := ""
+			if user.ID != 0 {
+				accountName = user.Lastname + " " + user.Firstname
+			}
+			var roleCapabilities models.PartyAccessLevel
 
-		inrec, err := json.Marshal(p.RoleCapabilities)
-		if err != nil {
-			return partiess, members, err
-		}
+			inrec, err := json.Marshal(party.RoleCapabilities)
+			if err != nil {
+				ch <- chanData{
+					Member: models.PartyResponse{},
+					Err:    err,
+				}
+				return
+			}
 
-		err = json.Unmarshal(inrec, &roleCapabilities)
-		if err != nil {
-			return partiess, members, err
+			err = json.Unmarshal(inrec, &roleCapabilities)
+			if err != nil {
+				ch <- chanData{
+					Member: models.PartyResponse{},
+					Err:    err,
+				}
+				return
+			}
+
+			ch <- chanData{
+				Member: models.PartyResponse{
+					PartyID:     int(party.ID),
+					AccountID:   party.AccountID,
+					AccountName: accountName,
+					PhoneNumber: user.PhoneNumber,
+					Email:       user.EmailAddress,
+					Role:        party.Role,
+					Status:      party.Status,
+					AccessLevel: roleCapabilities,
+				},
+				Err: nil,
+			}
+
+		}(p, ch, &wg)
+
+	}
+	go func() {
+		defer close(ch)
+		wg.Wait()
+	}()
+
+	for data := range ch {
+		if data.Err != nil {
+			return partiess, members, data.Err
+		} else {
+			members = append(members, data.Member)
 		}
-		members = append(members, models.PartyResponse{
-			PartyID:     int(p.ID),
-			AccountID:   p.AccountID,
-			AccountName: accountName,
-			PhoneNumber: user.PhoneNumber,
-			Email:       user.EmailAddress,
-			Role:        p.Role,
-			Status:      p.Status,
-			AccessLevel: roleCapabilities,
-		})
 	}
 	return partiess, members, nil
 }

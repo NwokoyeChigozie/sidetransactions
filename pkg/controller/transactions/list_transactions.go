@@ -215,6 +215,7 @@ func (base *Controller) ListTransactionsByUser(c *gin.Context) {
 		return
 	}
 
+	fmt.Println(pagination, pagination)
 	rd := utility.BuildSuccessResponse(http.StatusOK, "successful", transactions, pagination)
 	c.JSON(http.StatusOK, rd)
 

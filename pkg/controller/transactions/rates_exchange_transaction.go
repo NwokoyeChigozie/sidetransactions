@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/vesicash/transactions-ms/internal/models"
+	"github.com/vesicash/transactions-ms/pkg/repository/storage/postgresql"
 	"github.com/vesicash/transactions-ms/utility"
 )
 
@@ -25,16 +26,17 @@ func (base *Controller) ListRates(c *gin.Context) {
 func (base *Controller) ListExchangeTransactionByAccountID(c *gin.Context) {
 	var (
 		accountID = c.Param("account_id")
+		paginator = postgresql.GetPagination(c)
 	)
 
 	exchangeTransaction := models.ExchangeTransaction{AccountID: accountID}
-	exchangeTransactions, err := exchangeTransaction.GetAllResolvedByAccountID(base.Db.Transaction)
+	exchangeTransactions, pagination, err := exchangeTransaction.GetAllResolvedByAccountID(base.Db.Transaction, paginator)
 	if err != nil {
 		rd := utility.BuildErrorResponse(http.StatusInternalServerError, "error", err.Error(), err, nil)
 		c.JSON(http.StatusInternalServerError, rd)
 		return
 	}
-	rd := utility.BuildSuccessResponse(http.StatusOK, "success", exchangeTransactions)
+	rd := utility.BuildSuccessResponse(http.StatusOK, "success", exchangeTransactions, pagination)
 	c.JSON(http.StatusOK, rd)
 
 }

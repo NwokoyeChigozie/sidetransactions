@@ -30,7 +30,7 @@ func (r *RequestObj) SignupUser() (external_models.User, error) {
 		logger.Info("signup", outBoundResponse, err.Error())
 		return outBoundResponse.Data, err
 	}
-	logger.Info("signup", outBoundResponse)
+	logger.Info("signup", outBoundResponse, outBoundResponse.Data)
 
 	return outBoundResponse.Data, nil
 }

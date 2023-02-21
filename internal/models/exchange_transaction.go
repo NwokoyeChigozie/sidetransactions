@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/vesicash/transactions-ms/pkg/repository/storage/postgresql"
+	"github.com/vesicash/transactions-ms/utility"
 	"gorm.io/gorm"
 )
 
@@ -52,23 +53,28 @@ func (e *ExchangeTransaction) GetExchangeTransactionByID(db *gorm.DB) (int, erro
 	return http.StatusOK, nil
 }
 
-func (e *ExchangeTransaction) GetAllResolvedByAccountID(db *gorm.DB) ([]ExchangeTransactionWithRate, error) {
+func (e *ExchangeTransaction) GetAllResolvedByAccountID(db *gorm.DB, paginator postgresql.Pagination) ([]ExchangeTransactionWithRate, postgresql.PaginationResponse, error) {
 	details := []ExchangeTransaction{}
 	resolved := []ExchangeTransactionWithRate{}
 	err := postgresql.SelectAllFromDb(db, "desc", &details, "account_id = ?", e.AccountID)
 	if err != nil {
-		return resolved, err
+		return resolved, postgresql.PaginationResponse{}, err
+	}
+
+	pagination, err := postgresql.SelectAllFromDbOrderByPaginated(db, "id", "desc", paginator, &details, "account_id = ?", e.AccountID)
+	if err != nil {
+		return resolved, pagination, err
 	}
 
 	for _, e := range details {
 		r, _, err := e.ResolveExchangeTransaction(db)
 		if err != nil {
-			return resolved, err
+			return resolved, pagination, err
 		} else {
 			resolved = append(resolved, r)
 		}
 	}
-	return resolved, nil
+	return resolved, pagination, nil
 }
 
 func (e *ExchangeTransaction) GetResolvedExchangeTransactionByID(db *gorm.DB) (ExchangeTransactionWithRate, int, error) {
@@ -90,7 +96,7 @@ func (e *ExchangeTransaction) GetResolvedExchangeTransactionByID(db *gorm.DB) (E
 
 func (e *ExchangeTransaction) ResolveExchangeTransaction(db *gorm.DB) (ExchangeTransactionWithRate, int, error) {
 	var rate = Rate{ID: int64(e.RateID)}
-	date := e.CreatedAt.Format("2nd January, 2006")
+	date := utility.FormatDateSpecialCase(e.CreatedAt)
 	if e.RateID != 0 {
 		code, err := rate.GetRateByID(db)
 		if err != nil {

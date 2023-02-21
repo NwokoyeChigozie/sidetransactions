@@ -23,7 +23,7 @@ func RequestDueDateExtensionService(extReq request.ExternalRequest, logger *util
 	}
 
 	sellerParty := models.TransactionParty{TransactionID: req.TransactionID, Role: "seller"}
-	code, err = sellerParty.GetTransactionPartyByTransactionPartiesIDAndRole(db.Transaction)
+	code, err = sellerParty.GetTransactionPartyByTransactionIDAndRole(db.Transaction)
 	if err != nil {
 		return code, fmt.Errorf("seller not found: %v", err.Error())
 	}
@@ -61,7 +61,7 @@ func ApproveDueDateExtensionService(extReq request.ExternalRequest, logger *util
 	}
 
 	buyerParty := models.TransactionParty{TransactionID: req.TransactionID, Role: "buyer"}
-	code, err = buyerParty.GetTransactionPartyByTransactionPartiesIDAndRole(db.Transaction)
+	code, err = buyerParty.GetTransactionPartyByTransactionIDAndRole(db.Transaction)
 	if err != nil {
 		return code, fmt.Errorf("buyer not found: %v", err.Error())
 	}
