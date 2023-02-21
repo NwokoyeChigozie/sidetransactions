@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"net/http"
 	"time"
 
@@ -39,4 +40,12 @@ func (r *Rate) GetRateByID(db *gorm.DB) (int, error) {
 		return http.StatusInternalServerError, err
 	}
 	return http.StatusOK, nil
+}
+
+func (t *Rate) CreateRate(db *gorm.DB) error {
+	err := postgresql.CreateOneRecord(db, &t)
+	if err != nil {
+		return fmt.Errorf("rate creation failed: %v", err.Error())
+	}
+	return nil
 }

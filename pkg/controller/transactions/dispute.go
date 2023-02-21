@@ -52,7 +52,7 @@ func (base *Controller) CreateDispute(c *gin.Context) {
 		return
 	}
 
-	rd := utility.BuildSuccessResponse(http.StatusOK, "Transaction Disputed", nil)
+	rd := utility.BuildSuccessResponse(http.StatusCreated, "Transaction Disputed", nil)
 	c.JSON(http.StatusCreated, rd)
 
 }
@@ -77,7 +77,7 @@ func (base *Controller) GetDisputeByTransactionID(c *gin.Context) {
 	}
 
 	rd := utility.BuildSuccessResponse(http.StatusOK, "successful", dispute)
-	c.JSON(http.StatusCreated, rd)
+	c.JSON(http.StatusOK, rd)
 
 }
 
@@ -123,7 +123,7 @@ func (base *Controller) UpdateDispute(c *gin.Context) {
 	}
 
 	rd := utility.BuildSuccessResponse(http.StatusOK, "Transaction Dispute Modified", nil)
-	c.JSON(http.StatusCreated, rd)
+	c.JSON(http.StatusOK, rd)
 
 }
 
@@ -146,6 +146,6 @@ func (base *Controller) GetDisputeByUser(c *gin.Context) {
 	}
 
 	rd := utility.BuildSuccessResponse(http.StatusOK, "Data Retrieved", disputes, pagination)
-	c.JSON(http.StatusCreated, rd)
+	c.JSON(http.StatusOK, rd)
 
 }

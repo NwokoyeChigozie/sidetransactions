@@ -1,6 +1,7 @@
 package transactions
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/vesicash/transactions-ms/external/external_models"
@@ -94,20 +95,23 @@ func GetDisputeByTransactionIDService(extReq request.ExternalRequest, logger *ut
 
 func GetDisputeByUserService(extReq request.ExternalRequest, logger *utility.Logger, db postgresql.Databases, user external_models.User, paginator postgresql.Pagination) ([]models.TransactionDispute, postgresql.PaginationResponse, int, error) {
 	var (
-		disputes = []models.TransactionDispute{}
+		disputes         = []models.TransactionDispute{}
+		transactionParty = models.TransactionParty{AccountID: int(user.AccountID)}
 	)
-	transactions, pagination, code, err := ListTransactionsByUserService(extReq, logger, db, models.ListTransactionByUserRequest{}, paginator, user)
+
+	transactionParties, pagination, err := transactionParty.GetAllByAndQueriesForUniqueValueForDispute(db.Transaction, "", "id", "desc", "transaction_id", paginator)
 	if err != nil {
-		return []models.TransactionDispute{}, pagination, code, err
+		return []models.TransactionDispute{}, postgresql.PaginationResponse{}, http.StatusInternalServerError, err
 	}
 
-	for _, t := range transactions {
+	for _, t := range transactionParties {
 		transactionDispute := models.TransactionDispute{TransactionID: t.TransactionID}
 		code, err := transactionDispute.GetTransactionDisputeByTransactionID(db.Transaction)
 		if err != nil {
 			if code == http.StatusInternalServerError {
 				return []models.TransactionDispute{}, pagination, code, err
 			}
+			fmt.Println(err)
 		} else {
 			disputes = append(disputes, transactionDispute)
 		}

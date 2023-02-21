@@ -51,7 +51,7 @@ func (base *Controller) SendTransaction(c *gin.Context) {
 		return
 	}
 
-	rd := utility.BuildSuccessResponse(http.StatusCreated, "Transaction Sent", nil)
-	c.JSON(http.StatusCreated, rd)
+	rd := utility.BuildSuccessResponse(http.StatusOK, "Transaction Sent", nil)
+	c.JSON(http.StatusOK, rd)
 
 }

@@ -188,6 +188,47 @@ func (t *TransactionParty) GetAllByAndQueriesForUniqueValueForTransactionStatus(
 	return details, totalPages, nil
 }
 
+func (t *TransactionParty) GetAllByAndQueriesForUniqueValueForDispute(db *gorm.DB, CreatedAtInterval, orderBy, order, groupColumn string, paginator postgresql.Pagination) ([]TransactionParty, postgresql.PaginationResponse, error) {
+	var (
+		details = []TransactionParty{}
+		query   = ``
+	)
+
+	if t.AccountID != 0 {
+		query = addQuery(query, fmt.Sprintf("account_id = %v", t.AccountID), "AND")
+	}
+
+	if t.TransactionID != "" {
+		query = addQuery(query, fmt.Sprintf("transaction_id = '%v'", t.TransactionID), "AND")
+	}
+
+	if t.TransactionPartiesID != "" {
+		query = addQuery(query, fmt.Sprintf("transaction_parties_id = '%v'", t.TransactionPartiesID), "AND")
+	}
+	if t.ID != 0 {
+		query = addQuery(query, fmt.Sprintf("id = %v", t.ID), "AND")
+	}
+	if t.Role != "" {
+		query = addQuery(query, fmt.Sprintf("role = '%v'", t.Role), "AND")
+	}
+	if t.Status != "" {
+		query = addQuery(query, fmt.Sprintf("LOWER(status) = '%v'", strings.ToLower(t.Status)), "AND")
+	}
+
+	if CreatedAtInterval != "" {
+		start, end := utility.GetStartAndEnd(CreatedAtInterval)
+		query = addQuery(query, fmt.Sprintf("(created_at BETWEEN '%s' AND '%s')", start.Format(time.RFC3339), end.Format(time.RFC3339)), "AND")
+	}
+
+	query = addQuery(query, fmt.Sprintf("transaction_id IN (SELECT transaction_disputes.transaction_id FROM transaction_disputes WHERE CAST(transaction_disputes.transaction_id AS character varying)=transaction_parties.transaction_id)"), "AND")
+
+	totalPages, err := postgresql.SelectAllFromByGroup(db, orderBy, order, &paginator, &details, query, groupColumn)
+	if err != nil {
+		return details, totalPages, err
+	}
+	return details, totalPages, nil
+}
+
 func (t *TransactionParty) UpdateAllFields(db *gorm.DB) error {
 	_, err := postgresql.SaveAllFields(db, &t)
 	return err
