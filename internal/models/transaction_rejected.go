@@ -13,7 +13,7 @@ func (TransactionsRejected) TableName() string {
 }
 
 type TransactionsRejected struct {
-	ID            int64     `gorm:"primary_key;column:id" json:"id"`
+	ID            uint      `gorm:"column:id; type:uint; not null; primaryKey; unique; autoIncrement" json:"id"`
 	AccountID     int64     `gorm:"column:account_id; not null" json:"account_id"`
 	TransactionID string    `gorm:"column:transaction_id; type:varchar(255); not null" json:"transaction_id"`
 	Reason        string    `gorm:"column:reason; type:varchar(255); not null" json:"reason"`
