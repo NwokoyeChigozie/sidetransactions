@@ -11,7 +11,7 @@ import (
 )
 
 type TransactionState struct {
-	ID            int64     `gorm:"primary_key;column:id" json:"id"`
+	ID            uint      `gorm:"column:id; type:uint; not null; primaryKey; unique; autoIncrement" json:"id"`
 	AccountID     int64     `gorm:"column:account_id; comment: User account id of the user that resulted in the action" json:"account_id"`
 	TransactionID string    `gorm:"column:transaction_id" json:"transaction_id"`
 	MilestoneID   string    `gorm:"column:milestone_id; comment: Milestone ID of the transaction if serviced based" json:"milestone_id"`
