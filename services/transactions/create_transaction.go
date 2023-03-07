@@ -578,3 +578,31 @@ func validateDueDate(dateString string) (string, error) {
 	}
 	return dateString, nil
 }
+
+func UpdateTransactionAmountPaidService(extReq request.ExternalRequest, logger *utility.Logger, db postgresql.Databases, req models.UpdateTransactionAmountPaid) (models.Transaction, int, error) {
+	var (
+		transaction = models.Transaction{TransactionID: req.TransactionID}
+	)
+
+	code, err := transaction.GetTransactionByTransactionID(db.Transaction)
+	if err != nil {
+		return models.Transaction{}, code, err
+	}
+
+	if req.Action == "+" {
+		transaction.AmountPaid += req.Amount
+	} else if req.Action == "-" {
+		if transaction.AmountPaid < req.Amount {
+			transaction.AmountPaid = 0
+		} else {
+			transaction.AmountPaid -= req.Amount
+		}
+	}
+
+	err = transaction.UpdateAllFields(db.Transaction)
+	if err != nil {
+		return transaction, http.StatusInternalServerError, err
+	}
+
+	return transaction, http.StatusOK, nil
+}

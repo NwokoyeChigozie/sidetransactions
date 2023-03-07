@@ -67,6 +67,7 @@ func Transaction(r *gin.Engine, ApiVersion string, validator *validator.Validate
 	transactionsAppUrl := r.Group(fmt.Sprintf("%v/transactions", ApiVersion), middleware.Authorize(db, extReq, middleware.AppType))
 	{
 		transactionsAppUrl.POST("/validate_on_db", transaction.ValidateOnDB)
+		transactionsAppUrl.PATCH("/update_transaction_amount_paid", transaction.UpdateTransactionAmountPaid)
 	}
 	return r
 }
