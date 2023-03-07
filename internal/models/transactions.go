@@ -77,6 +77,11 @@ type EditTransactionRequest struct {
 type OnlyTransactionIDRequiredRequest struct {
 	TransactionID string `json:"transaction_id" validate:"required" pgvalidate:"exists=transaction$transactions$transaction_id"`
 }
+type UpdateTransactionAmountPaid struct {
+	TransactionID string  `json:"transaction_id" validate:"required" pgvalidate:"exists=transaction$transactions$transaction_id"`
+	Amount        float64 `json:"amount" validate:"required"`
+	Action        string  `json:"action" validate:"required,oneof=+ -"`
+}
 type RejectTransactionRequest struct {
 	TransactionID string `json:"transaction_id" validate:"required" pgvalidate:"exists=transaction$transactions$transaction_id"`
 	Reason        string `json:"reason"`

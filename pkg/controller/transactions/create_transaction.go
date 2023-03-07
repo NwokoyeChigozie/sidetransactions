@@ -91,6 +91,44 @@ func (base *Controller) CheckTransactionAmount(c *gin.Context) {
 	}
 
 	rd := utility.BuildSuccessResponse(http.StatusOK, "successful", status)
-	c.JSON(http.StatusCreated, rd)
+	c.JSON(http.StatusOK, rd)
+
+}
+func (base *Controller) UpdateTransactionAmountPaid(c *gin.Context) {
+	var (
+		req models.UpdateTransactionAmountPaid
+	)
+
+	err := c.ShouldBind(&req)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", "Failed to parse request body", err, nil)
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	err = base.Validator.Struct(&req)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", "Validation failed", utility.ValidationResponse(err, base.Validator), nil)
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	vr := postgresql.ValidateRequestM{Logger: base.Logger, Test: base.ExtReq.Test}
+	err = vr.ValidateRequest(req)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", err.Error(), err, nil)
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	transaction, code, err := transactions.UpdateTransactionAmountPaidService(base.ExtReq, base.Logger, base.Db, req)
+	if err != nil {
+		rd := utility.BuildErrorResponse(code, "error", err.Error(), err, nil)
+		c.JSON(code, rd)
+		return
+	}
+
+	rd := utility.BuildSuccessResponse(http.StatusOK, "successful", transaction)
+	c.JSON(http.StatusOK, rd)
 
 }
