@@ -17,6 +17,11 @@ type ActivityLog struct {
 	UpdatedAt     time.Time `gorm:"column:updated_at; autoUpdateTime" json:"updated_at"`
 }
 
+type CreateActivityLogRequest struct {
+	TransactionID string `json:"transaction_id" validate:"required" pgvalidate:"exists=transaction$transactions$transaction_id"`
+	Description   string `json:"description" validate:"required" `
+}
+
 func (a *ActivityLog) GetAllByTransactionID(db *gorm.DB) ([]ActivityLog, error) {
 	details := []ActivityLog{}
 	err := postgresql.SelectAllFromDb(db, "asc", &details, "transaction_id = ? ", a.TransactionID)

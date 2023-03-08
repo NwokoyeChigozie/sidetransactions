@@ -68,6 +68,7 @@ func Transaction(r *gin.Engine, ApiVersion string, validator *validator.Validate
 	{
 		transactionsAppUrl.POST("/validate_on_db", transaction.ValidateOnDB)
 		transactionsAppUrl.PATCH("/update_transaction_amount_paid", transaction.UpdateTransactionAmountPaid)
+		transactionsAppUrl.POST("/create_activity_log", transaction.CreateActivityLog)
 	}
 	return r
 }
