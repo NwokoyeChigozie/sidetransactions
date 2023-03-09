@@ -121,6 +121,8 @@ func (er ExternalRequest) SendExternalRequest(name string, data interface{}) (in
 		return notification_mocks.SendDueDateExtendedNotification(er.Logger, data)
 	case "send_transaction_delivered_accepted_notification":
 		return notification_mocks.SendTransactionDeliveredAcceptedNotification(er.Logger, data)
+	case "get_access_token_by_key":
+		return auth_mocks.GetAccessTokenByKey(er.Logger, data)
 	default:
 		return nil, fmt.Errorf("request not found")
 	}

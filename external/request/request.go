@@ -77,6 +77,7 @@ var (
 	SendDueDateProposalNotification              string = "send_due_date_proposal_notification"
 	SendDueDateExtendedNotification              string = "send_due_date_extended_notification"
 	SendTransactionDeliveredAcceptedNotification string = "send_transaction_delivered_accepted_notification"
+	GetAccessTokenByKey                          string = "get_access_token_by_key"
 )
 
 func (er ExternalRequest) SendExternalRequest(name string, data interface{}) (interface{}, error) {
@@ -547,6 +548,17 @@ func (er ExternalRequest) SendExternalRequest(name string, data interface{}) (in
 				Logger:       er.Logger,
 			}
 			return obj.SendTransactionDeliveredAcceptedNotification()
+		case "get_access_token_by_key":
+			obj := auth.RequestObj{
+				Name:         name,
+				Path:         fmt.Sprintf("%v/v2/auth/get_access_token_by_key", config.Microservices.Auth),
+				Method:       "GET",
+				SuccessCode:  200,
+				DecodeMethod: JsonDecodeMethod,
+				RequestData:  data,
+				Logger:       er.Logger,
+			}
+			return obj.GetAccessTokenByKey()
 		default:
 			return nil, fmt.Errorf("request not found")
 		}
