@@ -87,3 +87,48 @@ func SatisfiedService(extReq request.ExternalRequest, logger *utility.Logger, db
 
 	return http.StatusOK, nil
 }
+
+func SatisfiedApiService(extReq request.ExternalRequest, logger *utility.Logger, db postgresql.Databases, transactionID string) (int, error) {
+	var (
+		transaction = models.Transaction{TransactionID: transactionID}
+	)
+
+	code, err := transaction.GetTransactionByTransactionID(db.Transaction)
+	if err != nil {
+		return code, err
+	}
+
+	buyerParty := models.TransactionParty{TransactionID: transactionID, Role: "buyer"}
+	code, err = buyerParty.GetTransactionPartyByTransactionIDAndRole(db.Transaction)
+	if err != nil {
+		return code, fmt.Errorf("buyer not found: %v", err.Error())
+	}
+
+	transaction.Status = GetTransactionStatus("da")
+	err = transaction.UpdateAllFields(db.Transaction)
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
+
+	_, err = CreateTransactionState(db, "da", transactionID, transaction.MilestoneID, int(buyerParty.AccountID))
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
+
+	extReq.SendExternalRequest(request.SendTransactionDeliveredAcceptedNotification, external_models.TransactionIDRequestModel{
+		TransactionId: transactionID,
+	})
+
+	transaction.Status = GetTransactionStatus("cdp")
+	err = transaction.UpdateAllFields(db.Transaction)
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
+
+	_, err = CreateTransactionState(db, "cdp", transactionID, transaction.MilestoneID, int(buyerParty.AccountID))
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
+
+	return http.StatusOK, nil
+}

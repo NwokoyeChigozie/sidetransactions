@@ -57,7 +57,7 @@ func (base *Controller) UpdateTransactionStatus(c *gin.Context) {
 
 func (base *Controller) UpdateTransactionStatusApi(c *gin.Context) {
 	var (
-		req models.UpdateTransactionStatusRequest
+		req models.UpdateTransactionStatusApiRequest
 	)
 
 	err := c.ShouldBind(&req)
@@ -81,20 +81,20 @@ func (base *Controller) UpdateTransactionStatusApi(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, rd)
 		return
 	}
-	token, err := transactions.GetAccessTokenByKeyFromRequest(base.ExtReq, c)
-	if err != nil {
-		rd := utility.BuildErrorResponse(http.StatusInternalServerError, "error", err.Error(), err, nil)
-		c.JSON(http.StatusInternalServerError, rd)
-		return
-	}
-	user, err := transactions.GetUserWithAccountID(base.ExtReq, token.AccountID)
+	user, err := transactions.GetUserWithAccountID(base.ExtReq, req.AccountID)
 	if err != nil {
 		rd := utility.BuildErrorResponse(http.StatusInternalServerError, "error", err.Error(), err, nil)
 		c.JSON(http.StatusInternalServerError, rd)
 		return
 	}
 
-	code, err := transactions.UpdateTransactionStatusService(base.ExtReq, base.Logger, base.Db, req, user)
+	tReq := models.UpdateTransactionStatusRequest{
+		TransactionID: req.TransactionID,
+		MilestoneID:   req.MilestoneID,
+		Status:        req.Status,
+	}
+
+	code, err := transactions.UpdateTransactionStatusService(base.ExtReq, base.Logger, base.Db, tReq, user)
 	if err != nil {
 		rd := utility.BuildErrorResponse(code, "error", err.Error(), err, nil)
 		c.JSON(code, rd)

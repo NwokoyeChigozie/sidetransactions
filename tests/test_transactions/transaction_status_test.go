@@ -344,14 +344,15 @@ func TestUpdateTransactionStatusApi(t *testing.T) {
 
 	tests := []struct {
 		Name         string
-		RequestBody  models.UpdateTransactionStatusRequest
+		RequestBody  models.UpdateTransactionStatusApiRequest
 		ExpectedCode int
 		Headers      map[string]string
 		Message      string
 	}{
 		{
 			Name: "OK update transaction status",
-			RequestBody: models.UpdateTransactionStatusRequest{
+			RequestBody: models.UpdateTransactionStatusApiRequest{
+				AccountID:     int(testUser.AccountID),
 				TransactionID: transaction.TransactionID,
 				MilestoneID:   transaction.MilestoneID,
 				Status:        "cr",
@@ -365,7 +366,8 @@ func TestUpdateTransactionStatusApi(t *testing.T) {
 			},
 		}, {
 			Name: "OK update transaction status",
-			RequestBody: models.UpdateTransactionStatusRequest{
+			RequestBody: models.UpdateTransactionStatusApiRequest{
+				AccountID:     int(testUser.AccountID),
 				TransactionID: transaction.TransactionID,
 				MilestoneID:   transaction.MilestoneID,
 				Status:        "sr",
@@ -379,7 +381,8 @@ func TestUpdateTransactionStatusApi(t *testing.T) {
 			},
 		}, {
 			Name: "OK update transaction status",
-			RequestBody: models.UpdateTransactionStatusRequest{
+			RequestBody: models.UpdateTransactionStatusApiRequest{
+				AccountID:     int(testUser.AccountID),
 				TransactionID: transaction.TransactionID,
 				MilestoneID:   transaction.MilestoneID,
 				Status:        "dr",
@@ -393,7 +396,8 @@ func TestUpdateTransactionStatusApi(t *testing.T) {
 			},
 		}, {
 			Name: "OK update transaction status",
-			RequestBody: models.UpdateTransactionStatusRequest{
+			RequestBody: models.UpdateTransactionStatusApiRequest{
+				AccountID:     int(testUser.AccountID),
 				TransactionID: transaction.TransactionID,
 				MilestoneID:   transaction.MilestoneID,
 				Status:        "da",
@@ -408,7 +412,8 @@ func TestUpdateTransactionStatusApi(t *testing.T) {
 		},
 		{
 			Name: "incorrect transaction_id",
-			RequestBody: models.UpdateTransactionStatusRequest{
+			RequestBody: models.UpdateTransactionStatusApiRequest{
+				AccountID:     int(testUser.AccountID),
 				TransactionID: "not correct",
 				MilestoneID:   transaction.MilestoneID,
 				Status:        "cr",
@@ -421,8 +426,22 @@ func TestUpdateTransactionStatusApi(t *testing.T) {
 			},
 		},
 		{
+			Name: "no account_id",
+			RequestBody: models.UpdateTransactionStatusApiRequest{
+				TransactionID: transaction.TransactionID,
+				MilestoneID:   transaction.MilestoneID,
+				Status:        "cr",
+			},
+			ExpectedCode: http.StatusBadRequest,
+			Headers: map[string]string{
+				"Content-Type":  "application/json",
+				"v-private-key": pvKey,
+				"v-public-key":  pbKey,
+			},
+		},
+		{
 			Name:         "empty request",
-			RequestBody:  models.UpdateTransactionStatusRequest{},
+			RequestBody:  models.UpdateTransactionStatusApiRequest{},
 			ExpectedCode: http.StatusBadRequest,
 			Headers: map[string]string{
 				"Content-Type":  "application/json",

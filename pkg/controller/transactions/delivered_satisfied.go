@@ -129,20 +129,7 @@ func (base *Controller) SatisfiedApi(c *gin.Context) {
 		return
 	}
 
-	token, err := transactions.GetAccessTokenByKeyFromRequest(base.ExtReq, c)
-	if err != nil {
-		rd := utility.BuildErrorResponse(http.StatusInternalServerError, "error", err.Error(), err, nil)
-		c.JSON(http.StatusInternalServerError, rd)
-		return
-	}
-	user, err := transactions.GetUserWithAccountID(base.ExtReq, token.AccountID)
-	if err != nil {
-		rd := utility.BuildErrorResponse(http.StatusInternalServerError, "error", err.Error(), err, nil)
-		c.JSON(http.StatusInternalServerError, rd)
-		return
-	}
-
-	code, err := transactions.SatisfiedService(base.ExtReq, base.Logger, base.Db, req.TransactionID, user)
+	code, err := transactions.SatisfiedApiService(base.ExtReq, base.Logger, base.Db, req.TransactionID)
 	if err != nil {
 		rd := utility.BuildErrorResponse(code, "error", err.Error(), err, nil)
 		c.JSON(code, rd)
