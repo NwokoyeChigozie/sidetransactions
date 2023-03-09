@@ -61,7 +61,8 @@ func Transaction(r *gin.Engine, ApiVersion string, validator *validator.Validate
 		transactionsApiUrl.GET("/rates", transaction.ListRates)
 		transactionsApiUrl.GET("/exchange-transaction/:account_id", transaction.ListExchangeTransactionByAccountID)
 		transactionsApiUrl.GET("exchange-transaction/show/:exchange_id", transaction.GetExchangeTransactionByID)
-		transactionsAuthUrl.PATCH("/api/updateStatus", transaction.UpdateTransactionStatusApi)
+		transactionsApiUrl.PATCH("/api/updateStatus", transaction.UpdateTransactionStatusApi)
+		transactionsApiUrl.POST("/api/satisfied", transaction.SatisfiedApi)
 
 	}
 
