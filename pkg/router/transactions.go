@@ -61,6 +61,8 @@ func Transaction(r *gin.Engine, ApiVersion string, validator *validator.Validate
 		transactionsApiUrl.GET("/rates", transaction.ListRates)
 		transactionsApiUrl.GET("/exchange-transaction/:account_id", transaction.ListExchangeTransactionByAccountID)
 		transactionsApiUrl.GET("exchange-transaction/show/:exchange_id", transaction.GetExchangeTransactionByID)
+		transactionsApiUrl.PATCH("/api/updateStatus", transaction.UpdateTransactionStatusApi)
+		transactionsApiUrl.POST("/api/satisfied", transaction.SatisfiedApi)
 
 	}
 
@@ -68,6 +70,9 @@ func Transaction(r *gin.Engine, ApiVersion string, validator *validator.Validate
 	{
 		transactionsAppUrl.POST("/validate_on_db", transaction.ValidateOnDB)
 		transactionsAppUrl.PATCH("/update_transaction_amount_paid", transaction.UpdateTransactionAmountPaid)
+		transactionsAppUrl.POST("/create_activity_log", transaction.CreateActivityLog)
+		transactionsAppUrl.POST("/create_exchange_transaction", transaction.CreateExchangeTransaction)
+		transactionsAppUrl.GET("/get_rate/:id", transaction.GetRateByID)
 	}
 	return r
 }

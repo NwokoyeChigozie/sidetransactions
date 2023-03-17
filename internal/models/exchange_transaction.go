@@ -22,14 +22,21 @@ type ExchangeTransaction struct {
 	UpdatedAt     time.Time `gorm:"column:updated_at; autoUpdateTime" json:"-"`
 }
 type ExchangeTransactionWithRate struct {
-	ID              uint    `"json:"id"`
-	AccountID       string  `"json:"account_id"`
-	InitialAmount   float64 `"json:"initial_amount"`
+	ID              uint    `json:"id"`
+	AccountID       string  `json:"account_id"`
+	InitialAmount   float64 `json:"initial_amount"`
 	FinalAmount     float64 `json:"final_amount"`
 	Rate            Rate    `json:"rate"`
 	Status          string  `json:"status"`
 	TransactionName string  `json:"transaction_name"`
 	Date            string  `json:"date"`
+}
+type CreateExchangeTransactionRequest struct {
+	AccountID     int     `json:"account_id" validate:"required" pgvalidate:"exists=auth$users$account_id"`
+	InitialAmount float64 `json:"initial_amount" validate:"required"`
+	FinalAmount   float64 `json:"final_amount" validate:"required"`
+	RateID        int     `json:"rate_id" validate:"required" pgvalidate:"exists=transaction$rates$id"`
+	Status        string  `json:"status" validate:"required,oneof=failed pending completed"`
 }
 
 func (t *ExchangeTransaction) CreateExchangeTransaction(db *gorm.DB) error {

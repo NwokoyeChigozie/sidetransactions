@@ -48,7 +48,7 @@ func (base *Controller) GetExchangeTransactionByID(c *gin.Context) {
 
 	id, err := strconv.Atoi(idString)
 	if err != nil {
-		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", "invalid echange id", err, nil)
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", "invalid exchange id", err, nil)
 		c.JSON(http.StatusBadRequest, rd)
 		return
 	}
@@ -61,6 +61,76 @@ func (base *Controller) GetExchangeTransactionByID(c *gin.Context) {
 		return
 	}
 	rd := utility.BuildSuccessResponse(http.StatusOK, "success", rExchangeTransaction)
+	c.JSON(http.StatusOK, rd)
+
+}
+func (base *Controller) CreateExchangeTransaction(c *gin.Context) {
+	var (
+		req models.CreateExchangeTransactionRequest
+	)
+
+	err := c.ShouldBind(&req)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", "Failed to parse request body", err, nil)
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	err = base.Validator.Struct(&req)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", "Validation failed", utility.ValidationResponse(err, base.Validator), nil)
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	vr := postgresql.ValidateRequestM{Logger: base.Logger, Test: base.ExtReq.Test}
+	err = vr.ValidateRequest(req)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", err.Error(), err, nil)
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	exchangeTransaction := models.ExchangeTransaction{
+		AccountID:     strconv.Itoa(req.AccountID),
+		InitialAmount: req.InitialAmount,
+		FinalAmount:   req.FinalAmount,
+		RateID:        req.RateID,
+		Status:        req.Status,
+	}
+
+	err = exchangeTransaction.CreateExchangeTransaction(base.Db.Transaction)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusInternalServerError, "error", err.Error(), err, nil)
+		c.JSON(http.StatusInternalServerError, rd)
+		return
+	}
+
+	rd := utility.BuildSuccessResponse(http.StatusCreated, "Exchange Transaction Created", nil)
+	c.JSON(http.StatusCreated, rd)
+
+}
+
+func (base *Controller) GetRateByID(c *gin.Context) {
+	var (
+		idString = c.Param("id")
+	)
+
+	id, err := strconv.Atoi(idString)
+	if err != nil {
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", "invalid rate id", err, nil)
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
+	rate := models.Rate{ID: int64(id)}
+	code, err := rate.GetRateByID(base.Db.Transaction)
+	if err != nil {
+		rd := utility.BuildErrorResponse(code, "error", err.Error(), err, nil)
+		c.JSON(code, rd)
+		return
+	}
+	rd := utility.BuildSuccessResponse(http.StatusOK, "success", rate)
 	c.JSON(http.StatusOK, rd)
 
 }

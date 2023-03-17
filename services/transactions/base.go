@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/gin-gonic/gin"
 	"github.com/vesicash/transactions-ms/external/external_models"
 	"github.com/vesicash/transactions-ms/external/request"
 	"github.com/vesicash/transactions-ms/utility"
@@ -269,4 +270,24 @@ func CheckTransactionStatus(index string) bool {
 		"deleted": "Deleted",
 	}
 	return dataMap[strings.ToLower(index)] != ""
+}
+
+func GetAccessTokenByKeyFromRequest(extReq request.ExternalRequest, c *gin.Context) (external_models.AccessToken, error) {
+	privateKey := utility.GetHeader(c, "v-private-key")
+	publicKey := utility.GetHeader(c, "v-public-key")
+	key := privateKey
+	if key == "" {
+		key = publicKey
+	}
+	acItf, err := extReq.SendExternalRequest(request.GetAccessTokenByKey, key)
+	if err != nil {
+		return external_models.AccessToken{}, err
+	}
+
+	accessToken, ok := acItf.(external_models.AccessToken)
+	if !ok {
+		return external_models.AccessToken{}, fmt.Errorf("response data format error")
+	}
+
+	return accessToken, nil
 }

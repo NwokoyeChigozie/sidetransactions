@@ -95,6 +95,12 @@ type UpdateTransactionStatusRequest struct {
 	MilestoneID   string `json:"milestone_id" validate:"required" pgvalidate:"exists=transaction$transactions$milestone_id"`
 	Status        string `json:"status"`
 }
+type UpdateTransactionStatusApiRequest struct {
+	AccountID     int    `json:"account_id" validate:"required" pgvalidate:"exists=auth$users$account_id"`
+	TransactionID string `json:"transaction_id" validate:"required" pgvalidate:"exists=transaction$transactions$transaction_id"`
+	MilestoneID   string `json:"milestone_id" validate:"required" pgvalidate:"exists=transaction$transactions$milestone_id"`
+	Status        string `json:"status"`
+}
 type ApproveDueDateExtensionRequest struct {
 	TransactionID    string `json:"transaction_id" validate:"required" pgvalidate:"exists=transaction$transactions$transaction_id"`
 	MilestoneID      string `json:"milestone_id" validate:"required" pgvalidate:"exists=transaction$transactions$milestone_id"`
