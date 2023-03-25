@@ -67,7 +67,7 @@ type ListTransactionsByIDResponse struct {
 func CreateTransactionUser(t *testing.T, db postgresql.Databases, validator *validator.Validate, extReq request.ExternalRequest, accountID int, isArchived bool) models.TransactionByIDResponse {
 	var (
 		trans                 = transactions.Controller{Db: db, Validator: validator, Logger: extReq.Logger, ExtReq: extReq}
-		createTransactionPath = "/v2/transactions/create"
+		createTransactionPath = "/v2/create"
 		createTransactionURI  = url.URL{Path: createTransactionPath}
 		token, _              = uuid.NewV4()
 		headers               = map[string]string{

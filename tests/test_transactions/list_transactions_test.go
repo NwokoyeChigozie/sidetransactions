@@ -145,7 +145,7 @@ func TestListTransactionsByUser(t *testing.T) {
 
 			var b bytes.Buffer
 			json.NewEncoder(&b).Encode(test.RequestBody)
-			URI := url.URL{Path: "/v2/transactions/listByUser"}
+			URI := url.URL{Path: "/v2/listByUser"}
 
 			req, err := http.NewRequest(http.MethodPost, URI.String(), &b)
 			if err != nil {
@@ -284,7 +284,7 @@ func TestListArchivedTransactionsByUser(t *testing.T) {
 
 			var b bytes.Buffer
 			json.NewEncoder(&b).Encode(test.RequestBody)
-			URI := url.URL{Path: "/v2/transactions/list/archived"}
+			URI := url.URL{Path: "/v2/list/archived"}
 
 			req, err := http.NewRequest(http.MethodGet, URI.String(), &b)
 			if err != nil {
@@ -428,7 +428,7 @@ func TestListTransactionsByID(t *testing.T) {
 
 			var b bytes.Buffer
 			json.NewEncoder(&b).Encode(test.RequestBody)
-			URI := url.URL{Path: "/v2/transactions/listById/" + test.TransactionID}
+			URI := url.URL{Path: "/v2/listById/" + test.TransactionID}
 
 			req, err := http.NewRequest(http.MethodGet, URI.String(), &b)
 			if err != nil {
@@ -561,7 +561,7 @@ func TestListTransactions(t *testing.T) {
 
 			var b bytes.Buffer
 			json.NewEncoder(&b).Encode(test.RequestBody)
-			URI := url.URL{Path: "/v2/transactions/list"}
+			URI := url.URL{Path: "/v2/list"}
 
 			req, err := http.NewRequest(http.MethodPost, URI.String(), &b)
 			if err != nil {
@@ -705,7 +705,7 @@ func TestListTransactionsByUssdCode(t *testing.T) {
 
 			var b bytes.Buffer
 			json.NewEncoder(&b).Encode(test.RequestBody)
-			URI := url.URL{Path: "/v2/transactions/list-transactions-by-ussd-code/" + test.UssdCode}
+			URI := url.URL{Path: "/v2/list-transactions-by-ussd-code/" + test.UssdCode}
 
 			req, err := http.NewRequest(http.MethodGet, URI.String(), &b)
 			if err != nil {
@@ -841,7 +841,7 @@ func TestListTransactionsByBusiness(t *testing.T) {
 
 			var b bytes.Buffer
 			json.NewEncoder(&b).Encode(test.RequestBody)
-			URI := url.URL{Path: "/v2/transactions/listByBusiness"}
+			URI := url.URL{Path: "/v2/listByBusiness"}
 
 			req, err := http.NewRequest(http.MethodPost, URI.String(), &b)
 			if err != nil {
@@ -975,7 +975,7 @@ func TestListByBusinessFromMondayToThursday(t *testing.T) {
 
 			var b bytes.Buffer
 			json.NewEncoder(&b).Encode(test.RequestBody)
-			URI := url.URL{Path: "/v2/transactions/listByBusinessFromMondayToThursday"}
+			URI := url.URL{Path: "/v2/listByBusinessFromMondayToThursday"}
 
 			req, err := http.NewRequest(http.MethodPost, URI.String(), &b)
 			if err != nil {

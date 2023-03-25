@@ -182,7 +182,7 @@ func TestEditTransaction(t *testing.T) {
 
 			var b bytes.Buffer
 			json.NewEncoder(&b).Encode(test.RequestBody)
-			URI := url.URL{Path: "/v2/transactions/edit"}
+			URI := url.URL{Path: "/v2/edit"}
 
 			req, err := http.NewRequest(http.MethodPatch, URI.String(), &b)
 			if err != nil {
@@ -302,7 +302,7 @@ func TestDeleteTransaction(t *testing.T) {
 
 			var b bytes.Buffer
 			json.NewEncoder(&b).Encode(test.RequestBody)
-			URI := url.URL{Path: "/v2/transactions/delete/" + test.TransactionID}
+			URI := url.URL{Path: "/v2/delete/" + test.TransactionID}
 
 			req, err := http.NewRequest(http.MethodDelete, URI.String(), &b)
 			if err != nil {

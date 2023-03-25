@@ -197,7 +197,7 @@ func TestUpdateTransactionParties(t *testing.T) {
 
 			var b bytes.Buffer
 			json.NewEncoder(&b).Encode(test.RequestBody)
-			URI := url.URL{Path: "/v2/transactions/parties/update"}
+			URI := url.URL{Path: "/v2/parties/update"}
 
 			req, err := http.NewRequest(http.MethodPatch, URI.String(), &b)
 			if err != nil {
@@ -395,7 +395,7 @@ func TestUpdateTransactionPartyStatus(t *testing.T) {
 
 			var b bytes.Buffer
 			json.NewEncoder(&b).Encode(test.RequestBody)
-			URI := url.URL{Path: "/v2/transactions/parties/update-status"}
+			URI := url.URL{Path: "/v2/parties/update-status"}
 
 			req, err := http.NewRequest(http.MethodPatch, URI.String(), &b)
 			if err != nil {
@@ -604,7 +604,7 @@ func TestAssignTransactionBuyer(t *testing.T) {
 
 			var b bytes.Buffer
 			json.NewEncoder(&b).Encode(test.RequestBody)
-			URI := url.URL{Path: "/v2/transactions/assign/buyer"}
+			URI := url.URL{Path: "/v2/assign/buyer"}
 
 			req, err := http.NewRequest(http.MethodPost, URI.String(), &b)
 			if err != nil {
@@ -819,7 +819,7 @@ func TestUpdateTransactionBroker(t *testing.T) {
 
 			var b bytes.Buffer
 			json.NewEncoder(&b).Encode(test.RequestBody)
-			URI := url.URL{Path: "/v2/transactions/broker/update"}
+			URI := url.URL{Path: "/v2/broker/update"}
 
 			req, err := http.NewRequest(http.MethodPatch, URI.String(), &b)
 			if err != nil {

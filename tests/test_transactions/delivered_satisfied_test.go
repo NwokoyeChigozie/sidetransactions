@@ -178,7 +178,7 @@ func TestTransactionDelivered(t *testing.T) {
 
 			var b bytes.Buffer
 			json.NewEncoder(&b).Encode(test.RequestBody)
-			URI := url.URL{Path: "/v2/transactions/delivered"}
+			URI := url.URL{Path: "/v2/delivered"}
 
 			req, err := http.NewRequest(http.MethodPost, URI.String(), &b)
 			if err != nil {
@@ -355,7 +355,7 @@ func TestSatisfied(t *testing.T) {
 
 			var b bytes.Buffer
 			json.NewEncoder(&b).Encode(test.RequestBody)
-			URI := url.URL{Path: "/v2/transactions/satisfied"}
+			URI := url.URL{Path: "/v2/satisfied"}
 
 			req, err := http.NewRequest(http.MethodPost, URI.String(), &b)
 			if err != nil {
@@ -543,7 +543,7 @@ func TestSatisfiedApi(t *testing.T) {
 
 			var b bytes.Buffer
 			json.NewEncoder(&b).Encode(test.RequestBody)
-			URI := url.URL{Path: "/v2/transactions/api/satisfied"}
+			URI := url.URL{Path: "/v2/api/satisfied"}
 
 			req, err := http.NewRequest(http.MethodPost, URI.String(), &b)
 			if err != nil {

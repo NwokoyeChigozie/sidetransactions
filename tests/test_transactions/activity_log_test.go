@@ -189,7 +189,7 @@ func TestCreateActivityLog(t *testing.T) {
 
 			var b bytes.Buffer
 			json.NewEncoder(&b).Encode(test.RequestBody)
-			URI := url.URL{Path: "/v2/transactions/create_activity_log"}
+			URI := url.URL{Path: "/v2/create_activity_log"}
 
 			req, err := http.NewRequest(http.MethodPost, URI.String(), &b)
 			if err != nil {

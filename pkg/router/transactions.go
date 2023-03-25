@@ -21,7 +21,7 @@ func Transaction(r *gin.Engine, ApiVersion string, validator *validator.Validate
 
 	// }
 
-	transactionsAuthUrl := r.Group(fmt.Sprintf("%v/transactions", ApiVersion), middleware.Authorize(db, extReq, middleware.AuthType))
+	transactionsAuthUrl := r.Group(fmt.Sprintf("%v", ApiVersion), middleware.Authorize(db, extReq, middleware.AuthType))
 	{
 		transactionsAuthUrl.POST("/create", transaction.CreateTransaction)
 		transactionsAuthUrl.PATCH("/edit", transaction.EditTransaction)
@@ -45,7 +45,7 @@ func Transaction(r *gin.Engine, ApiVersion string, validator *validator.Validate
 
 	}
 
-	transactionsApiUrl := r.Group(fmt.Sprintf("%v/transactions", ApiVersion), middleware.Authorize(db, extReq, middleware.ApiType))
+	transactionsApiUrl := r.Group(fmt.Sprintf("%v", ApiVersion), middleware.Authorize(db, extReq, middleware.ApiType))
 	{
 		transactionsApiUrl.POST("/list", transaction.ListTransactions)
 		transactionsApiUrl.GET("/listById/:id", transaction.ListTransactionsByID)
@@ -66,7 +66,7 @@ func Transaction(r *gin.Engine, ApiVersion string, validator *validator.Validate
 
 	}
 
-	transactionsAppUrl := r.Group(fmt.Sprintf("%v/transactions", ApiVersion), middleware.Authorize(db, extReq, middleware.AppType))
+	transactionsAppUrl := r.Group(fmt.Sprintf("%v", ApiVersion), middleware.Authorize(db, extReq, middleware.AppType))
 	{
 		transactionsAppUrl.POST("/validate_on_db", transaction.ValidateOnDB)
 		transactionsAppUrl.PATCH("/update_transaction_amount_paid", transaction.UpdateTransactionAmountPaid)

@@ -167,7 +167,7 @@ func TestCreateDispute(t *testing.T) {
 
 			var b bytes.Buffer
 			json.NewEncoder(&b).Encode(test.RequestBody)
-			URI := url.URL{Path: "/v2/transactions/dispute"}
+			URI := url.URL{Path: "/v2/dispute"}
 
 			req, err := http.NewRequest(http.MethodPost, URI.String(), &b)
 			if err != nil {
@@ -341,7 +341,7 @@ func TestGetDisputeByTransactionID(t *testing.T) {
 
 			var b bytes.Buffer
 			json.NewEncoder(&b).Encode(test.RequestBody)
-			URI := url.URL{Path: "/v2/transactions/dispute/fetch/" + test.TransactionID}
+			URI := url.URL{Path: "/v2/dispute/fetch/" + test.TransactionID}
 
 			req, err := http.NewRequest(http.MethodGet, URI.String(), &b)
 			if err != nil {
@@ -531,7 +531,7 @@ func TestUpdateDispute(t *testing.T) {
 
 			var b bytes.Buffer
 			json.NewEncoder(&b).Encode(test.RequestBody)
-			URI := url.URL{Path: "/v2/transactions/dispute/update"}
+			URI := url.URL{Path: "/v2/dispute/update"}
 
 			req, err := http.NewRequest(http.MethodPatch, URI.String(), &b)
 			if err != nil {
@@ -695,7 +695,7 @@ func TestGetDisputeByUser(t *testing.T) {
 
 			var b bytes.Buffer
 			json.NewEncoder(&b).Encode(test.RequestBody)
-			URI := url.URL{Path: "/v2/transactions/list/user_disputes"}
+			URI := url.URL{Path: "/v2/list/user_disputes"}
 
 			req, err := http.NewRequest(http.MethodGet, URI.String(), &b)
 			if err != nil {

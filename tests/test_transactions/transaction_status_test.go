@@ -207,7 +207,7 @@ func TestUpdateTransactionStatus(t *testing.T) {
 
 			var b bytes.Buffer
 			json.NewEncoder(&b).Encode(test.RequestBody)
-			URI := url.URL{Path: "/v2/transactions/updateStatus"}
+			URI := url.URL{Path: "/v2/updateStatus"}
 
 			req, err := http.NewRequest(http.MethodPatch, URI.String(), &b)
 			if err != nil {
@@ -461,7 +461,7 @@ func TestUpdateTransactionStatusApi(t *testing.T) {
 
 			var b bytes.Buffer
 			json.NewEncoder(&b).Encode(test.RequestBody)
-			URI := url.URL{Path: "/v2/transactions/api/updateStatus"}
+			URI := url.URL{Path: "/v2/api/updateStatus"}
 
 			req, err := http.NewRequest(http.MethodPatch, URI.String(), &b)
 			if err != nil {

@@ -135,7 +135,7 @@ func TestGetEscrowCharge(t *testing.T) {
 
 			var b bytes.Buffer
 			json.NewEncoder(&b).Encode(test.RequestBody)
-			URI := url.URL{Path: "/v2/transactions/escrowcharge"}
+			URI := url.URL{Path: "/v2/escrowcharge"}
 
 			req, err := http.NewRequest(http.MethodPost, URI.String(), &b)
 			if err != nil {

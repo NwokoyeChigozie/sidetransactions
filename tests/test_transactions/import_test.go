@@ -153,7 +153,7 @@ func TestImportTransaction(t *testing.T) {
 
 			var payload bytes.Buffer
 			writer := multipart.NewWriter(&payload)
-			URI := url.URL{Path: "/v2/transactions/import"}
+			URI := url.URL{Path: "/v2/import"}
 			if test.RequestBody {
 				file, errFile1 := os.Open("./import.csv")
 				if errFile1 != nil {
