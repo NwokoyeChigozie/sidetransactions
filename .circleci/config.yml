@@ -143,7 +143,7 @@ jobs:
           name: Publish Docker image
           command: |
             IMAGE_NAME="${REGISTRY}/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}"
-            IMAGE_TAG="0.1.${CIRCLE_BUILD_NUM}"
+            IMAGE_TAG="development"
             echo $DOCKER_PASS | docker login $REGISTRY -u $DOCKER_USER --password-stdin
             docker tag $IMAGE_NAME:latest $IMAGE_NAME:$IMAGE_TAG
             docker push $IMAGE_NAME:$IMAGE_TAG
