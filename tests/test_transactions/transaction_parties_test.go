@@ -187,7 +187,7 @@ func TestUpdateTransactionParties(t *testing.T) {
 		},
 	}
 
-	transactionsApiUrl := r.Group(fmt.Sprintf("%v/transactions", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.ApiType))
+	transactionsApiUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.ApiType))
 	{
 		transactionsApiUrl.PATCH("/parties/update", trans.UpdateTransactionParties)
 	}
@@ -197,7 +197,7 @@ func TestUpdateTransactionParties(t *testing.T) {
 
 			var b bytes.Buffer
 			json.NewEncoder(&b).Encode(test.RequestBody)
-			URI := url.URL{Path: "/v2/transactions/parties/update"}
+			URI := url.URL{Path: "/v2/parties/update"}
 
 			req, err := http.NewRequest(http.MethodPatch, URI.String(), &b)
 			if err != nil {
@@ -385,7 +385,7 @@ func TestUpdateTransactionPartyStatus(t *testing.T) {
 		},
 	}
 
-	transactionsApiUrl := r.Group(fmt.Sprintf("%v/transactions", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.ApiType))
+	transactionsApiUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.ApiType))
 	{
 		transactionsApiUrl.PATCH("/parties/update-status", trans.UpdateTransactionPartyStatus)
 	}
@@ -395,7 +395,7 @@ func TestUpdateTransactionPartyStatus(t *testing.T) {
 
 			var b bytes.Buffer
 			json.NewEncoder(&b).Encode(test.RequestBody)
-			URI := url.URL{Path: "/v2/transactions/parties/update-status"}
+			URI := url.URL{Path: "/v2/parties/update-status"}
 
 			req, err := http.NewRequest(http.MethodPatch, URI.String(), &b)
 			if err != nil {
@@ -594,7 +594,7 @@ func TestAssignTransactionBuyer(t *testing.T) {
 		},
 	}
 
-	transactionsApiUrl := r.Group(fmt.Sprintf("%v/transactions", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.ApiType))
+	transactionsApiUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.ApiType))
 	{
 		transactionsApiUrl.POST("/assign/buyer", trans.AssignTransactionBuyer)
 	}
@@ -604,7 +604,7 @@ func TestAssignTransactionBuyer(t *testing.T) {
 
 			var b bytes.Buffer
 			json.NewEncoder(&b).Encode(test.RequestBody)
-			URI := url.URL{Path: "/v2/transactions/assign/buyer"}
+			URI := url.URL{Path: "/v2/assign/buyer"}
 
 			req, err := http.NewRequest(http.MethodPost, URI.String(), &b)
 			if err != nil {
@@ -809,7 +809,7 @@ func TestUpdateTransactionBroker(t *testing.T) {
 		},
 	}
 
-	transactionsApiUrl := r.Group(fmt.Sprintf("%v/transactions", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.ApiType))
+	transactionsApiUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.ApiType))
 	{
 		transactionsApiUrl.PATCH("/broker/update", trans.UpdateTransactionBroker)
 	}
@@ -819,7 +819,7 @@ func TestUpdateTransactionBroker(t *testing.T) {
 
 			var b bytes.Buffer
 			json.NewEncoder(&b).Encode(test.RequestBody)
-			URI := url.URL{Path: "/v2/transactions/broker/update"}
+			URI := url.URL{Path: "/v2/broker/update"}
 
 			req, err := http.NewRequest(http.MethodPatch, URI.String(), &b)
 			if err != nil {

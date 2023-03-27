@@ -168,7 +168,7 @@ func TestTransactionDelivered(t *testing.T) {
 		},
 	}
 
-	transactionsAuthUrl := r.Group(fmt.Sprintf("%v/transactions", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.AuthType))
+	transactionsAuthUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.AuthType))
 	{
 		transactionsAuthUrl.POST("/delivered", trans.TransactionDelivered)
 	}
@@ -178,7 +178,7 @@ func TestTransactionDelivered(t *testing.T) {
 
 			var b bytes.Buffer
 			json.NewEncoder(&b).Encode(test.RequestBody)
-			URI := url.URL{Path: "/v2/transactions/delivered"}
+			URI := url.URL{Path: "/v2/delivered"}
 
 			req, err := http.NewRequest(http.MethodPost, URI.String(), &b)
 			if err != nil {
@@ -345,7 +345,7 @@ func TestSatisfied(t *testing.T) {
 		},
 	}
 
-	transactionsAuthUrl := r.Group(fmt.Sprintf("%v/transactions", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.AuthType))
+	transactionsAuthUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.AuthType))
 	{
 		transactionsAuthUrl.POST("/satisfied", trans.Satisfied)
 	}
@@ -355,7 +355,7 @@ func TestSatisfied(t *testing.T) {
 
 			var b bytes.Buffer
 			json.NewEncoder(&b).Encode(test.RequestBody)
-			URI := url.URL{Path: "/v2/transactions/satisfied"}
+			URI := url.URL{Path: "/v2/satisfied"}
 
 			req, err := http.NewRequest(http.MethodPost, URI.String(), &b)
 			if err != nil {
@@ -533,7 +533,7 @@ func TestSatisfiedApi(t *testing.T) {
 		},
 	}
 
-	transactionsApiUrl := r.Group(fmt.Sprintf("%v/transactions", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.ApiType))
+	transactionsApiUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.ApiType))
 	{
 		transactionsApiUrl.POST("/api/satisfied", trans.SatisfiedApi)
 	}
@@ -543,7 +543,7 @@ func TestSatisfiedApi(t *testing.T) {
 
 			var b bytes.Buffer
 			json.NewEncoder(&b).Encode(test.RequestBody)
-			URI := url.URL{Path: "/v2/transactions/api/satisfied"}
+			URI := url.URL{Path: "/v2/api/satisfied"}
 
 			req, err := http.NewRequest(http.MethodPost, URI.String(), &b)
 			if err != nil {

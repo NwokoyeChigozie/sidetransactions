@@ -125,7 +125,7 @@ func TestGetEscrowCharge(t *testing.T) {
 		},
 	}
 
-	transactionApiUrl := r.Group(fmt.Sprintf("%v/transactions", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.ApiType))
+	transactionApiUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.ApiType))
 	{
 		transactionApiUrl.POST("/escrowcharge", trans.GetEscrowCharge)
 	}
@@ -135,7 +135,7 @@ func TestGetEscrowCharge(t *testing.T) {
 
 			var b bytes.Buffer
 			json.NewEncoder(&b).Encode(test.RequestBody)
-			URI := url.URL{Path: "/v2/transactions/escrowcharge"}
+			URI := url.URL{Path: "/v2/escrowcharge"}
 
 			req, err := http.NewRequest(http.MethodPost, URI.String(), &b)
 			if err != nil {

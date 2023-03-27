@@ -126,7 +126,7 @@ func TestListRates(t *testing.T) {
 		},
 	}
 
-	transactionApiUrl := r.Group(fmt.Sprintf("%v/transactions", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.ApiType))
+	transactionApiUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.ApiType))
 	{
 		transactionApiUrl.GET("/rates", trans.ListRates)
 	}
@@ -136,7 +136,7 @@ func TestListRates(t *testing.T) {
 
 			var b bytes.Buffer
 			json.NewEncoder(&b).Encode(test.RequestBody)
-			URI := url.URL{Path: "/v2/transactions/rates"}
+			URI := url.URL{Path: "/v2/rates"}
 
 			req, err := http.NewRequest(http.MethodGet, URI.String(), &b)
 			if err != nil {
@@ -287,7 +287,7 @@ func TestListExchangeTransactionByAccountID(t *testing.T) {
 		},
 	}
 
-	transactionApiUrl := r.Group(fmt.Sprintf("%v/transactions", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.ApiType))
+	transactionApiUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.ApiType))
 	{
 		transactionApiUrl.GET("/exchange-transaction/:account_id", trans.ListExchangeTransactionByAccountID)
 	}
@@ -297,7 +297,7 @@ func TestListExchangeTransactionByAccountID(t *testing.T) {
 
 			var b bytes.Buffer
 			json.NewEncoder(&b).Encode(test.RequestBody)
-			URI := url.URL{Path: "/v2/transactions/exchange-transaction/" + test.AccountID}
+			URI := url.URL{Path: "/v2/exchange-transaction/" + test.AccountID}
 
 			req, err := http.NewRequest(http.MethodGet, URI.String(), &b)
 			if err != nil {
@@ -458,7 +458,7 @@ func TestGetExchangeTransactionByID(t *testing.T) {
 		},
 	}
 
-	transactionApiUrl := r.Group(fmt.Sprintf("%v/transactions", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.ApiType))
+	transactionApiUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.ApiType))
 	{
 		transactionApiUrl.GET("exchange-transaction/show/:exchange_id", trans.GetExchangeTransactionByID)
 	}
@@ -468,7 +468,7 @@ func TestGetExchangeTransactionByID(t *testing.T) {
 
 			var b bytes.Buffer
 			json.NewEncoder(&b).Encode(test.RequestBody)
-			URI := url.URL{Path: "/v2/transactions/exchange-transaction/show/" + test.ExchangeTransactionID}
+			URI := url.URL{Path: "/v2/exchange-transaction/show/" + test.ExchangeTransactionID}
 
 			req, err := http.NewRequest(http.MethodGet, URI.String(), &b)
 			if err != nil {
@@ -643,7 +643,7 @@ func TestCreateExchangeTransaction(t *testing.T) {
 		},
 	}
 
-	transactionAppUrl := r.Group(fmt.Sprintf("%v/transactions", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.AppType))
+	transactionAppUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.AppType))
 	{
 		transactionAppUrl.POST("/create_exchange_transaction", trans.CreateExchangeTransaction)
 	}
@@ -653,7 +653,7 @@ func TestCreateExchangeTransaction(t *testing.T) {
 
 			var b bytes.Buffer
 			json.NewEncoder(&b).Encode(test.RequestBody)
-			URI := url.URL{Path: "/v2/transactions/create_exchange_transaction"}
+			URI := url.URL{Path: "/v2/create_exchange_transaction"}
 
 			req, err := http.NewRequest(http.MethodPost, URI.String(), &b)
 			if err != nil {
@@ -808,7 +808,7 @@ func TestGetRateByID(t *testing.T) {
 		},
 	}
 
-	transactionAppUrl := r.Group(fmt.Sprintf("%v/transactions", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.AppType))
+	transactionAppUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.AppType))
 	{
 		transactionAppUrl.GET("/get_rate/:id", trans.GetRateByID)
 	}
@@ -818,7 +818,7 @@ func TestGetRateByID(t *testing.T) {
 
 			var b bytes.Buffer
 			json.NewEncoder(&b).Encode(test.RequestBody)
-			URI := url.URL{Path: "/v2/transactions/get_rate/" + test.ID}
+			URI := url.URL{Path: "/v2/get_rate/" + test.ID}
 
 			req, err := http.NewRequest(http.MethodGet, URI.String(), &b)
 			if err != nil {

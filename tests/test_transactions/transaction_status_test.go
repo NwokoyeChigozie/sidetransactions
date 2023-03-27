@@ -197,7 +197,7 @@ func TestUpdateTransactionStatus(t *testing.T) {
 		},
 	}
 
-	transactionsAuthUrl := r.Group(fmt.Sprintf("%v/transactions", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.AuthType))
+	transactionsAuthUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.AuthType))
 	{
 		transactionsAuthUrl.PATCH("/updateStatus", trans.UpdateTransactionStatus)
 	}
@@ -207,7 +207,7 @@ func TestUpdateTransactionStatus(t *testing.T) {
 
 			var b bytes.Buffer
 			json.NewEncoder(&b).Encode(test.RequestBody)
-			URI := url.URL{Path: "/v2/transactions/updateStatus"}
+			URI := url.URL{Path: "/v2/updateStatus"}
 
 			req, err := http.NewRequest(http.MethodPatch, URI.String(), &b)
 			if err != nil {
@@ -451,7 +451,7 @@ func TestUpdateTransactionStatusApi(t *testing.T) {
 		},
 	}
 
-	transactionsApiUrl := r.Group(fmt.Sprintf("%v/transactions", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.ApiType))
+	transactionsApiUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.ApiType))
 	{
 		transactionsApiUrl.PATCH("/api/updateStatus", trans.UpdateTransactionStatusApi)
 	}
@@ -461,7 +461,7 @@ func TestUpdateTransactionStatusApi(t *testing.T) {
 
 			var b bytes.Buffer
 			json.NewEncoder(&b).Encode(test.RequestBody)
-			URI := url.URL{Path: "/v2/transactions/api/updateStatus"}
+			URI := url.URL{Path: "/v2/api/updateStatus"}
 
 			req, err := http.NewRequest(http.MethodPatch, URI.String(), &b)
 			if err != nil {

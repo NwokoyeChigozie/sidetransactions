@@ -135,7 +135,7 @@ func TestListTransactionsByUser(t *testing.T) {
 		},
 	}
 
-	transactionAuthUrl := r.Group(fmt.Sprintf("%v/transactions", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.AuthType))
+	transactionAuthUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.AuthType))
 	{
 		transactionAuthUrl.POST("/listByUser", trans.ListTransactionsByUser)
 	}
@@ -145,7 +145,7 @@ func TestListTransactionsByUser(t *testing.T) {
 
 			var b bytes.Buffer
 			json.NewEncoder(&b).Encode(test.RequestBody)
-			URI := url.URL{Path: "/v2/transactions/listByUser"}
+			URI := url.URL{Path: "/v2/listByUser"}
 
 			req, err := http.NewRequest(http.MethodPost, URI.String(), &b)
 			if err != nil {
@@ -274,7 +274,7 @@ func TestListArchivedTransactionsByUser(t *testing.T) {
 		},
 	}
 
-	transactionAuthUrl := r.Group(fmt.Sprintf("%v/transactions", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.AuthType))
+	transactionAuthUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.AuthType))
 	{
 		transactionAuthUrl.GET("/list/archived", trans.ListArchivedTransactions)
 	}
@@ -284,7 +284,7 @@ func TestListArchivedTransactionsByUser(t *testing.T) {
 
 			var b bytes.Buffer
 			json.NewEncoder(&b).Encode(test.RequestBody)
-			URI := url.URL{Path: "/v2/transactions/list/archived"}
+			URI := url.URL{Path: "/v2/list/archived"}
 
 			req, err := http.NewRequest(http.MethodGet, URI.String(), &b)
 			if err != nil {
@@ -418,7 +418,7 @@ func TestListTransactionsByID(t *testing.T) {
 		},
 	}
 
-	transactionApiUrl := r.Group(fmt.Sprintf("%v/transactions", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.ApiType))
+	transactionApiUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.ApiType))
 	{
 		transactionApiUrl.GET("/listById/:id", trans.ListTransactionsByID)
 	}
@@ -428,7 +428,7 @@ func TestListTransactionsByID(t *testing.T) {
 
 			var b bytes.Buffer
 			json.NewEncoder(&b).Encode(test.RequestBody)
-			URI := url.URL{Path: "/v2/transactions/listById/" + test.TransactionID}
+			URI := url.URL{Path: "/v2/listById/" + test.TransactionID}
 
 			req, err := http.NewRequest(http.MethodGet, URI.String(), &b)
 			if err != nil {
@@ -551,7 +551,7 @@ func TestListTransactions(t *testing.T) {
 		},
 	}
 
-	transactionApiUrl := r.Group(fmt.Sprintf("%v/transactions", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.ApiType))
+	transactionApiUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.ApiType))
 	{
 		transactionApiUrl.POST("/list", trans.ListTransactions)
 	}
@@ -561,7 +561,7 @@ func TestListTransactions(t *testing.T) {
 
 			var b bytes.Buffer
 			json.NewEncoder(&b).Encode(test.RequestBody)
-			URI := url.URL{Path: "/v2/transactions/list"}
+			URI := url.URL{Path: "/v2/list"}
 
 			req, err := http.NewRequest(http.MethodPost, URI.String(), &b)
 			if err != nil {
@@ -695,7 +695,7 @@ func TestListTransactionsByUssdCode(t *testing.T) {
 		},
 	}
 
-	transactionApiUrl := r.Group(fmt.Sprintf("%v/transactions", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.ApiType))
+	transactionApiUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.ApiType))
 	{
 		transactionApiUrl.GET("/list-transactions-by-ussd-code/:code", trans.ListTransactionsByUSSDCode)
 	}
@@ -705,7 +705,7 @@ func TestListTransactionsByUssdCode(t *testing.T) {
 
 			var b bytes.Buffer
 			json.NewEncoder(&b).Encode(test.RequestBody)
-			URI := url.URL{Path: "/v2/transactions/list-transactions-by-ussd-code/" + test.UssdCode}
+			URI := url.URL{Path: "/v2/list-transactions-by-ussd-code/" + test.UssdCode}
 
 			req, err := http.NewRequest(http.MethodGet, URI.String(), &b)
 			if err != nil {
@@ -831,7 +831,7 @@ func TestListTransactionsByBusiness(t *testing.T) {
 		},
 	}
 
-	transactionApiUrl := r.Group(fmt.Sprintf("%v/transactions", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.ApiType))
+	transactionApiUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.ApiType))
 	{
 		transactionApiUrl.POST("/listByBusiness", trans.ListTransactionsByBusiness)
 	}
@@ -841,7 +841,7 @@ func TestListTransactionsByBusiness(t *testing.T) {
 
 			var b bytes.Buffer
 			json.NewEncoder(&b).Encode(test.RequestBody)
-			URI := url.URL{Path: "/v2/transactions/listByBusiness"}
+			URI := url.URL{Path: "/v2/listByBusiness"}
 
 			req, err := http.NewRequest(http.MethodPost, URI.String(), &b)
 			if err != nil {
@@ -965,7 +965,7 @@ func TestListByBusinessFromMondayToThursday(t *testing.T) {
 		},
 	}
 
-	transactionApiUrl := r.Group(fmt.Sprintf("%v/transactions", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.ApiType))
+	transactionApiUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.ApiType))
 	{
 		transactionApiUrl.POST("/listByBusinessFromMondayToThursday", trans.ListByBusinessFromMondayToThursday)
 	}
@@ -975,7 +975,7 @@ func TestListByBusinessFromMondayToThursday(t *testing.T) {
 
 			var b bytes.Buffer
 			json.NewEncoder(&b).Encode(test.RequestBody)
-			URI := url.URL{Path: "/v2/transactions/listByBusinessFromMondayToThursday"}
+			URI := url.URL{Path: "/v2/listByBusinessFromMondayToThursday"}
 
 			req, err := http.NewRequest(http.MethodPost, URI.String(), &b)
 			if err != nil {

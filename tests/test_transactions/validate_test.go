@@ -167,7 +167,7 @@ func TestValidateOnDb(t *testing.T) {
 		Test:   true,
 	}}
 
-	transactionsAppUrl := r.Group(fmt.Sprintf("%v/transactions", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.AppType))
+	transactionsAppUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.AppType))
 	{
 		transactionsAppUrl.POST("/validate_on_db", trans.ValidateOnDB)
 	}
@@ -176,7 +176,7 @@ func TestValidateOnDb(t *testing.T) {
 		t.Run(test.Name, func(t *testing.T) {
 			var b bytes.Buffer
 			json.NewEncoder(&b).Encode(test.RequestBody)
-			URI := url.URL{Path: "/v2/transactions/validate_on_db"}
+			URI := url.URL{Path: "/v2/validate_on_db"}
 
 			req, err := http.NewRequest(http.MethodPost, URI.String(), &b)
 			if err != nil {

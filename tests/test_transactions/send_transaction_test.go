@@ -154,7 +154,7 @@ func TestSendTransaction(t *testing.T) {
 		},
 	}
 
-	transactionsAuthUrl := r.Group(fmt.Sprintf("%v/transactions", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.AuthType))
+	transactionsAuthUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.AuthType))
 	{
 		transactionsAuthUrl.POST("/send", trans.SendTransaction)
 	}
@@ -164,7 +164,7 @@ func TestSendTransaction(t *testing.T) {
 
 			var b bytes.Buffer
 			json.NewEncoder(&b).Encode(test.RequestBody)
-			URI := url.URL{Path: "/v2/transactions/send"}
+			URI := url.URL{Path: "/v2/send"}
 
 			req, err := http.NewRequest(http.MethodPost, URI.String(), &b)
 			if err != nil {

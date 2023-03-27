@@ -157,7 +157,7 @@ func TestRequestDueDateExtension(t *testing.T) {
 		},
 	}
 
-	transactionsAuthUrl := r.Group(fmt.Sprintf("%v/transactions", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.AuthType))
+	transactionsAuthUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.AuthType))
 	{
 		transactionsAuthUrl.POST("/request/due_date_extension", trans.RequestDueDateExtension)
 	}
@@ -167,7 +167,7 @@ func TestRequestDueDateExtension(t *testing.T) {
 
 			var b bytes.Buffer
 			json.NewEncoder(&b).Encode(test.RequestBody)
-			URI := url.URL{Path: "/v2/transactions/request/due_date_extension"}
+			URI := url.URL{Path: "/v2/request/due_date_extension"}
 
 			req, err := http.NewRequest(http.MethodPost, URI.String(), &b)
 			if err != nil {
@@ -353,7 +353,7 @@ func TestApproveDueDateExtension(t *testing.T) {
 		},
 	}
 
-	transactionsAuthUrl := r.Group(fmt.Sprintf("%v/transactions", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.AuthType))
+	transactionsAuthUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.AuthType))
 	{
 		transactionsAuthUrl.POST("/approve/due_date_extension", trans.ApproveDueDateExtension)
 	}
@@ -363,7 +363,7 @@ func TestApproveDueDateExtension(t *testing.T) {
 
 			var b bytes.Buffer
 			json.NewEncoder(&b).Encode(test.RequestBody)
-			URI := url.URL{Path: "/v2/transactions/approve/due_date_extension"}
+			URI := url.URL{Path: "/v2/approve/due_date_extension"}
 
 			req, err := http.NewRequest(http.MethodPost, URI.String(), &b)
 			if err != nil {

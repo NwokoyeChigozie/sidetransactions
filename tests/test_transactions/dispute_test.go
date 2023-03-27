@@ -157,7 +157,7 @@ func TestCreateDispute(t *testing.T) {
 		},
 	}
 
-	transactionsAuthUrl := r.Group(fmt.Sprintf("%v/transactions", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.AuthType))
+	transactionsAuthUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.AuthType))
 	{
 		transactionsAuthUrl.POST("/dispute", trans.CreateDispute)
 	}
@@ -167,7 +167,7 @@ func TestCreateDispute(t *testing.T) {
 
 			var b bytes.Buffer
 			json.NewEncoder(&b).Encode(test.RequestBody)
-			URI := url.URL{Path: "/v2/transactions/dispute"}
+			URI := url.URL{Path: "/v2/dispute"}
 
 			req, err := http.NewRequest(http.MethodPost, URI.String(), &b)
 			if err != nil {
@@ -331,7 +331,7 @@ func TestGetDisputeByTransactionID(t *testing.T) {
 		},
 	}
 
-	transactionsAuthUrl := r.Group(fmt.Sprintf("%v/transactions", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.AuthType))
+	transactionsAuthUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.AuthType))
 	{
 		transactionsAuthUrl.GET("/dispute/fetch/:transaction_id", trans.GetDisputeByTransactionID)
 	}
@@ -341,7 +341,7 @@ func TestGetDisputeByTransactionID(t *testing.T) {
 
 			var b bytes.Buffer
 			json.NewEncoder(&b).Encode(test.RequestBody)
-			URI := url.URL{Path: "/v2/transactions/dispute/fetch/" + test.TransactionID}
+			URI := url.URL{Path: "/v2/dispute/fetch/" + test.TransactionID}
 
 			req, err := http.NewRequest(http.MethodGet, URI.String(), &b)
 			if err != nil {
@@ -521,7 +521,7 @@ func TestUpdateDispute(t *testing.T) {
 		},
 	}
 
-	transactionsAuthUrl := r.Group(fmt.Sprintf("%v/transactions", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.AuthType))
+	transactionsAuthUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.AuthType))
 	{
 		transactionsAuthUrl.PATCH("/dispute/update", trans.UpdateDispute)
 	}
@@ -531,7 +531,7 @@ func TestUpdateDispute(t *testing.T) {
 
 			var b bytes.Buffer
 			json.NewEncoder(&b).Encode(test.RequestBody)
-			URI := url.URL{Path: "/v2/transactions/dispute/update"}
+			URI := url.URL{Path: "/v2/dispute/update"}
 
 			req, err := http.NewRequest(http.MethodPatch, URI.String(), &b)
 			if err != nil {
@@ -685,7 +685,7 @@ func TestGetDisputeByUser(t *testing.T) {
 		},
 	}
 
-	transactionsAuthUrl := r.Group(fmt.Sprintf("%v/transactions", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.AuthType))
+	transactionsAuthUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.AuthType))
 	{
 		transactionsAuthUrl.GET("/list/user_disputes", trans.GetDisputeByUser)
 	}
@@ -695,7 +695,7 @@ func TestGetDisputeByUser(t *testing.T) {
 
 			var b bytes.Buffer
 			json.NewEncoder(&b).Encode(test.RequestBody)
-			URI := url.URL{Path: "/v2/transactions/list/user_disputes"}
+			URI := url.URL{Path: "/v2/list/user_disputes"}
 
 			req, err := http.NewRequest(http.MethodGet, URI.String(), &b)
 			if err != nil {

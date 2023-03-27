@@ -172,7 +172,7 @@ func TestEditTransaction(t *testing.T) {
 		},
 	}
 
-	transactionsAuthUrl := r.Group(fmt.Sprintf("%v/transactions", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.AuthType))
+	transactionsAuthUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.AuthType))
 	{
 		transactionsAuthUrl.PATCH("/edit", trans.EditTransaction)
 	}
@@ -182,7 +182,7 @@ func TestEditTransaction(t *testing.T) {
 
 			var b bytes.Buffer
 			json.NewEncoder(&b).Encode(test.RequestBody)
-			URI := url.URL{Path: "/v2/transactions/edit"}
+			URI := url.URL{Path: "/v2/edit"}
 
 			req, err := http.NewRequest(http.MethodPatch, URI.String(), &b)
 			if err != nil {
@@ -292,7 +292,7 @@ func TestDeleteTransaction(t *testing.T) {
 		},
 	}
 
-	transactionsAuthUrl := r.Group(fmt.Sprintf("%v/transactions", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.AuthType))
+	transactionsAuthUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.AuthType))
 	{
 		transactionsAuthUrl.DELETE("/delete/:id", trans.DeleteTransaction)
 	}
@@ -302,7 +302,7 @@ func TestDeleteTransaction(t *testing.T) {
 
 			var b bytes.Buffer
 			json.NewEncoder(&b).Encode(test.RequestBody)
-			URI := url.URL{Path: "/v2/transactions/delete/" + test.TransactionID}
+			URI := url.URL{Path: "/v2/delete/" + test.TransactionID}
 
 			req, err := http.NewRequest(http.MethodDelete, URI.String(), &b)
 			if err != nil {

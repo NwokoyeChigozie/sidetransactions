@@ -577,7 +577,7 @@ func TestCreateTransaction(t *testing.T) {
 		},
 	}
 
-	transactionsAuthUrl := r.Group(fmt.Sprintf("%v/transactions", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.AuthType))
+	transactionsAuthUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.AuthType))
 	{
 		transactionsAuthUrl.POST("/create", trans.CreateTransaction)
 	}
@@ -587,7 +587,7 @@ func TestCreateTransaction(t *testing.T) {
 
 			var b bytes.Buffer
 			json.NewEncoder(&b).Encode(test.RequestBody)
-			URI := url.URL{Path: "/v2/transactions/create"}
+			URI := url.URL{Path: "/v2/create"}
 
 			req, err := http.NewRequest(http.MethodPost, URI.String(), &b)
 			if err != nil {
@@ -754,7 +754,7 @@ func TestCheckTransactionAmount(t *testing.T) {
 		},
 	}
 
-	transactionsAuthUrl := r.Group(fmt.Sprintf("%v/transactions", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.AuthType))
+	transactionsAuthUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.AuthType))
 	{
 		transactionsAuthUrl.POST("/check-amount", trans.CheckTransactionAmount)
 	}
@@ -764,7 +764,7 @@ func TestCheckTransactionAmount(t *testing.T) {
 
 			var b bytes.Buffer
 			json.NewEncoder(&b).Encode(test.RequestBody)
-			URI := url.URL{Path: "/v2/transactions/check-amount"}
+			URI := url.URL{Path: "/v2/check-amount"}
 
 			req, err := http.NewRequest(http.MethodPost, URI.String(), &b)
 			if err != nil {
@@ -957,7 +957,7 @@ func TestUpdateTransactionAmountPaid(t *testing.T) {
 		},
 	}
 
-	transactionsAppUrl := r.Group(fmt.Sprintf("%v/transactions", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.AppType))
+	transactionsAppUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.AppType))
 	{
 		transactionsAppUrl.PATCH("/update_transaction_amount_paid", trans.UpdateTransactionAmountPaid)
 	}
@@ -967,7 +967,7 @@ func TestUpdateTransactionAmountPaid(t *testing.T) {
 
 			var b bytes.Buffer
 			json.NewEncoder(&b).Encode(test.RequestBody)
-			URI := url.URL{Path: "/v2/transactions/update_transaction_amount_paid"}
+			URI := url.URL{Path: "/v2/update_transaction_amount_paid"}
 
 			req, err := http.NewRequest(http.MethodPatch, URI.String(), &b)
 			if err != nil {
