@@ -16,7 +16,7 @@ func Transaction(r *gin.Engine, ApiVersion string, validator *validator.Validate
 	extReq := request.ExternalRequest{Logger: logger, Test: false}
 	transaction := transactions.Controller{Db: db, Validator: validator, Logger: logger, ExtReq: extReq}
 
-	// transactionsUrl := r.Group(fmt.Sprintf("%v/transactions", ApiVersion))
+	// transactionsUrl := r.Group(fmt.Sprintf("%v", ApiVersion))
 	// {
 
 	// }

@@ -125,7 +125,7 @@ func TestGetEscrowCharge(t *testing.T) {
 		},
 	}
 
-	transactionApiUrl := r.Group(fmt.Sprintf("%v/transactions", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.ApiType))
+	transactionApiUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.ApiType))
 	{
 		transactionApiUrl.POST("/escrowcharge", trans.GetEscrowCharge)
 	}

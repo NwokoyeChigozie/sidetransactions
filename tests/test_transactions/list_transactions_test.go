@@ -135,7 +135,7 @@ func TestListTransactionsByUser(t *testing.T) {
 		},
 	}
 
-	transactionAuthUrl := r.Group(fmt.Sprintf("%v/transactions", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.AuthType))
+	transactionAuthUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.AuthType))
 	{
 		transactionAuthUrl.POST("/listByUser", trans.ListTransactionsByUser)
 	}
@@ -274,7 +274,7 @@ func TestListArchivedTransactionsByUser(t *testing.T) {
 		},
 	}
 
-	transactionAuthUrl := r.Group(fmt.Sprintf("%v/transactions", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.AuthType))
+	transactionAuthUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.AuthType))
 	{
 		transactionAuthUrl.GET("/list/archived", trans.ListArchivedTransactions)
 	}
@@ -418,7 +418,7 @@ func TestListTransactionsByID(t *testing.T) {
 		},
 	}
 
-	transactionApiUrl := r.Group(fmt.Sprintf("%v/transactions", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.ApiType))
+	transactionApiUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.ApiType))
 	{
 		transactionApiUrl.GET("/listById/:id", trans.ListTransactionsByID)
 	}
@@ -551,7 +551,7 @@ func TestListTransactions(t *testing.T) {
 		},
 	}
 
-	transactionApiUrl := r.Group(fmt.Sprintf("%v/transactions", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.ApiType))
+	transactionApiUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.ApiType))
 	{
 		transactionApiUrl.POST("/list", trans.ListTransactions)
 	}
@@ -695,7 +695,7 @@ func TestListTransactionsByUssdCode(t *testing.T) {
 		},
 	}
 
-	transactionApiUrl := r.Group(fmt.Sprintf("%v/transactions", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.ApiType))
+	transactionApiUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.ApiType))
 	{
 		transactionApiUrl.GET("/list-transactions-by-ussd-code/:code", trans.ListTransactionsByUSSDCode)
 	}
@@ -831,7 +831,7 @@ func TestListTransactionsByBusiness(t *testing.T) {
 		},
 	}
 
-	transactionApiUrl := r.Group(fmt.Sprintf("%v/transactions", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.ApiType))
+	transactionApiUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.ApiType))
 	{
 		transactionApiUrl.POST("/listByBusiness", trans.ListTransactionsByBusiness)
 	}
@@ -965,7 +965,7 @@ func TestListByBusinessFromMondayToThursday(t *testing.T) {
 		},
 	}
 
-	transactionApiUrl := r.Group(fmt.Sprintf("%v/transactions", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.ApiType))
+	transactionApiUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.ApiType))
 	{
 		transactionApiUrl.POST("/listByBusinessFromMondayToThursday", trans.ListByBusinessFromMondayToThursday)
 	}

@@ -197,7 +197,7 @@ func TestUpdateTransactionStatus(t *testing.T) {
 		},
 	}
 
-	transactionsAuthUrl := r.Group(fmt.Sprintf("%v/transactions", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.AuthType))
+	transactionsAuthUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.AuthType))
 	{
 		transactionsAuthUrl.PATCH("/updateStatus", trans.UpdateTransactionStatus)
 	}
@@ -451,7 +451,7 @@ func TestUpdateTransactionStatusApi(t *testing.T) {
 		},
 	}
 
-	transactionsApiUrl := r.Group(fmt.Sprintf("%v/transactions", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.ApiType))
+	transactionsApiUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.ApiType))
 	{
 		transactionsApiUrl.PATCH("/api/updateStatus", trans.UpdateTransactionStatusApi)
 	}

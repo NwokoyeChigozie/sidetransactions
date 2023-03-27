@@ -167,7 +167,7 @@ func TestValidateOnDb(t *testing.T) {
 		Test:   true,
 	}}
 
-	transactionsAppUrl := r.Group(fmt.Sprintf("%v/transactions", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.AppType))
+	transactionsAppUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.AppType))
 	{
 		transactionsAppUrl.POST("/validate_on_db", trans.ValidateOnDB)
 	}

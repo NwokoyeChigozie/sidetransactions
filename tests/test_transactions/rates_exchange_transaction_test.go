@@ -126,7 +126,7 @@ func TestListRates(t *testing.T) {
 		},
 	}
 
-	transactionApiUrl := r.Group(fmt.Sprintf("%v/transactions", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.ApiType))
+	transactionApiUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.ApiType))
 	{
 		transactionApiUrl.GET("/rates", trans.ListRates)
 	}
@@ -287,7 +287,7 @@ func TestListExchangeTransactionByAccountID(t *testing.T) {
 		},
 	}
 
-	transactionApiUrl := r.Group(fmt.Sprintf("%v/transactions", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.ApiType))
+	transactionApiUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.ApiType))
 	{
 		transactionApiUrl.GET("/exchange-transaction/:account_id", trans.ListExchangeTransactionByAccountID)
 	}
@@ -458,7 +458,7 @@ func TestGetExchangeTransactionByID(t *testing.T) {
 		},
 	}
 
-	transactionApiUrl := r.Group(fmt.Sprintf("%v/transactions", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.ApiType))
+	transactionApiUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.ApiType))
 	{
 		transactionApiUrl.GET("exchange-transaction/show/:exchange_id", trans.GetExchangeTransactionByID)
 	}
@@ -643,7 +643,7 @@ func TestCreateExchangeTransaction(t *testing.T) {
 		},
 	}
 
-	transactionAppUrl := r.Group(fmt.Sprintf("%v/transactions", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.AppType))
+	transactionAppUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.AppType))
 	{
 		transactionAppUrl.POST("/create_exchange_transaction", trans.CreateExchangeTransaction)
 	}
@@ -808,7 +808,7 @@ func TestGetRateByID(t *testing.T) {
 		},
 	}
 
-	transactionAppUrl := r.Group(fmt.Sprintf("%v/transactions", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.AppType))
+	transactionAppUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.AppType))
 	{
 		transactionAppUrl.GET("/get_rate/:id", trans.GetRateByID)
 	}

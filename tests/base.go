@@ -76,7 +76,7 @@ func CreateTransactionUser(t *testing.T, db postgresql.Databases, validator *val
 		}
 		r = gin.Default()
 	)
-	transactionsAuthUrl := r.Group(fmt.Sprintf("%v/transactions", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.AuthType))
+	transactionsAuthUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.AuthType))
 	{
 		transactionsAuthUrl.POST("/create", trans.CreateTransaction)
 	}

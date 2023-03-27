@@ -179,7 +179,7 @@ func TestCreateActivityLog(t *testing.T) {
 		},
 	}
 
-	transactionsAppUrl := r.Group(fmt.Sprintf("%v/transactions", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.AppType))
+	transactionsAppUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.AppType))
 	{
 		transactionsAppUrl.POST("/create_activity_log", trans.CreateActivityLog)
 	}
