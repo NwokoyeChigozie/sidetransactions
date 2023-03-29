@@ -12,13 +12,17 @@ import (
 	"github.com/vesicash/transactions-ms/utility"
 )
 
-func Setup(logger *utility.Logger, validator *validator.Validate, db postgresql.Databases) *gin.Engine {
+func Setup(logger *utility.Logger, validator *validator.Validate, db postgresql.Databases, appConfiguration *config.App) *gin.Engine {
+	if appConfiguration.Mode == "release" {
+		gin.SetMode(gin.ReleaseMode)
+	}
 	r := gin.New()
 
 	// Middlewares
 	// r.Use(gin.Logger())
 	r.ForwardedByClientIP = true
 	r.SetTrustedProxies(config.GetConfig().Server.TrustedProxies)
+	r.Use(middleware.PrometheusMiddleware())
 	r.Use(middleware.Security())
 	r.Use(middleware.Throttle())
 	r.Use(middleware.Logger())
