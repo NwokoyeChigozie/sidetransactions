@@ -78,6 +78,8 @@ var (
 	SendDueDateExtendedNotification              string = "send_due_date_extended_notification"
 	SendTransactionDeliveredAcceptedNotification string = "send_transaction_delivered_accepted_notification"
 	GetAccessTokenByKey                          string = "get_access_token_by_key"
+
+	RequestManualRefund string = "request_manual_refund"
 )
 
 func (er ExternalRequest) SendExternalRequest(name string, data interface{}) (interface{}, error) {
@@ -559,6 +561,17 @@ func (er ExternalRequest) SendExternalRequest(name string, data interface{}) (in
 				Logger:       er.Logger,
 			}
 			return obj.GetAccessTokenByKey()
+		case "request_manual_refund":
+			obj := payment.RequestObj{
+				Name:         name,
+				Path:         fmt.Sprintf("%v/v2/disbursement/process/refund", config.Microservices.Payment),
+				Method:       "POST",
+				SuccessCode:  200,
+				DecodeMethod: JsonDecodeMethod,
+				RequestData:  data,
+				Logger:       er.Logger,
+			}
+			return obj.RequestManualRefund()
 		default:
 			return nil, fmt.Errorf("request not found")
 		}

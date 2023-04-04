@@ -1,6 +1,7 @@
 package transactions
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/vesicash/transactions-ms/external/external_models"
@@ -100,9 +101,25 @@ func RejectTransactionService(extReq request.ExternalRequest, logger *utility.Lo
 
 	// Send Refund If The Transaction Has Been PAid For
 	if payment.IsPaid {
-		// TODO: Send Refund
+		// Send Refund
+		_, err := extReq.SendExternalRequest(request.RequestManualRefund, req.TransactionID)
+		if err != nil {
+			return http.StatusInternalServerError, fmt.Errorf("refund failed")
+		}
+		transaction.Status = GetTransactionStatus("cr")
+	} else {
+		transaction.Status = GetTransactionStatus("closed")
 	}
-	// TODO: Call Close Transaction
+
+	err = transaction.UpdateAllFields(db.Transaction)
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
+
+	_, err = CreateTransactionState(db, transaction.Status, req.TransactionID, transaction.MilestoneID, int(user.AccountID))
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
 
 	extReq.SendExternalRequest(request.SendTransactionAcceptedNotification, external_models.TransactionIDRequestModel{
 		TransactionId: req.TransactionID,
@@ -133,7 +150,18 @@ func RejectTransactionDeliveryService(extReq request.ExternalRequest, logger *ut
 		return http.StatusInternalServerError, err
 	}
 
-	// TODO: Call Close Transaction
+	statusCode = "closed"
+
+	transaction.Status = GetTransactionStatus(statusCode)
+	err = transaction.UpdateAllFields(db.Transaction)
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
+
+	_, err = CreateTransactionState(db, statusCode, req.TransactionID, transaction.MilestoneID, int(user.AccountID))
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
 
 	extReq.SendExternalRequest(request.SendTransactionDeliveredRejectedNotification, external_models.TransactionIDRequestModel{
 		TransactionId: req.TransactionID,
