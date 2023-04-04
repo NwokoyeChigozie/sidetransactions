@@ -344,11 +344,11 @@ func resolveCreateMilestoneTransaction(extReq request.ExternalRequest, milestone
 		escrowCharge       = transactionAmount - getTotalAmoutForMilestones(milestones)
 		milestonesResponse = []models.MilestonesResponse{}
 		transactionM       = models.Transaction{}
+		transUssdCode      = utility.GetRandomNumbersInRange(10000, 99999)
 	)
-
 	for i, m := range milestones {
 		milestoneID := utility.RandomString(20)
-		transUssdCode := utility.GetRandomNumbersInRange(10000, 99999)
+
 		dueDate, _ := utility.GetUnixString(m.DueDate, "2006-01-02", "2006-01-02")
 		description := m.Description
 		if description == "" {

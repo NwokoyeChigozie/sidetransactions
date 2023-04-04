@@ -123,6 +123,8 @@ func (er ExternalRequest) SendExternalRequest(name string, data interface{}) (in
 		return notification_mocks.SendTransactionDeliveredAcceptedNotification(er.Logger, data)
 	case "get_access_token_by_key":
 		return auth_mocks.GetAccessTokenByKey(er.Logger, data)
+	case "request_manual_refund":
+		return payment_mocks.RequestManualRefund(er.Logger, data)
 	default:
 		return nil, fmt.Errorf("request not found")
 	}
