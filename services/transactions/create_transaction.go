@@ -32,7 +32,12 @@ func CreateTransactionService(extReq request.ExternalRequest, logger *utility.Lo
 		transactionPaylinked      = req.Paylinked
 		transactionSource         = req.Source
 		transactionDisputeHandler = req.DisputeHandler
+		totalMilestonesAmount     = getTotalAmoutForMilestones(req.Milestones)
 	)
+
+	if transactionAmount < totalMilestonesAmount {
+		return models.TransactionCreateResponse{}, http.StatusBadRequest, fmt.Errorf("transaction amount cannot be less than the sum of amounts for milestones")
+	}
 	if businessID == 0 {
 		businessID = int(user.BusinessId)
 	}
@@ -99,7 +104,7 @@ func CreateTransactionService(extReq request.ExternalRequest, logger *utility.Lo
 		DisputeHandler:       transactionDisputeHandler,
 		EscrowWallet:         req.EscrowWallet,
 	}
-	escrowCharge := getEscrowCharge(businessCharge, getTotalAmoutForMilestones(req.Milestones))
+	escrowCharge := getEscrowCharge(businessCharge, totalMilestonesAmount)
 	if transactionSource == "transfer" {
 		escrowCharge = 2
 	}
