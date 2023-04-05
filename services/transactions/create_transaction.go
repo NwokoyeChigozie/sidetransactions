@@ -99,13 +99,18 @@ func CreateTransactionService(extReq request.ExternalRequest, logger *utility.Lo
 		DisputeHandler:       transactionDisputeHandler,
 		EscrowWallet:         req.EscrowWallet,
 	}
+	escrowCharge := getEscrowCharge(businessCharge, getTotalAmoutForMilestones(req.Milestones))
+	if transactionSource == "transfer" {
+		escrowCharge = 2
+	}
+
 	if transactionType == "oneoff" {
-		transaction, mileStoneResponse, err = resolveCreateOneOffTransaction(extReq, req.Milestones, transactionAmount, transactionObj, db)
+		transaction, mileStoneResponse, err = resolveCreateOneOffTransaction(extReq, req.Milestones, transactionAmount, escrowCharge, transactionObj, db)
 		if err != nil {
 			return models.TransactionCreateResponse{}, http.StatusInternalServerError, err
 		}
 	} else if transactionType == "milestone" {
-		transaction, mileStoneResponse, err = resolveCreateMilestoneTransaction(extReq, req.Milestones, transactionAmount, transactionObj, db)
+		transaction, mileStoneResponse, err = resolveCreateMilestoneTransaction(extReq, req.Milestones, transactionAmount, escrowCharge, transactionObj, db)
 		if err != nil {
 			return models.TransactionCreateResponse{}, http.StatusInternalServerError, err
 		}
@@ -118,10 +123,6 @@ func CreateTransactionService(extReq request.ExternalRequest, logger *utility.Lo
 	err = transaction.UpdateAllFields(db.Transaction)
 	if err != nil {
 		return models.TransactionCreateResponse{}, http.StatusInternalServerError, err
-	}
-	escrowCharge := getEscrowCharge(businessCharge, getTotalAmoutForMilestones(req.Milestones))
-	if transactionSource == "transfer" {
-		escrowCharge = 2
 	}
 
 	createPaymentPayload := external_models.CreatePaymentRequestWithToken{
@@ -257,9 +258,9 @@ func getEscrowCharge(businessCharge external_models.BusinessCharge, totalAmountF
 	return charge
 }
 
-func resolveCreateOneOffTransaction(extReq request.ExternalRequest, milestones []models.MileStone, transactionAmount float64, transactionObj models.ResolveTransactionObj, db postgresql.Databases) (models.Transaction, []models.MilestonesResponse, error) {
+func resolveCreateOneOffTransaction(extReq request.ExternalRequest, milestones []models.MileStone, transactionAmount, escrowCharge float64, transactionObj models.ResolveTransactionObj, db postgresql.Databases) (models.Transaction, []models.MilestonesResponse, error) {
 	var (
-		escrowCharge       = transactionAmount - getTotalAmoutForMilestones(milestones)
+		// escrowCharge       = transactionAmount - getTotalAmoutForMilestones(milestones)
 		milestonesResponse = []models.MilestonesResponse{}
 		transactionM       = models.Transaction{}
 	)
@@ -339,13 +340,18 @@ func resolveCreateOneOffTransaction(extReq request.ExternalRequest, milestones [
 	return transactionM, milestonesResponse, nil
 }
 
-func resolveCreateMilestoneTransaction(extReq request.ExternalRequest, milestones []models.MileStone, transactionAmount float64, transactionObj models.ResolveTransactionObj, db postgresql.Databases) (models.Transaction, []models.MilestonesResponse, error) {
+func resolveCreateMilestoneTransaction(extReq request.ExternalRequest, milestones []models.MileStone, transactionAmount, escrowCharge float64, transactionObj models.ResolveTransactionObj, db postgresql.Databases) (models.Transaction, []models.MilestonesResponse, error) {
 	var (
-		escrowCharge       = transactionAmount - getTotalAmoutForMilestones(milestones)
+		// escrowCharge       = transactionAmount - getTotalAmoutForMilestones(milestones)
 		milestonesResponse = []models.MilestonesResponse{}
 		transactionM       = models.Transaction{}
 		transUssdCode      = utility.GetRandomNumbersInRange(10000, 99999)
 	)
+
+	if escrowCharge < 0 {
+		escrowCharge = 0
+	}
+
 	for i, m := range milestones {
 		milestoneID := utility.RandomString(20)
 
