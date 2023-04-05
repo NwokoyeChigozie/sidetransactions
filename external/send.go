@@ -87,18 +87,18 @@ func (r *SendRequestObject) SendRequest(response interface{}) error {
 		return err
 	}
 
-	if r.DecodeMethod != PhpSerializerMethod {
-		err = json.NewDecoder(res.Body).Decode(response)
-		if err != nil {
-			logger.Error("json decoding error", name, err.Error())
-			return err
-		}
-	}
-
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
 		logger.Error("readin body error", name, err.Error())
 		return err
+	}
+
+	if r.DecodeMethod != PhpSerializerMethod {
+		err = json.Unmarshal(body, response)
+		if err != nil {
+			logger.Error("json decoding error", name, err.Error())
+			return err
+		}
 	}
 
 	logger.Info("response body", name, r.Path, string(body))
