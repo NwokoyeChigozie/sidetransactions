@@ -118,7 +118,7 @@ func (r *SendRequestObject) SendRequest(response interface{}) error {
 		return nil
 	}
 
-	if res.StatusCode < 200 && res.StatusCode > 299 {
+	if res.StatusCode < 200 || res.StatusCode > 299 {
 		return fmt.Errorf("Error " + strconv.Itoa(res.StatusCode))
 	}
 
