@@ -324,7 +324,7 @@ func resolveCreateOneOffTransaction(extReq request.ExternalRequest, milestones [
 						Amount:      r.Amount,
 					})
 				}
-				dDate, err := utility.FormatDate(transaction.DueDate, "2006-01-02", "2006-01-02 15::05")
+				dDate, err := utility.FormatDate(transaction.DueDate, "2006-01-02", "2006-01-02 15:04:05")
 				if err != nil {
 					dDate = ""
 				}
@@ -420,7 +420,7 @@ func resolveCreateMilestoneTransaction(extReq request.ExternalRequest, milestone
 						Amount:      r.Amount,
 					})
 				}
-				dDate, err := utility.FormatDate(transaction.DueDate, "2006-01-02", "2006-01-02 15::05")
+				dDate, err := utility.FormatDate(transaction.DueDate, "2006-01-02", "2006-01-02 15:04:05")
 				if err != nil {
 					dDate = ""
 				}

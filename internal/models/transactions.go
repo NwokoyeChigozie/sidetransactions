@@ -254,6 +254,23 @@ func (t *Transaction) GetAllByTransactionID(db *gorm.DB) ([]Transaction, error) 
 	return details, nil
 }
 
+func (t *Transaction) GetAllByQuery(db *gorm.DB, query string) ([]Transaction, error) {
+	details := []Transaction{}
+	err := postgresql.SelectAllFromDb(db, "asc", &details, query)
+	if err != nil {
+		return details, err
+	}
+	return details, nil
+}
+func (t *Transaction) GetAllByQueryWithLimit(db *gorm.DB, query string, limit int) ([]Transaction, error) {
+	details := []Transaction{}
+	err := postgresql.SelectAllFromDbWithLimit(db, "asc", limit, &details, query)
+	if err != nil {
+		return details, err
+	}
+	return details, nil
+}
+
 func (t *Transaction) GetAllOthersByIDAndPartiesID(db *gorm.DB) ([]Transaction, error) {
 	details := []Transaction{}
 	err := postgresql.SelectAllFromDb(db, "asc", &details, "id != ? and parties_id = ?", t.ID, t.PartiesID)

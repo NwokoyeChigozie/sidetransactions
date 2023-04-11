@@ -125,6 +125,12 @@ func (er ExternalRequest) SendExternalRequest(name string, data interface{}) (in
 		return auth_mocks.GetAccessTokenByKey(er.Logger, data)
 	case "request_manual_refund":
 		return payment_mocks.RequestManualRefund(er.Logger, data)
+	case "wallet_transfer":
+		return payment_mocks.WalletTransfer(er.Logger, data)
+	case "debit_wallet":
+		return payment_mocks.DebitWallet(er.Logger, data)
+	case "credit_wallet":
+		return payment_mocks.CreditWallet(er.Logger, data)
 	default:
 		return nil, fmt.Errorf("request not found")
 	}
