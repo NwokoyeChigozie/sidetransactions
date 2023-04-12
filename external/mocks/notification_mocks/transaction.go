@@ -11,12 +11,12 @@ import (
 func SendNewTransactionNotification(logger *utility.Logger, idata interface{}) (interface{}, error) {
 	_, ok := idata.(external_models.TransactionIDRequestModel)
 	if !ok {
-		logger.Info("new transaction notification", idata, "request data format error")
+		logger.Error("new transaction notification", idata, "request data format error")
 		return nil, fmt.Errorf("request data format error")
 	}
 	_, err := auth_mocks.GetAccessToken(logger)
 	if err != nil {
-		logger.Info("new transaction notification", nil, err.Error())
+		logger.Error("new transaction notification", nil, err.Error())
 		return nil, err
 	}
 
@@ -31,12 +31,12 @@ func SendTransactionAcceptedNotification(logger *utility.Logger, idata interface
 	)
 	_, ok := idata.(external_models.TransactionIDRequestModel)
 	if !ok {
-		logger.Info("transaction accepted notification", idata, "request data format error")
+		logger.Error("transaction accepted notification", idata, "request data format error")
 		return nil, fmt.Errorf("request data format error")
 	}
 	_, err := auth_mocks.GetAccessToken(logger)
 	if err != nil {
-		logger.Info("transaction accepted notification", outBoundResponse, err.Error())
+		logger.Error("transaction accepted notification", outBoundResponse, err.Error())
 		return nil, err
 	}
 
@@ -51,12 +51,12 @@ func SendTransactionRejectedNotification(logger *utility.Logger, idata interface
 	)
 	_, ok := idata.(external_models.TransactionIDRequestModel)
 	if !ok {
-		logger.Info("transaction rejected notification", idata, "request data format error")
+		logger.Error("transaction rejected notification", idata, "request data format error")
 		return nil, fmt.Errorf("request data format error")
 	}
 	_, err := auth_mocks.GetAccessToken(logger)
 	if err != nil {
-		logger.Info("transaction rejected notification", outBoundResponse, err.Error())
+		logger.Error("transaction rejected notification", outBoundResponse, err.Error())
 		return nil, err
 	}
 
@@ -70,12 +70,12 @@ func SendTransactionDeliveredRejectedNotification(logger *utility.Logger, idata 
 	)
 	_, ok := idata.(external_models.TransactionIDRequestModel)
 	if !ok {
-		logger.Info("transaction delivered rejected notification", idata, "request data format error")
+		logger.Error("transaction delivered rejected notification", idata, "request data format error")
 		return nil, fmt.Errorf("request data format error")
 	}
 	_, err := auth_mocks.GetAccessToken(logger)
 	if err != nil {
-		logger.Info("transaction delivered rejected notification", outBoundResponse, err.Error())
+		logger.Error("transaction delivered rejected notification", outBoundResponse, err.Error())
 		return nil, err
 	}
 
@@ -89,12 +89,12 @@ func SendDisputeOpenedNotification(logger *utility.Logger, idata interface{}) (i
 	)
 	_, ok := idata.(external_models.TransactionIDAccountIDRequestModel)
 	if !ok {
-		logger.Info("dispute opened notification", idata, "request data format error")
+		logger.Error("dispute opened notification", idata, "request data format error")
 		return nil, fmt.Errorf("request data format error")
 	}
 	_, err := auth_mocks.GetAccessToken(logger)
 	if err != nil {
-		logger.Info("dispute opened notification", outBoundResponse, err.Error())
+		logger.Error("dispute opened notification", outBoundResponse, err.Error())
 		return nil, err
 	}
 
@@ -108,12 +108,12 @@ func SendTransactionDeliveredNotification(logger *utility.Logger, idata interfac
 	)
 	_, ok := idata.(external_models.TransactionIDRequestModel)
 	if !ok {
-		logger.Info("transaction delivered notification", idata, "request data format error")
+		logger.Error("transaction delivered notification", idata, "request data format error")
 		return nil, fmt.Errorf("request data format error")
 	}
 	_, err := auth_mocks.GetAccessToken(logger)
 	if err != nil {
-		logger.Info("transaction delivered notification", outBoundResponse, err.Error())
+		logger.Error("transaction delivered notification", outBoundResponse, err.Error())
 		return nil, err
 	}
 
@@ -128,12 +128,12 @@ func SendDueDateProposalNotification(logger *utility.Logger, idata interface{}) 
 	)
 	_, ok := idata.(external_models.DueDateExtensionProposalRequestModel)
 	if !ok {
-		logger.Info("due date proposal notification", idata, "request data format error")
+		logger.Error("due date proposal notification", idata, "request data format error")
 		return nil, fmt.Errorf("request data format error")
 	}
 	_, err := auth_mocks.GetAccessToken(logger)
 	if err != nil {
-		logger.Info("due date proposal notification", outBoundResponse, err.Error())
+		logger.Error("due date proposal notification", outBoundResponse, err.Error())
 		return nil, err
 	}
 
@@ -147,12 +147,12 @@ func SendDueDateExtendedNotification(logger *utility.Logger, idata interface{}) 
 	)
 	_, ok := idata.(external_models.TransactionIDRequestModel)
 	if !ok {
-		logger.Info("due date extended notification", idata, "request data format error")
+		logger.Error("due date extended notification", idata, "request data format error")
 		return nil, fmt.Errorf("request data format error")
 	}
 	_, err := auth_mocks.GetAccessToken(logger)
 	if err != nil {
-		logger.Info("due date extended notification", outBoundResponse, err.Error())
+		logger.Error("due date extended notification", outBoundResponse, err.Error())
 		return nil, err
 	}
 
@@ -166,12 +166,12 @@ func SendTransactionDeliveredAcceptedNotification(logger *utility.Logger, idata 
 	)
 	_, ok := idata.(external_models.TransactionIDRequestModel)
 	if !ok {
-		logger.Info("transaction delivered accepted notification", idata, "request data format error")
+		logger.Error("transaction delivered accepted notification", idata, "request data format error")
 		return nil, fmt.Errorf("request data format error")
 	}
 	_, err := auth_mocks.GetAccessToken(logger)
 	if err != nil {
-		logger.Info("transaction delivered accepted notification", outBoundResponse, err.Error())
+		logger.Error("transaction delivered accepted notification", outBoundResponse, err.Error())
 		return nil, err
 	}
 

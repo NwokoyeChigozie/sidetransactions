@@ -15,7 +15,7 @@ func WalletTransfer(logger *utility.Logger, idata interface{}) (interface{}, err
 
 	data, ok := idata.(external_models.WalletTransferRequest)
 	if !ok {
-		logger.Info("wallet transfer", idata, "request data format error")
+		logger.Error("wallet transfer", idata, "request data format error")
 		return outBoundResponse, fmt.Errorf("request data format error")
 	}
 
@@ -32,7 +32,7 @@ func DebitWallet(logger *utility.Logger, idata interface{}) (external_models.Wal
 
 	data, ok := idata.(external_models.DebitWalletRequest)
 	if !ok {
-		logger.Info("debit wallet", idata, "request data format error")
+		logger.Error("debit wallet", idata, "request data format error")
 		return outBoundResponse.Data, fmt.Errorf("request data format error")
 	}
 
@@ -54,7 +54,7 @@ func CreditWallet(logger *utility.Logger, idata interface{}) (external_models.Wa
 
 	data, ok := idata.(external_models.CreditWalletRequest)
 	if !ok {
-		logger.Info("credit wallet", idata, "request data format error")
+		logger.Error("credit wallet", idata, "request data format error")
 		return outBoundResponse.Data, fmt.Errorf("request data format error")
 	}
 

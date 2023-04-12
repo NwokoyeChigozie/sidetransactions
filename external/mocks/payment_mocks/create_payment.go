@@ -15,12 +15,12 @@ func CreatePayment(logger *utility.Logger, idata interface{}) (external_models.P
 
 	_, ok := idata.(external_models.CreatePaymentRequestWithToken)
 	if !ok {
-		logger.Info("create payment", idata, "request data format error")
+		logger.Error("create payment", idata, "request data format error")
 		return external_models.Payment{}, fmt.Errorf("request data format error")
 	}
 
 	if Payment == nil {
-		logger.Info("create payment", Payment, "payment not provided")
+		logger.Error("create payment", Payment, "payment not provided")
 		return external_models.Payment{}, fmt.Errorf("payment not provided")
 	}
 

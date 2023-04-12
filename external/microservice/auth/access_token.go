@@ -21,7 +21,7 @@ func (r *RequestObj) GetAccessToken() (external_models.AccessToken, error) {
 
 	err := r.getNewSendRequestObject(nil, headers, "").SendRequest(&outBoundResponse)
 	if err != nil {
-		logger.Info("get access_token", outBoundResponse, err)
+		logger.Error("get access_token", outBoundResponse, err)
 		return outBoundResponse.Data, err
 	}
 	logger.Info("get access_token", outBoundResponse)
@@ -39,7 +39,7 @@ func (r *RequestObj) GetAccessTokenByKey() (external_models.AccessToken, error) 
 
 	data, ok := idata.(string)
 	if !ok {
-		logger.Info("get access token by key", idata, "request data format error")
+		logger.Error("get access token by key", idata, "request data format error")
 		return outBoundResponse.Data, fmt.Errorf("request data format error")
 	}
 
@@ -50,7 +50,7 @@ func (r *RequestObj) GetAccessTokenByKey() (external_models.AccessToken, error) 
 
 	err := r.getNewSendRequestObject(nil, headers, fmt.Sprintf("/%v", data)).SendRequest(&outBoundResponse)
 	if err != nil {
-		logger.Info("get access token by key", outBoundResponse, err)
+		logger.Error("get access token by key", outBoundResponse, err)
 		return outBoundResponse.Data, err
 	}
 	logger.Info("get access token by key", outBoundResponse)

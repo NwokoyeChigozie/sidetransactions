@@ -16,7 +16,7 @@ func GetBusinessProfileByAccountID(extReq request.ExternalRequest, logger *utili
 		AccountID: uint(accountID),
 	})
 	if err != nil {
-		logger.Info(err.Error())
+		logger.Error(err.Error())
 		return external_models.BusinessProfile{}, fmt.Errorf("Business lacks a profile.")
 	}
 
@@ -104,7 +104,7 @@ func getBusinessChargeWithBusinessIDAndCurrency(extReq request.ExternalRequest, 
 	})
 
 	if err != nil {
-		extReq.Logger.Info(err.Error())
+		extReq.Logger.Error(err.Error())
 		return external_models.BusinessCharge{}, err
 	}
 
@@ -126,7 +126,7 @@ func initBusinessCharge(extReq request.ExternalRequest, businessID int, currency
 	})
 
 	if err != nil {
-		extReq.Logger.Info(err.Error())
+		extReq.Logger.Error(err.Error())
 		return external_models.BusinessCharge{}, err
 	}
 
@@ -148,7 +148,7 @@ func GetCountryByNameOrCode(extReq request.ExternalRequest, logger *utility.Logg
 	})
 
 	if err != nil {
-		logger.Info(err.Error())
+		logger.Error(err.Error())
 		return external_models.Country{}, fmt.Errorf("Your country could not be resolved, please update your profile.")
 	}
 	country, ok := countryInterface.(external_models.Country)
@@ -168,7 +168,7 @@ func getCountryByCurrency(extReq request.ExternalRequest, logger *utility.Logger
 	})
 
 	if err != nil {
-		logger.Info(err.Error())
+		logger.Error(err.Error())
 		return external_models.Country{}, fmt.Errorf("Your country could not be resolved, please update your profile.")
 	}
 	country, ok := countryInterface.(external_models.Country)

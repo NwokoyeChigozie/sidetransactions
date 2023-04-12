@@ -13,7 +13,7 @@ func RequestManualRefund(logger *utility.Logger, idata interface{}) (map[string]
 	)
 	data, ok := idata.(string)
 	if !ok {
-		logger.Info("request manual refund", idata, "request data format error")
+		logger.Error("request manual refund", idata, "request data format error")
 		return outBoundResponse, fmt.Errorf("request data format error")
 	}
 

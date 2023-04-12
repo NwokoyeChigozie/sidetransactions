@@ -18,7 +18,7 @@ func (r *RequestObj) WalletTransfer() (interface{}, error) {
 
 	data, ok := idata.(external_models.WalletTransferRequest)
 	if !ok {
-		logger.Info("wallet transfer", idata, "request data format error")
+		logger.Error("wallet transfer", idata, "request data format error")
 		return outBoundResponse, fmt.Errorf("request data format error")
 	}
 
@@ -30,7 +30,7 @@ func (r *RequestObj) WalletTransfer() (interface{}, error) {
 	logger.Info("wallet transfer", data)
 	err := r.getNewSendRequestObject(data, headers, "").SendRequest(&outBoundResponse)
 	if err != nil {
-		logger.Info("wallet transfer", outBoundResponse, err.Error())
+		logger.Error("wallet transfer", outBoundResponse, err.Error())
 		return outBoundResponse, err
 	}
 	logger.Info("wallet transfer", outBoundResponse)
@@ -49,7 +49,7 @@ func (r *RequestObj) DebitWallet() (external_models.WalletBalance, error) {
 
 	data, ok := idata.(external_models.DebitWalletRequest)
 	if !ok {
-		logger.Info("debit wallet", idata, "request data format error")
+		logger.Error("debit wallet", idata, "request data format error")
 		return outBoundResponse.Data, fmt.Errorf("request data format error")
 	}
 
@@ -61,7 +61,7 @@ func (r *RequestObj) DebitWallet() (external_models.WalletBalance, error) {
 	logger.Info("debit wallet", data)
 	err := r.getNewSendRequestObject(data, headers, "").SendRequest(&outBoundResponse)
 	if err != nil {
-		logger.Info("debit wallet", outBoundResponse, err.Error())
+		logger.Error("debit wallet", outBoundResponse, err.Error())
 		return outBoundResponse.Data, err
 	}
 	logger.Info("debit wallet", outBoundResponse)
@@ -80,7 +80,7 @@ func (r *RequestObj) CreditWallet() (external_models.WalletBalance, error) {
 
 	data, ok := idata.(external_models.CreditWalletRequest)
 	if !ok {
-		logger.Info("credit wallet", idata, "request data format error")
+		logger.Error("credit wallet", idata, "request data format error")
 		return outBoundResponse.Data, fmt.Errorf("request data format error")
 	}
 
@@ -92,7 +92,7 @@ func (r *RequestObj) CreditWallet() (external_models.WalletBalance, error) {
 	logger.Info("credit wallet", data)
 	err := r.getNewSendRequestObject(data, headers, "").SendRequest(&outBoundResponse)
 	if err != nil {
-		logger.Info("credit wallet", outBoundResponse, err.Error())
+		logger.Error("credit wallet", outBoundResponse, err.Error())
 		return outBoundResponse.Data, err
 	}
 	logger.Info("credit wallet", outBoundResponse)

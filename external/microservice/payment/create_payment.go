@@ -16,7 +16,7 @@ func (r *RequestObj) CreatePayment() (external_models.Payment, error) {
 
 	fdata, ok := idata.(external_models.CreatePaymentRequestWithToken)
 	if !ok {
-		logger.Info("create payment", idata, "request data format error")
+		logger.Error("create payment", idata, "request data format error")
 		return outBoundResponse.Data, fmt.Errorf("request data format error")
 	}
 
@@ -37,7 +37,7 @@ func (r *RequestObj) CreatePayment() (external_models.Payment, error) {
 	logger.Info("create payment", data)
 	err := r.getNewSendRequestObject(data, headers, "").SendRequest(&outBoundResponse)
 	if err != nil {
-		logger.Info("create payment", outBoundResponse, err.Error())
+		logger.Error("create payment", outBoundResponse, err.Error())
 		return outBoundResponse.Data, err
 	}
 	logger.Info("create payment", outBoundResponse)

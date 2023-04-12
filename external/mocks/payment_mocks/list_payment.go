@@ -18,17 +18,17 @@ func ListPayment(logger *utility.Logger, idata interface{}) (external_models.Lis
 	)
 	_, ok := idata.(string)
 	if !ok {
-		logger.Info("list payment by transaction id", idata, "request data format error")
+		logger.Error("list payment by transaction id", idata, "request data format error")
 		return outBoundResponse.Data.Payment, fmt.Errorf("request data format error")
 	}
 	_, err := auth_mocks.GetAccessToken(logger)
 	if err != nil {
-		logger.Info("list payment by transaction id", outBoundResponse, err.Error())
+		logger.Error("list payment by transaction id", outBoundResponse, err.Error())
 		return outBoundResponse.Data.Payment, err
 	}
 
 	if ListPaymentObj == nil {
-		logger.Info("list payment by tansaction id", ListPaymentObj, "ListPayment not provided")
+		logger.Error("list payment by tansaction id", ListPaymentObj, "ListPayment not provided")
 		return outBoundResponse.Data.Payment, fmt.Errorf("ListPayment not provided")
 	}
 

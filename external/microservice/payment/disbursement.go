@@ -14,12 +14,12 @@ func (r *RequestObj) RequestManualRefund() (map[string]interface{}, error) {
 	)
 	data, ok := idata.(string)
 	if !ok {
-		logger.Info("request manual refund", idata, "request data format error")
+		logger.Error("request manual refund", idata, "request data format error")
 		return outBoundResponse, fmt.Errorf("request data format error")
 	}
 	accessToken, err := r.getAccessTokenObject().GetAccessToken()
 	if err != nil {
-		logger.Info("request manual refund", outBoundResponse, err.Error())
+		logger.Error("request manual refund", outBoundResponse, err.Error())
 		return outBoundResponse, err
 	}
 
@@ -36,7 +36,7 @@ func (r *RequestObj) RequestManualRefund() (map[string]interface{}, error) {
 	logger.Info("request manual refund", data)
 	err = r.getNewSendRequestObject(reqData, headers, "").SendRequest(&outBoundResponse)
 	if err != nil {
-		logger.Info("request manual refund", outBoundResponse, err.Error())
+		logger.Error("request manual refund", outBoundResponse, err.Error())
 		return outBoundResponse, err
 	}
 	logger.Info("request manual refund", outBoundResponse)
