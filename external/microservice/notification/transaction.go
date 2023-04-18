@@ -14,12 +14,12 @@ func (r *RequestObj) SendNewTransactionNotification() (interface{}, error) {
 	)
 	data, ok := idata.(external_models.TransactionIDRequestModel)
 	if !ok {
-		logger.Info("new transaction notification", idata, "request data format error")
+		logger.Error("new transaction notification", idata, "request data format error")
 		return nil, fmt.Errorf("request data format error")
 	}
 	accessToken, err := r.getAccessTokenObject().GetAccessToken()
 	if err != nil {
-		logger.Info("new transaction notification", outBoundResponse, err.Error())
+		logger.Error("new transaction notification", outBoundResponse, err.Error())
 		return nil, err
 	}
 
@@ -32,7 +32,7 @@ func (r *RequestObj) SendNewTransactionNotification() (interface{}, error) {
 	logger.Info("new transaction notification", data)
 	err = r.getNewSendRequestObject(data, headers, "").SendRequest(&outBoundResponse)
 	if err != nil {
-		logger.Info("new transaction notification", outBoundResponse, err.Error())
+		logger.Error("new transaction notification", outBoundResponse, err.Error())
 		return nil, err
 	}
 	logger.Info("new transaction notification", outBoundResponse)
@@ -48,12 +48,12 @@ func (r *RequestObj) SendTransactionAcceptedNotification() (interface{}, error) 
 	)
 	data, ok := idata.(external_models.TransactionIDRequestModel)
 	if !ok {
-		logger.Info("transaction accepted notification", idata, "request data format error")
+		logger.Error("transaction accepted notification", idata, "request data format error")
 		return nil, fmt.Errorf("request data format error")
 	}
 	accessToken, err := r.getAccessTokenObject().GetAccessToken()
 	if err != nil {
-		logger.Info("transaction accepted notification", outBoundResponse, err.Error())
+		logger.Error("transaction accepted notification", outBoundResponse, err.Error())
 		return nil, err
 	}
 
@@ -66,7 +66,7 @@ func (r *RequestObj) SendTransactionAcceptedNotification() (interface{}, error) 
 	logger.Info("transaction accepted notification", data)
 	err = r.getNewSendRequestObject(data, headers, "").SendRequest(&outBoundResponse)
 	if err != nil {
-		logger.Info("transaction accepted notification", outBoundResponse, err.Error())
+		logger.Error("transaction accepted notification", outBoundResponse, err.Error())
 		return nil, err
 	}
 	logger.Info("transaction accepted notification", outBoundResponse)
@@ -82,12 +82,12 @@ func (r *RequestObj) SendTransactionRejectedNotification() (interface{}, error) 
 	)
 	data, ok := idata.(external_models.TransactionIDRequestModel)
 	if !ok {
-		logger.Info("transaction rejected notification", idata, "request data format error")
+		logger.Error("transaction rejected notification", idata, "request data format error")
 		return nil, fmt.Errorf("request data format error")
 	}
 	accessToken, err := r.getAccessTokenObject().GetAccessToken()
 	if err != nil {
-		logger.Info("transaction rejected notification", outBoundResponse, err.Error())
+		logger.Error("transaction rejected notification", outBoundResponse, err.Error())
 		return nil, err
 	}
 
@@ -100,7 +100,7 @@ func (r *RequestObj) SendTransactionRejectedNotification() (interface{}, error) 
 	logger.Info("transaction rejected notification", data)
 	err = r.getNewSendRequestObject(data, headers, "").SendRequest(&outBoundResponse)
 	if err != nil {
-		logger.Info("transaction rejected notification", outBoundResponse, err.Error())
+		logger.Error("transaction rejected notification", outBoundResponse, err.Error())
 		return nil, err
 	}
 	logger.Info("transaction rejected notification", outBoundResponse)
@@ -115,12 +115,12 @@ func (r *RequestObj) SendTransactionDeliveredRejectedNotification() (interface{}
 	)
 	data, ok := idata.(external_models.TransactionIDRequestModel)
 	if !ok {
-		logger.Info("transaction delivered rejected notification", idata, "request data format error")
+		logger.Error("transaction delivered rejected notification", idata, "request data format error")
 		return nil, fmt.Errorf("request data format error")
 	}
 	accessToken, err := r.getAccessTokenObject().GetAccessToken()
 	if err != nil {
-		logger.Info("transaction delivered rejected notification", outBoundResponse, err.Error())
+		logger.Error("transaction delivered rejected notification", outBoundResponse, err.Error())
 		return nil, err
 	}
 
@@ -133,7 +133,7 @@ func (r *RequestObj) SendTransactionDeliveredRejectedNotification() (interface{}
 	logger.Info("transaction delivered rejected notification", data)
 	err = r.getNewSendRequestObject(data, headers, "").SendRequest(&outBoundResponse)
 	if err != nil {
-		logger.Info("transaction delivered rejected notification", outBoundResponse, err.Error())
+		logger.Error("transaction delivered rejected notification", outBoundResponse, err.Error())
 		return nil, err
 	}
 	logger.Info("transaction delivered rejected notification", outBoundResponse)
@@ -148,12 +148,12 @@ func (r *RequestObj) SendDisputeOpenedNotification() (interface{}, error) {
 	)
 	data, ok := idata.(external_models.TransactionIDAccountIDRequestModel)
 	if !ok {
-		logger.Info("dispute opened notification", idata, "request data format error")
+		logger.Error("dispute opened notification", idata, "request data format error")
 		return nil, fmt.Errorf("request data format error")
 	}
 	accessToken, err := r.getAccessTokenObject().GetAccessToken()
 	if err != nil {
-		logger.Info("dispute opened notification", outBoundResponse, err.Error())
+		logger.Error("dispute opened notification", outBoundResponse, err.Error())
 		return nil, err
 	}
 
@@ -166,7 +166,7 @@ func (r *RequestObj) SendDisputeOpenedNotification() (interface{}, error) {
 	logger.Info("dispute opened notification", data)
 	err = r.getNewSendRequestObject(data, headers, "").SendRequest(&outBoundResponse)
 	if err != nil {
-		logger.Info("dispute opened notification", outBoundResponse, err.Error())
+		logger.Error("dispute opened notification", outBoundResponse, err.Error())
 		return nil, err
 	}
 	logger.Info("dispute opened notification", outBoundResponse)
@@ -181,12 +181,12 @@ func (r *RequestObj) SendTransactionDeliveredNotification() (interface{}, error)
 	)
 	data, ok := idata.(external_models.TransactionIDRequestModel)
 	if !ok {
-		logger.Info("transaction delivered notification", idata, "request data format error")
+		logger.Error("transaction delivered notification", idata, "request data format error")
 		return nil, fmt.Errorf("request data format error")
 	}
 	accessToken, err := r.getAccessTokenObject().GetAccessToken()
 	if err != nil {
-		logger.Info("transaction delivered notification", outBoundResponse, err.Error())
+		logger.Error("transaction delivered notification", outBoundResponse, err.Error())
 		return nil, err
 	}
 
@@ -199,7 +199,7 @@ func (r *RequestObj) SendTransactionDeliveredNotification() (interface{}, error)
 	logger.Info("transaction delivered notification", data)
 	err = r.getNewSendRequestObject(data, headers, "").SendRequest(&outBoundResponse)
 	if err != nil {
-		logger.Info("transaction delivered notification", outBoundResponse, err.Error())
+		logger.Error("transaction delivered notification", outBoundResponse, err.Error())
 		return nil, err
 	}
 	logger.Info("transaction delivered notification", outBoundResponse)
@@ -215,12 +215,12 @@ func (r *RequestObj) SendDueDateProposalNotification() (interface{}, error) {
 	)
 	data, ok := idata.(external_models.DueDateExtensionProposalRequestModel)
 	if !ok {
-		logger.Info("due date proposal notification", idata, "request data format error")
+		logger.Error("due date proposal notification", idata, "request data format error")
 		return nil, fmt.Errorf("request data format error")
 	}
 	accessToken, err := r.getAccessTokenObject().GetAccessToken()
 	if err != nil {
-		logger.Info("due date proposal notification", outBoundResponse, err.Error())
+		logger.Error("due date proposal notification", outBoundResponse, err.Error())
 		return nil, err
 	}
 
@@ -233,7 +233,7 @@ func (r *RequestObj) SendDueDateProposalNotification() (interface{}, error) {
 	logger.Info("due date proposal notification", data)
 	err = r.getNewSendRequestObject(data, headers, "").SendRequest(&outBoundResponse)
 	if err != nil {
-		logger.Info("due date proposal notification", outBoundResponse, err.Error())
+		logger.Error("due date proposal notification", outBoundResponse, err.Error())
 		return nil, err
 	}
 	logger.Info("due date proposal notification", outBoundResponse)
@@ -248,12 +248,12 @@ func (r *RequestObj) SendDueDateExtendedNotification() (interface{}, error) {
 	)
 	data, ok := idata.(external_models.TransactionIDRequestModel)
 	if !ok {
-		logger.Info("due date extended notification", idata, "request data format error")
+		logger.Error("due date extended notification", idata, "request data format error")
 		return nil, fmt.Errorf("request data format error")
 	}
 	accessToken, err := r.getAccessTokenObject().GetAccessToken()
 	if err != nil {
-		logger.Info("due date extended notification", outBoundResponse, err.Error())
+		logger.Error("due date extended notification", outBoundResponse, err.Error())
 		return nil, err
 	}
 
@@ -266,7 +266,7 @@ func (r *RequestObj) SendDueDateExtendedNotification() (interface{}, error) {
 	logger.Info("due date extended notification", data)
 	err = r.getNewSendRequestObject(data, headers, "").SendRequest(&outBoundResponse)
 	if err != nil {
-		logger.Info("due date extended notification", outBoundResponse, err.Error())
+		logger.Error("due date extended notification", outBoundResponse, err.Error())
 		return nil, err
 	}
 	logger.Info("due date extended notification", outBoundResponse)
@@ -281,12 +281,12 @@ func (r *RequestObj) SendTransactionDeliveredAcceptedNotification() (interface{}
 	)
 	data, ok := idata.(external_models.TransactionIDRequestModel)
 	if !ok {
-		logger.Info("transaction delivered accepted notification", idata, "request data format error")
+		logger.Error("transaction delivered accepted notification", idata, "request data format error")
 		return nil, fmt.Errorf("request data format error")
 	}
 	accessToken, err := r.getAccessTokenObject().GetAccessToken()
 	if err != nil {
-		logger.Info("transaction delivered accepted notification", outBoundResponse, err.Error())
+		logger.Error("transaction delivered accepted notification", outBoundResponse, err.Error())
 		return nil, err
 	}
 
@@ -299,7 +299,7 @@ func (r *RequestObj) SendTransactionDeliveredAcceptedNotification() (interface{}
 	logger.Info("transaction delivered accepted notification", data)
 	err = r.getNewSendRequestObject(data, headers, "").SendRequest(&outBoundResponse)
 	if err != nil {
-		logger.Info("transaction delivered accepted notification", outBoundResponse, err.Error())
+		logger.Error("transaction delivered accepted notification", outBoundResponse, err.Error())
 		return nil, err
 	}
 	logger.Info("transaction delivered accepted notification", outBoundResponse)

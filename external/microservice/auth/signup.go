@@ -16,7 +16,7 @@ func (r *RequestObj) SignupUser() (external_models.User, error) {
 
 	data, ok := idata.(external_models.CreateUserRequestModel)
 	if !ok {
-		logger.Info("signup", idata, "request data format error")
+		logger.Error("signup", idata, "request data format error")
 		return outBoundResponse.Data, fmt.Errorf("request data format error")
 	}
 
@@ -27,7 +27,7 @@ func (r *RequestObj) SignupUser() (external_models.User, error) {
 	logger.Info("signup", data)
 	err := r.getNewSendRequestObject(data, headers, "").SendRequest(&outBoundResponse)
 	if err != nil {
-		logger.Info("signup", outBoundResponse, err.Error())
+		logger.Error("signup", outBoundResponse, err.Error())
 		return outBoundResponse.Data, err
 	}
 	logger.Info("signup", outBoundResponse, outBoundResponse.Data)

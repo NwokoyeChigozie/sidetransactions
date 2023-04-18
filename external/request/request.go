@@ -80,6 +80,9 @@ var (
 	GetAccessTokenByKey                          string = "get_access_token_by_key"
 
 	RequestManualRefund string = "request_manual_refund"
+	WalletTransfer      string = "wallet_transfer"
+	DebitWallet         string = "debit_wallet"
+	CreditWallet        string = "credit_wallet"
 )
 
 func (er ExternalRequest) SendExternalRequest(name string, data interface{}) (interface{}, error) {
@@ -572,6 +575,39 @@ func (er ExternalRequest) SendExternalRequest(name string, data interface{}) (in
 				Logger:       er.Logger,
 			}
 			return obj.RequestManualRefund()
+		case "wallet_transfer":
+			obj := payment.RequestObj{
+				Name:         name,
+				Path:         fmt.Sprintf("%v/v2/disbursement/wallet/wallet-transfer", config.Microservices.Payment),
+				Method:       "POST",
+				SuccessCode:  200,
+				DecodeMethod: JsonDecodeMethod,
+				RequestData:  data,
+				Logger:       er.Logger,
+			}
+			return obj.WalletTransfer()
+		case "debit_wallet":
+			obj := payment.RequestObj{
+				Name:         name,
+				Path:         fmt.Sprintf("%v/v2/wallet/debit", config.Microservices.Payment),
+				Method:       "POST",
+				SuccessCode:  200,
+				DecodeMethod: JsonDecodeMethod,
+				RequestData:  data,
+				Logger:       er.Logger,
+			}
+			return obj.DebitWallet()
+		case "credit_wallet":
+			obj := payment.RequestObj{
+				Name:         name,
+				Path:         fmt.Sprintf("%v/v2/wallet/credit", config.Microservices.Payment),
+				Method:       "POST",
+				SuccessCode:  200,
+				DecodeMethod: JsonDecodeMethod,
+				RequestData:  data,
+				Logger:       er.Logger,
+			}
+			return obj.CreditWallet()
 		default:
 			return nil, fmt.Errorf("request not found")
 		}

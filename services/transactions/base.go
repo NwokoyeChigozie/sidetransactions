@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/vesicash/transactions-ms/external/external_models"
 	"github.com/vesicash/transactions-ms/external/request"
+	"github.com/vesicash/transactions-ms/pkg/repository/storage/postgresql"
 	"github.com/vesicash/transactions-ms/utility"
 )
 
@@ -15,7 +16,7 @@ func GetBusinessProfileByAccountID(extReq request.ExternalRequest, logger *utili
 		AccountID: uint(accountID),
 	})
 	if err != nil {
-		logger.Info(err.Error())
+		logger.Error(err.Error())
 		return external_models.BusinessProfile{}, fmt.Errorf("Business lacks a profile.")
 	}
 
@@ -103,7 +104,7 @@ func getBusinessChargeWithBusinessIDAndCurrency(extReq request.ExternalRequest, 
 	})
 
 	if err != nil {
-		extReq.Logger.Info(err.Error())
+		extReq.Logger.Error(err.Error())
 		return external_models.BusinessCharge{}, err
 	}
 
@@ -125,7 +126,7 @@ func initBusinessCharge(extReq request.ExternalRequest, businessID int, currency
 	})
 
 	if err != nil {
-		extReq.Logger.Info(err.Error())
+		extReq.Logger.Error(err.Error())
 		return external_models.BusinessCharge{}, err
 	}
 
@@ -147,7 +148,7 @@ func GetCountryByNameOrCode(extReq request.ExternalRequest, logger *utility.Logg
 	})
 
 	if err != nil {
-		logger.Info(err.Error())
+		logger.Error(err.Error())
 		return external_models.Country{}, fmt.Errorf("Your country could not be resolved, please update your profile.")
 	}
 	country, ok := countryInterface.(external_models.Country)
@@ -167,7 +168,7 @@ func getCountryByCurrency(extReq request.ExternalRequest, logger *utility.Logger
 	})
 
 	if err != nil {
-		logger.Info(err.Error())
+		logger.Error(err.Error())
 		return external_models.Country{}, fmt.Errorf("Your country could not be resolved, please update your profile.")
 	}
 	country, ok := countryInterface.(external_models.Country)
@@ -290,4 +291,45 @@ func GetAccessTokenByKeyFromRequest(extReq request.ExternalRequest, c *gin.Conte
 	}
 
 	return accessToken, nil
+}
+
+func DebitWallet(extReq request.ExternalRequest, db postgresql.Databases, amount float64, currency string, businessID int, creditEscrow string, transactionID string) (external_models.WalletBalance, error) {
+	walletItf, err := extReq.SendExternalRequest(request.DebitWallet, external_models.DebitWalletRequest{
+		Amount:        amount,
+		Currency:      currency,
+		BusinessID:    businessID,
+		EscrowWallet:  creditEscrow,
+		TransactionID: transactionID,
+	})
+	if err != nil {
+		return external_models.WalletBalance{}, err
+	}
+
+	walletBalance, ok := walletItf.(external_models.WalletBalance)
+	if !ok {
+		return external_models.WalletBalance{}, fmt.Errorf("response data format error")
+	}
+
+	return walletBalance, nil
+}
+
+func CreditWallet(extReq request.ExternalRequest, db postgresql.Databases, amount float64, currency string, businessID int, isRefund bool, creditEscrow string, transactionID string) (external_models.WalletBalance, error) {
+	walletItf, err := extReq.SendExternalRequest(request.CreditWallet, external_models.CreditWalletRequest{
+		Amount:        amount,
+		Currency:      currency,
+		BusinessID:    businessID,
+		EscrowWallet:  creditEscrow,
+		TransactionID: transactionID,
+		IsRefund:      isRefund,
+	})
+	if err != nil {
+		return external_models.WalletBalance{}, err
+	}
+
+	walletBalance, ok := walletItf.(external_models.WalletBalance)
+	if !ok {
+		return external_models.WalletBalance{}, fmt.Errorf("response data format error")
+	}
+
+	return walletBalance, nil
 }

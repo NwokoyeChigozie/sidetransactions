@@ -160,7 +160,7 @@ func ImportTransactions(c *gin.Context, extReq request.ExternalRequest, logger *
 				transactionParty := models.TransactionParty{}
 				_, err = transactionParty.CreateTransactionsParties(db.Transaction, parties)
 				if err != nil {
-					logger.Info("error bulk creating transaction parties", err.Error())
+					logger.Error("error bulk creating transaction parties", err.Error())
 				}
 
 				amount, _ := strconv.ParseFloat(amount, 64)

@@ -125,7 +125,7 @@ func ListTransactionsByIDService(extReq request.ExternalRequest, logger *utility
 
 	for data := range ch {
 		if data.Err != nil {
-			logger.Info("error getting other transactions", data.Err.Error())
+			logger.Error("error getting other transactions", data.Err.Error())
 		}
 		milestones[data.Index] = data.MileStoneSlice
 	}
@@ -135,7 +135,7 @@ func ListTransactionsByIDService(extReq request.ExternalRequest, logger *utility
 
 	code, err = transactionBroker.GetTransactionBrokerByTransactionID(db.Transaction)
 	if err != nil && code == http.StatusInternalServerError {
-		logger.Info("error getting transaction broker", err.Error())
+		logger.Error("error getting transaction broker", err.Error())
 	}
 
 	activities, err := activity.GetAllByTransactionID(db.Transaction)
@@ -145,7 +145,7 @@ func ListTransactionsByIDService(extReq request.ExternalRequest, logger *utility
 
 	country, err := GetCountryByNameOrCode(extReq, logger, transaction.Country)
 	if err != nil && code == http.StatusInternalServerError {
-		logger.Info("error getting country", err.Error())
+		logger.Error("error getting country", err.Error())
 	}
 
 	dDateFormatted, err := utility.FormatDate(transaction.DueDate, "2006-01-02", "2006-01-02 15:04:05")
@@ -542,7 +542,7 @@ func resolveTransactionForAmountAndMilestoneResponse(extReq request.ExternalRequ
 
 	err := json.Unmarshal([]byte(t.Recipients), &recipients)
 	if err != nil {
-		extReq.Logger.Info("error unmarshaling recipient json string to struct", t.Recipients, err.Error())
+		extReq.Logger.Error("error unmarshaling recipient json string to struct", t.Recipients, err.Error())
 	}
 
 	for _, r := range recipients {

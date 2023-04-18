@@ -14,12 +14,12 @@ func (r *RequestObj) ListPayment() (external_models.ListPayment, error) {
 	)
 	data, ok := idata.(string)
 	if !ok {
-		logger.Info("list payment by transaction id", idata, "request data format error")
+		logger.Error("list payment by transaction id", idata, "request data format error")
 		return outBoundResponse.Data.Payment, fmt.Errorf("request data format error")
 	}
 	accessToken, err := r.getAccessTokenObject().GetAccessToken()
 	if err != nil {
-		logger.Info("list payment by transaction id", outBoundResponse, err.Error())
+		logger.Error("list payment by transaction id", outBoundResponse, err.Error())
 		return outBoundResponse.Data.Payment, err
 	}
 
@@ -32,7 +32,7 @@ func (r *RequestObj) ListPayment() (external_models.ListPayment, error) {
 	logger.Info("list payment by transaction id", data)
 	err = r.getNewSendRequestObject(data, headers, "/"+data).SendRequest(&outBoundResponse)
 	if err != nil {
-		logger.Info("list payment by transaction id", outBoundResponse, err.Error())
+		logger.Error("list payment by transaction id", outBoundResponse, err.Error())
 		return outBoundResponse.Data.Payment, err
 	}
 	logger.Info("list payment by transaction id", outBoundResponse)

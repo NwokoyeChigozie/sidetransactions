@@ -79,7 +79,7 @@ type OnlyTransactionIDRequiredRequest struct {
 }
 type UpdateTransactionAmountPaid struct {
 	TransactionID string  `json:"transaction_id" validate:"required" pgvalidate:"exists=transaction$transactions$transaction_id"`
-	Amount        float64 `json:"amount" validate:"required"`
+	Amount        float64 `json:"amount"`
 	Action        string  `json:"action" validate:"required,oneof=+ -"`
 }
 type RejectTransactionRequest struct {
@@ -248,6 +248,23 @@ func (t *Transaction) GetTransactionByUssdCode(db *gorm.DB) (int, error) {
 func (t *Transaction) GetAllByTransactionID(db *gorm.DB) ([]Transaction, error) {
 	details := []Transaction{}
 	err := postgresql.SelectAllFromDb(db, "asc", &details, "transaction_id = ? ", t.TransactionID)
+	if err != nil {
+		return details, err
+	}
+	return details, nil
+}
+
+func (t *Transaction) GetAllByQuery(db *gorm.DB, query string) ([]Transaction, error) {
+	details := []Transaction{}
+	err := postgresql.SelectAllFromDb(db, "asc", &details, query)
+	if err != nil {
+		return details, err
+	}
+	return details, nil
+}
+func (t *Transaction) GetAllByQueryWithLimit(db *gorm.DB, query string, limit int) ([]Transaction, error) {
+	details := []Transaction{}
+	err := postgresql.SelectAllFromDbWithLimit(db, "asc", limit, &details, query)
 	if err != nil {
 		return details, err
 	}
