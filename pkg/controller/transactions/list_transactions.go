@@ -82,6 +82,13 @@ func (base *Controller) ListTransactions(c *gin.Context) {
 		return
 	}
 
+	if req.Filter != "" && req.Filter != "day" && req.Filter != "week" && req.Filter != "month" {
+		msg := "filter must be either day, week, or month"
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, "error", msg, fmt.Errorf(msg), nil)
+		c.JSON(http.StatusBadRequest, rd)
+		return
+	}
+
 	transactions, pagination, code, err := transactions.ListTransactionsService(base.ExtReq, base.Logger, base.Db, req, paginator)
 	if err != nil {
 		rd := utility.BuildErrorResponse(code, "error", err.Error(), err, nil)

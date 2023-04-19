@@ -87,7 +87,7 @@ type TransactionCreateResponse struct {
 type ListTransactionsRequest struct {
 	Status     string `json:"status"`
 	StatusCode string `json:"status_code"`
-	Filter     string `json:"filter" validate:"oneof=day week month"`
+	Filter     string `json:"filter"`
 }
 type ListTransactionByBusinessRequest struct {
 	BusinessID int    `json:"business_id" validate:"required" pgvalidate:"exists=auth$business_profiles$account_id"`

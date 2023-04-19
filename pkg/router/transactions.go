@@ -74,5 +74,13 @@ func Transaction(r *gin.Engine, ApiVersion string, validator *validator.Validate
 		transactionsAppUrl.POST("/create_exchange_transaction", transaction.CreateExchangeTransaction)
 		transactionsAppUrl.GET("/get_rate/:id", transaction.GetRateByID)
 	}
+
+	transactionsjobsUrl := r.Group(fmt.Sprintf("%v/jobs", ApiVersion))
+	{
+		transactionsjobsUrl.POST("/start", transaction.StartCronJob)
+		transactionsjobsUrl.POST("/start-bulk", transaction.StartCronJobsBulk)
+		transactionsjobsUrl.POST("/stop", transaction.StopCronJob)
+		transactionsjobsUrl.PATCH("/update_interval", transaction.UpdateCronJobInterval)
+	}
 	return r
 }
