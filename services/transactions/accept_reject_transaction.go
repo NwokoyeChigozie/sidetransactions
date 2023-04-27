@@ -121,7 +121,7 @@ func RejectTransactionService(extReq request.ExternalRequest, logger *utility.Lo
 		return http.StatusInternalServerError, err
 	}
 
-	extReq.SendExternalRequest(request.SendTransactionAcceptedNotification, external_models.TransactionIDRequestModel{
+	extReq.SendExternalRequest(request.SendTransactionRejectedNotification, external_models.TransactionIDRequestModel{
 		TransactionId: req.TransactionID,
 	})
 
