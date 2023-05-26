@@ -124,13 +124,13 @@ func refund(extReq request.ExternalRequest, db postgresql.Databases, amountPaid 
 	recipientCurrency := strings.ToUpper(transactionCurrency)
 	senderCurrency := "ESCROW_" + strings.ToUpper(transactionCurrency)
 
-	_, err = transactions.DebitWallet(extReq, db, amountPaid, senderCurrency, buyer.AccountID, "no", transaction.TransactionID)
+	_, err = transactions.DebitWallet(extReq, db, amountPaid, senderCurrency, buyer.AccountID, "no", "no", transaction.TransactionID)
 	if err != nil {
 		extReq.Logger.Error(fmt.Sprintf("error debiting buyer %v, walletcurrency:%v for transaction %v", buyer.AccountID, senderCurrency, transaction.TransactionID))
 		return
 	}
 
-	_, err = transactions.CreditWallet(extReq, db, amountPaid, recipientCurrency, buyer.AccountID, true, "no", transaction.TransactionID)
+	_, err = transactions.CreditWallet(extReq, db, amountPaid, recipientCurrency, buyer.AccountID, true, "no", "no", transaction.TransactionID)
 	if err != nil {
 		extReq.Logger.Error(fmt.Sprintf("error crediting buyer %v, walletcurrency:%v for transaction %v", buyer.AccountID, recipientCurrency, transaction.TransactionID))
 		return
