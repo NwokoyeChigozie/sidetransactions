@@ -5,6 +5,7 @@ type DebitWalletRequest struct {
 	Currency      string  `json:"currency"`
 	BusinessID    int     `json:"business_id"`
 	EscrowWallet  string  `json:"escrow_wallet"`
+	MorWallet     string  `json:"mor_wallet"`
 	TransactionID string  `json:"transaction_id"`
 }
 
@@ -14,6 +15,7 @@ type CreditWalletRequest struct {
 	BusinessID    int     `json:"business_id"`
 	IsRefund      bool    `json:"is_refund"`
 	EscrowWallet  string  `json:"escrow_wallet"`
+	MorWallet     string  `json:"mor_wallet"`
 	TransactionID string  `json:"transaction_id"`
 }
 

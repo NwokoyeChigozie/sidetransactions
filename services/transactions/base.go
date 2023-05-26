@@ -293,12 +293,13 @@ func GetAccessTokenByKeyFromRequest(extReq request.ExternalRequest, c *gin.Conte
 	return accessToken, nil
 }
 
-func DebitWallet(extReq request.ExternalRequest, db postgresql.Databases, amount float64, currency string, businessID int, creditEscrow string, transactionID string) (external_models.WalletBalance, error) {
+func DebitWallet(extReq request.ExternalRequest, db postgresql.Databases, amount float64, currency string, businessID int, creditEscrow string, creditMor string, transactionID string) (external_models.WalletBalance, error) {
 	walletItf, err := extReq.SendExternalRequest(request.DebitWallet, external_models.DebitWalletRequest{
 		Amount:        amount,
 		Currency:      currency,
 		BusinessID:    businessID,
 		EscrowWallet:  creditEscrow,
+		MorWallet:     creditMor,
 		TransactionID: transactionID,
 	})
 	if err != nil {
@@ -313,12 +314,13 @@ func DebitWallet(extReq request.ExternalRequest, db postgresql.Databases, amount
 	return walletBalance, nil
 }
 
-func CreditWallet(extReq request.ExternalRequest, db postgresql.Databases, amount float64, currency string, businessID int, isRefund bool, creditEscrow string, transactionID string) (external_models.WalletBalance, error) {
+func CreditWallet(extReq request.ExternalRequest, db postgresql.Databases, amount float64, currency string, businessID int, isRefund bool, creditEscrow string, creditMor string, transactionID string) (external_models.WalletBalance, error) {
 	walletItf, err := extReq.SendExternalRequest(request.CreditWallet, external_models.CreditWalletRequest{
 		Amount:        amount,
 		Currency:      currency,
 		BusinessID:    businessID,
 		EscrowWallet:  creditEscrow,
+		MorWallet:     creditMor,
 		TransactionID: transactionID,
 		IsRefund:      isRefund,
 	})
