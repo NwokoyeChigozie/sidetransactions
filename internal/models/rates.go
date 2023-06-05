@@ -3,6 +3,7 @@ package models
 import (
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/vesicash/transactions-ms/pkg/repository/storage/postgresql"
@@ -34,6 +35,17 @@ func (r Rate) GetAll(db *gorm.DB) ([]Rate, error) {
 
 func (r *Rate) GetRateByID(db *gorm.DB) (int, error) {
 	err, nilErr := postgresql.SelectOneFromDb(db, &r, "id = ?", r.ID)
+	if nilErr != nil {
+		return http.StatusBadRequest, nilErr
+	}
+
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
+	return http.StatusOK, nil
+}
+func (r *Rate) GetRateByFromAndToCurrencies(db *gorm.DB) (int, error) {
+	err, nilErr := postgresql.SelectOneFromDb(db, &r, "Lower(from_currency)=? and Lower(to_currency)=?", strings.ToLower(r.FromCurrency), strings.ToLower(r.ToCurrency))
 	if nilErr != nil {
 		return http.StatusBadRequest, nilErr
 	}
