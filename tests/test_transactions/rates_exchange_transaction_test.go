@@ -854,3 +854,161 @@ func TestGetRateByID(t *testing.T) {
 	}
 
 }
+func TestGetRateByFromAndToCurrencies(t *testing.T) {
+	logger := tst.Setup()
+	gin.SetMode(gin.TestMode)
+	validatorRef := validator.New()
+	app := config.GetConfig().App
+	db := postgresql.Connection()
+	var (
+		muuid, _  = uuid.NewV4()
+		accountID = uint(utility.GetRandomNumbersInRange(1000000000, 9999999999))
+		testUser  = external_models.User{
+			ID:           uint(utility.GetRandomNumbersInRange(1000000000, 9999999999)),
+			AccountID:    accountID,
+			EmailAddress: fmt.Sprintf("testuser%v@qa.team", muuid.String()),
+			PhoneNumber:  fmt.Sprintf("+234%v", utility.GetRandomNumbersInRange(7000000000, 9099999999)),
+			AccountType:  "individual",
+			Firstname:    "test",
+			Lastname:     "user",
+			Username:     fmt.Sprintf("test_username%v", muuid.String()),
+		}
+	)
+
+	auth_mocks.User = &testUser
+	auth_mocks.BusinessProfile = &external_models.BusinessProfile{
+		ID:        uint(utility.GetRandomNumbersInRange(1000000000, 9999999999)),
+		AccountID: int(testUser.AccountID),
+		Country:   "NG",
+		Currency:  "NGN",
+	}
+	auth_mocks.ValidateAuthorizationRes = &external_models.ValidateAuthorizationDataModel{
+		Status:  true,
+		Message: "authorized",
+		Data:    testUser,
+	}
+	auth_mocks.UserProfile = &external_models.UserProfile{
+		ID:        uint(utility.GetRandomNumbersInRange(1000000000, 9999999999)),
+		AccountID: int(testUser.AccountID),
+		Country:   "NG",
+		Currency:  "NGN",
+	}
+
+	auth_mocks.Country = &external_models.Country{
+		ID:           uint(utility.GetRandomNumbersInRange(1000000000, 9999999999)),
+		Name:         "nigeria",
+		CountryCode:  "NG",
+		CurrencyCode: "NGN",
+	}
+
+	auth_mocks.BusinessCharge = &external_models.BusinessCharge{
+		ID:                  uint(utility.GetRandomNumbersInRange(1000000000, 9999999999)),
+		BusinessId:          int(testUser.AccountID),
+		Country:             "NG",
+		Currency:            "NGN",
+		BusinessCharge:      "0",
+		VesicashCharge:      "2.5",
+		ProcessingFee:       "0",
+		PaymentGateway:      "rave",
+		DisbursementGateway: "rave_momo",
+		ProcessingFeeMode:   "fixed",
+	}
+
+	trans := transactions.Controller{Db: db, Validator: validatorRef, Logger: logger, ExtReq: request.ExternalRequest{
+		Logger: logger,
+		Test:   true,
+	}}
+
+	tst.CreateTransactionUser(t, db, validatorRef, trans.ExtReq, int(testUser.AccountID), false)
+	r := gin.Default()
+	rate := models.Rate{
+		FromCurrency: "USD",
+		ToCurrency:   "NGN",
+		From_symbol:  "NGN",
+		ToSymbol:     "NGN",
+		Amount:       700,
+	}
+	err := rate.CreateRate(db.Transaction)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	tests := []struct {
+		Name         string
+		RequestBody  interface{}
+		ExpectedCode int
+		Headers      map[string]string
+		Message      string
+		FROM         string
+		To           string
+	}{
+		{
+			Name:         "OK get rate by id",
+			RequestBody:  nil,
+			ExpectedCode: http.StatusOK,
+			Message:      "success",
+			Headers: map[string]string{
+				"Content-Type": "application/json",
+				"v-app":        app.Key,
+			},
+			FROM: rate.FromCurrency,
+			To:   rate.ToCurrency,
+		}, {
+			Name:         "wrong currencies",
+			RequestBody:  nil,
+			ExpectedCode: http.StatusBadRequest,
+			Headers: map[string]string{
+				"Content-Type": "application/json",
+				"v-app":        app.Key,
+			},
+			FROM: "yyyw",
+			To:   "ddggs",
+		},
+	}
+
+	transactionAppUrl := r.Group(fmt.Sprintf("%v", "v2"), middleware.Authorize(db, trans.ExtReq, middleware.AppType))
+	{
+		transactionAppUrl.GET("/get_rate_by_currency/:from/:to", trans.GetRateByFromAndToCurrencies)
+	}
+
+	for _, test := range tests {
+		t.Run(test.Name, func(t *testing.T) {
+
+			var b bytes.Buffer
+			json.NewEncoder(&b).Encode(test.RequestBody)
+			URI := url.URL{Path: fmt.Sprintf("/v2/get_rate_by_currency/%v/%v", test.FROM, test.To)}
+
+			req, err := http.NewRequest(http.MethodGet, URI.String(), &b)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			for i, v := range test.Headers {
+				req.Header.Set(i, v)
+			}
+
+			rr := httptest.NewRecorder()
+			r.ServeHTTP(rr, req)
+
+			tst.AssertStatusCode(t, rr.Code, test.ExpectedCode)
+
+			data := tst.ParseResponse(rr)
+			fmt.Println(data)
+			code := int(data["code"].(float64))
+			tst.AssertStatusCode(t, code, test.ExpectedCode)
+
+			if test.Message != "" {
+				message := data["message"]
+				if message != nil {
+					tst.AssertResponseMessage(t, message.(string), test.Message)
+				} else {
+					tst.AssertResponseMessage(t, "", test.Message)
+				}
+
+			}
+
+		})
+
+	}
+
+}

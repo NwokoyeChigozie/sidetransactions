@@ -72,6 +72,7 @@ func Transaction(r *gin.Engine, ApiVersion string, validator *validator.Validate
 		transactionsAppUrl.PATCH("/update_transaction_amount_paid", transaction.UpdateTransactionAmountPaid)
 		transactionsAppUrl.POST("/create_activity_log", transaction.CreateActivityLog)
 		transactionsAppUrl.POST("/create_exchange_transaction", transaction.CreateExchangeTransaction)
+		transactionsAppUrl.GET("/get_rate_by_currency/:from/:to", transaction.GetRateByFromAndToCurrencies)
 		transactionsAppUrl.GET("/get_rate/:id", transaction.GetRateByID)
 	}
 
