@@ -6,7 +6,7 @@ orbs:
 executors:
   ubuntu:
     environment:
-      REGISTRY: registry.digitalocean.com
+      REGISTRY: registry.hub.docker.com
       TAG: latest
     docker:
       - image: cimg/base:2023.03
@@ -117,12 +117,12 @@ jobs:
       - run:
           name: Build Docker image
           command: |
-            IMAGE_NAME="${REGISTRY}/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}"
+            IMAGE_NAME="${REGISTRY}/vesicash/${CIRCLE_PROJECT_REPONAME}"
             docker build -t $IMAGE_NAME:$TAG .
       - run:
           name: Archive Docker image
           command: |
-            IMAGE_NAME="${REGISTRY}/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}"
+            IMAGE_NAME="${REGISTRY}/vesicash/${CIRCLE_PROJECT_REPONAME}"
             docker save -o image.tar $IMAGE_NAME
       - persist_to_workspace:
           root: .
@@ -142,7 +142,7 @@ jobs:
       - run:
           name: Publish Docker image
           command: |
-            IMAGE_NAME="${REGISTRY}/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}"
+            IMAGE_NAME="${REGISTRY}/vesicash/${CIRCLE_PROJECT_REPONAME}"
             IMAGE_TAG="development"
             echo $DOCKER_PASS | docker login $REGISTRY -u $DOCKER_USER --password-stdin
             docker tag $IMAGE_NAME:latest $IMAGE_NAME:$IMAGE_TAG
@@ -162,7 +162,7 @@ jobs:
           name: Publish Docker image
           command: |
             echo $DOCKER_PASS | docker login $REGISTRY -u $DOCKER_USER --password-stdin
-            IMAGE_NAME="${REGISTRY}/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}"
+            IMAGE_NAME="${REGISTRY}/vesicash/${CIRCLE_PROJECT_REPONAME}"
             docker push $IMAGE_NAME:$TAG
   publish-tagged-image:
     executor: ubuntu
@@ -179,7 +179,7 @@ jobs:
           name: Publish Docker image
           command: |
             echo $DOCKER_PASS | docker login $REGISTRY -u $DOCKER_USER --password-stdin
-            IMAGE_NAME="${REGISTRY}/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}"
+            IMAGE_NAME="${REGISTRY}/vesicash/${CIRCLE_PROJECT_REPONAME}"
             IMAGE_TAG="${CIRCLE_TAG/v/''}"
             docker tag $IMAGE_NAME:latest $IMAGE_NAME:$IMAGE_TAG
             docker push $IMAGE_NAME:$IMAGE_TAG
