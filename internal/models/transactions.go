@@ -18,14 +18,14 @@ type Transaction struct {
 	MilestoneID      string    `gorm:"column:milestone_id; type:varchar(255); comment: " json:"milestone_id"`
 	BrokerID         string    `gorm:"column:broker_id; type:varchar(255); comment: " json:"broker_id"`
 	Title            string    `gorm:"column:title; type:varchar(255); not null; comment: " json:"title"`
-	Type             string    `gorm:"column:type; type:varchar(255); not null; comment: Transaction Type: product, service[oneoff], service[milestone]" json:"type"`
+	Type             string    `gorm:"column:type; type:varchar(255); comment: Transaction Type: product, service[oneoff], service[milestone]" json:"type"`
 	Description      string    `gorm:"column:description; type:text; not null; comment: " json:"description"`
-	Amount           float64   `gorm:"column:amount; type:decimal(20,2); not null; comment:" json:"amount"`
+	Amount           float64   `gorm:"column:amount; type:decimal(20,2); comment:" json:"amount"`
 	Status           string    `gorm:"column:status; type:varchar(255); default: Draft; comment: Transaction Status" json:"status"`
 	Quantity         int       `gorm:"column:quantity; type:int" json:"quantity"`
 	InspectionPeriod string    `gorm:"column:inspection_period; type:varchar(255); comment: " json:"inspection_period"`
 	DueDate          string    `gorm:"column:due_date; type:varchar(255); comment: " json:"due_date"`
-	ShippingFee      float64   `gorm:"column:shipping_fee; type:decimal(20,2); not null; comment:" json:"shipping_fee"`
+	ShippingFee      float64   `gorm:"column:shipping_fee; type:decimal(20,2); comment:" json:"shipping_fee"`
 	GracePeriod      string    `gorm:"column:grace_period; type:varchar(255); comment: Grace Period 48 hours" json:"grace_period"`
 	Currency         string    `gorm:"column:currency; type:varchar(255); comment: Currency transaction made in" json:"currency"`
 	DeletedAt        time.Time `gorm:"column:deleted_at" json:"deleted_at"`
@@ -38,8 +38,8 @@ type Transaction struct {
 	TransUssdCode    int       `gorm:"column:trans_ussd_code; type:int" json:"trans_ussd_code"`
 	Recipients       string    `gorm:"column:recipients; type:varchar(255)" json:"recipients"`
 	DisputeHandler   string    `gorm:"column:dispute_handler; type:varchar(255)" json:"dispute_handler"`
-	AmountPaid       float64   `gorm:"column:amount_paid; type:decimal(20,2); not null; comment:" json:"amount_paid"`
-	EscrowCharge     float64   `gorm:"column:escrow_charge; type:decimal(20,2); not null; comment:" json:"escrow_charge"`
+	AmountPaid       float64   `gorm:"column:amount_paid; type:decimal(20,2); comment:" json:"amount_paid"`
+	EscrowCharge     float64   `gorm:"column:escrow_charge; type:decimal(20,2); comment:" json:"escrow_charge"`
 	EscrowWallet     string    `gorm:"column:escrow_wallet; type:varchar(255); default: no" json:"escrow_wallet"`
 }
 
@@ -79,7 +79,7 @@ type OnlyTransactionIDRequiredRequest struct {
 }
 type UpdateTransactionAmountPaid struct {
 	TransactionID string  `json:"transaction_id" validate:"required" pgvalidate:"exists=transaction$transactions$transaction_id"`
-	Amount        float64 `json:"amount" validate:"required"`
+	Amount        float64 `json:"amount"`
 	Action        string  `json:"action" validate:"required,oneof=+ -"`
 }
 type RejectTransactionRequest struct {
@@ -248,6 +248,23 @@ func (t *Transaction) GetTransactionByUssdCode(db *gorm.DB) (int, error) {
 func (t *Transaction) GetAllByTransactionID(db *gorm.DB) ([]Transaction, error) {
 	details := []Transaction{}
 	err := postgresql.SelectAllFromDb(db, "asc", &details, "transaction_id = ? ", t.TransactionID)
+	if err != nil {
+		return details, err
+	}
+	return details, nil
+}
+
+func (t *Transaction) GetAllByQuery(db *gorm.DB, query string) ([]Transaction, error) {
+	details := []Transaction{}
+	err := postgresql.SelectAllFromDb(db, "asc", &details, query)
+	if err != nil {
+		return details, err
+	}
+	return details, nil
+}
+func (t *Transaction) GetAllByQueryWithLimit(db *gorm.DB, query string, limit int) ([]Transaction, error) {
+	details := []Transaction{}
+	err := postgresql.SelectAllFromDbWithLimit(db, "asc", limit, &details, query)
 	if err != nil {
 		return details, err
 	}

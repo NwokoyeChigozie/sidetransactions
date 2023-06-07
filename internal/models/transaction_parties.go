@@ -12,17 +12,17 @@ import (
 )
 
 type TransactionParty struct {
-	ID                   uint      `gorm:"column:id; type:uint; not null; primaryKey; unique; autoIncrement" json:"id"`
-	TransactionPartiesID string    `gorm:"column:transaction_parties_id; type:varchar(255); not null" json:"transaction_parties_id"`
-	TransactionID        string    `gorm:"column:transaction_id; type:varchar(255); not null; comment: 12 characters long string" json:"transaction_id"`
-	AccountID            int       `gorm:"column:account_id; type:int" json:"account_id"`
-	Role                 string    `gorm:"column:role; type:varchar(255); not null" json:"role"`
-	DeletedAt            time.Time `gorm:"column:deleted_at" json:"deleted_at"`
-	CreatedAt            time.Time `gorm:"column:created_at; autoCreateTime" json:"created_at"`
-	UpdatedAt            time.Time `gorm:"column:updated_at; autoUpdateTime" json:"updated_at"`
-	RoleCapabilities     jsonmap   `gorm:"column:role_capabilities; type:varchar(250); default: '{\"can_view\":true,\"can_receive\":false,\"mark_as_done\":false,\"approve\":true}'; comment: view|manage" json:"role_capabilities"`
-	RoleDescription      string    `gorm:"column:role_description; type:text" json:"role_description"`
-	Status               string    `gorm:"column:status; type:varchar(255); not null;default:created" json:"status"`
+	ID                   uint             `gorm:"column:id; type:uint; not null; primaryKey; unique; autoIncrement" json:"id"`
+	TransactionPartiesID string           `gorm:"column:transaction_parties_id; type:varchar(255); not null" json:"transaction_parties_id"`
+	TransactionID        string           `gorm:"column:transaction_id; type:varchar(255); not null; comment: 12 characters long string" json:"transaction_id"`
+	AccountID            int              `gorm:"column:account_id; type:int" json:"account_id"`
+	Role                 string           `gorm:"column:role; type:varchar(255); not null" json:"role"`
+	DeletedAt            time.Time        `gorm:"column:deleted_at" json:"deleted_at"`
+	CreatedAt            time.Time        `gorm:"column:created_at; autoCreateTime" json:"created_at"`
+	UpdatedAt            time.Time        `gorm:"column:updated_at; autoUpdateTime" json:"updated_at"`
+	RoleCapabilities     roleCapabilities `gorm:"column:role_capabilities; type:varchar(250); default: '{\"can_view\":true,\"can_receive\":false,\"mark_as_done\":false,\"approve\":true}'; comment: view|manage" json:"role_capabilities"`
+	RoleDescription      string           `gorm:"column:role_description; type:text" json:"role_description"`
+	Status               string           `gorm:"column:status; type:varchar(255); not null;default:created" json:"status"`
 }
 
 type UpdateTransactionPartiesRequest struct {

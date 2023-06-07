@@ -22,9 +22,11 @@ type BaseConfig struct {
 	REQUEST_PER_SECOND               float64 `mapstructure:"REQUEST_PER_SECOND"`
 	TRUSTED_PROXIES                  string  `mapstructure:"TRUSTED_PROXIES"`
 	EXEMPT_FROM_THROTTLE             string  `mapstructure:"EXEMPT_FROM_THROTTLE"`
+	METRICS_SERVER_PORT              string  `mapstructure:"METRICS_SERVER_PORT"`
 
 	APP_NAME string `mapstructure:"APP_NAME"`
 	APP_KEY  string `mapstructure:"APP_KEY"`
+	APP_MODE string `mapstructure:"APP_MODE"`
 
 	DB_HOST          string `mapstructure:"DB_HOST"`
 	DB_PORT          string `mapstructure:"DB_PORT"`
@@ -121,10 +123,12 @@ func (config *BaseConfig) SetupConfigurationn() *Configuration {
 			RequestPerSecond:          config.REQUEST_PER_SECOND,
 			TrustedProxies:            trustedProxies,
 			ExemptFromThrottle:        exemptFromThrottle,
+			MetricsPort:               config.METRICS_SERVER_PORT,
 		},
 		App: App{
 			Name: config.APP_NAME,
 			Key:  config.APP_KEY,
+			Mode: config.APP_MODE,
 		},
 		Databases: Databases{
 			DB_HOST:          config.DB_HOST,

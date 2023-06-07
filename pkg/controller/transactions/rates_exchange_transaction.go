@@ -134,3 +134,20 @@ func (base *Controller) GetRateByID(c *gin.Context) {
 	c.JSON(http.StatusOK, rd)
 
 }
+func (base *Controller) GetRateByFromAndToCurrencies(c *gin.Context) {
+	var (
+		fromCurrency = c.Param("from")
+		toCurrency   = c.Param("to")
+	)
+
+	rate := models.Rate{FromCurrency: fromCurrency, ToCurrency: toCurrency}
+	code, err := rate.GetRateByFromAndToCurrencies(base.Db.Transaction)
+	if err != nil {
+		rd := utility.BuildErrorResponse(code, "error", err.Error(), err, nil)
+		c.JSON(code, rd)
+		return
+	}
+	rd := utility.BuildSuccessResponse(http.StatusOK, "success", rate)
+	c.JSON(http.StatusOK, rd)
+
+}

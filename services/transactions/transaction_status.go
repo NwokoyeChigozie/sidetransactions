@@ -44,8 +44,10 @@ func UpdateTransactionStatusService(extReq request.ExternalRequest, logger *util
 			localStatus = GetTransactionStatus("closed")
 			closedTransactionMessage = "Transaction has been closed."
 		} else {
-			//TODO: if yes, do refund with amount_paid
-			//TODO: if refund successful, set status to close-refunded
+			_, err := extReq.SendExternalRequest(request.RequestManualRefund, req.TransactionID)
+			if err != nil {
+				return http.StatusInternalServerError, fmt.Errorf("refund failed")
+			}
 			localStatus = GetTransactionStatus("cr")
 			closedTransactionMessage = "Transaction has closed and payment refunded back to buyer."
 		}

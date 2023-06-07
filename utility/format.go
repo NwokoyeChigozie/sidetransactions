@@ -14,6 +14,17 @@ func FormatDate(date, currentISOFormat, newISOFormat string) (string, error) {
 	}
 	return t.Format(newISOFormat), nil
 }
+
+func UnFormatDueDate(date string) (time.Time, error) {
+	t, err := time.Parse("2006-01-02 15:04:05", date)
+	if err != nil {
+		t, err = time.Parse("2006-01-02 15::05", date)
+		if err != nil {
+			return t, err
+		}
+	}
+	return t, nil
+}
 func FormatDateSpecialCase(t time.Time) string {
 	day := t.Day()
 	var suffix string

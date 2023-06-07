@@ -15,14 +15,14 @@ func SignupUser(logger *utility.Logger, idata interface{}) (external_models.User
 
 	data, ok := idata.(external_models.CreateUserRequestModel)
 	if !ok {
-		logger.Info("signup", idata, "request data format error")
+		logger.Error("signup", idata, "request data format error")
 		return outBoundResponse.Data, fmt.Errorf("request data format error")
 	}
 
 	logger.Info("signup", data)
 
 	if User == nil {
-		logger.Info("signup", User, "user not provided")
+		logger.Error("signup", User, "user not provided")
 		return external_models.User{}, fmt.Errorf("user not provided")
 	}
 

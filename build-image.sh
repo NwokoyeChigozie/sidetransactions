@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 
-IMAGE_NAME="vesicash/auth"
+IMAGE_NAME="vesicash/transactions"
 IMAGE_TAG="${1:-latest}"
 
 if [[ ! -f "app.env" ]]

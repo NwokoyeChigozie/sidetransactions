@@ -62,6 +62,14 @@ func SelectAllFromDb(db *gorm.DB, order string, receiver interface{}, query inte
 	return tx.Error
 }
 
+func SelectAllFromDbWithLimit(db *gorm.DB, order string, limit int, receiver interface{}, query interface{}, args ...interface{}) error {
+	if order == "" {
+		order = "desc"
+	}
+	tx := db.Order("id "+order).Where(query, args...).Limit(limit).Find(receiver)
+	return tx.Error
+}
+
 func SelectAllFromDbOrderBy(db *gorm.DB, orderBy, order string, receiver interface{}, query interface{}, args ...interface{}) error {
 	if order == "" {
 		order = "desc"
