@@ -56,7 +56,7 @@ type CreateTransactionRequest struct {
 	Amount           float64     `json:"amount"`
 	InspectionPeriod int         `json:"inspection_period"`
 	GracePeriod      string      `json:"grace_period"`
-	DueDate          string      `json:"due_date" validate:"required"`
+	DueDate          string      `json:"due_date"`
 	ShippingFee      float64     `json:"shipping_fee"`
 	Currency         string      `json:"currency"  validate:"required"`
 	Source           string      `json:"source" validate:"oneof=api instantescrow trizact transfer"`

@@ -42,6 +42,10 @@ func CreateTransactionService(extReq request.ExternalRequest, logger *utility.Lo
 		businessID = int(user.BusinessId)
 	}
 
+	if businessID == 0 {
+		businessID = int(user.AccountID)
+	}
+
 	if transactionDescription == "" {
 		transactionDescription = req.Title
 	}
