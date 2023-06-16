@@ -93,7 +93,7 @@ func ListTransactionsByIDService(extReq request.ExternalRequest, logger *utility
 	}
 
 	var wg sync.WaitGroup
-	ch := make(chan chanData)
+	ch := make(chan chanData, len(transactions))
 	wg.Add(len(transactions))
 	for i, t := range transactions {
 		go func(extReq request.ExternalRequest, db postgresql.Databases, index int, transaction models.Transaction, currentMileStoneSlice []models.MilestonesResponse, ch chan chanData, wg *sync.WaitGroup) {
@@ -215,7 +215,7 @@ func ListTransactionsService(extReq request.ExternalRequest, logger *utility.Log
 	}
 
 	var wg sync.WaitGroup
-	ch := make(chan chanData)
+	ch := make(chan chanData, len(transactions))
 	wg.Add(len(transactions))
 	for _, t := range transactions {
 		go func(extReq request.ExternalRequest, logger *utility.Logger, db postgresql.Databases, transactionID string, ch chan chanData, wg *sync.WaitGroup) {
@@ -272,7 +272,7 @@ func ListTransactionsByBusinessService(extReq request.ExternalRequest, logger *u
 		Err                 error
 	}
 	var wg sync.WaitGroup
-	ch := make(chan chanData)
+	ch := make(chan chanData, len(transactions))
 	wg.Add(len(transactions))
 	for _, t := range transactions {
 		go func(extReq request.ExternalRequest, logger *utility.Logger, db postgresql.Databases, transactionID string, ch chan chanData, wg *sync.WaitGroup) {
@@ -338,7 +338,7 @@ func ListByBusinessFromMondayToThursdayService(extReq request.ExternalRequest, l
 		Err                 error
 	}
 	var wg sync.WaitGroup
-	ch := make(chan chanData)
+	ch := make(chan chanData, len(transactions))
 	wg.Add(len(transactions))
 	for _, t := range transactions {
 		go func(extReq request.ExternalRequest, logger *utility.Logger, db postgresql.Databases, transactionID string, ch chan chanData, wg *sync.WaitGroup) {
@@ -417,7 +417,7 @@ func ListTransactionsByUserService(extReq request.ExternalRequest, logger *utili
 	}
 
 	var wg sync.WaitGroup
-	ch := make(chan chanData)
+	ch := make(chan chanData, len(transactions))
 	wg.Add(len(transactions))
 	for _, t := range transactions {
 		go func(extReq request.ExternalRequest, logger *utility.Logger, db postgresql.Databases, transactionID string, ch chan chanData, wg *sync.WaitGroup) {
@@ -481,7 +481,7 @@ func ListArchivedTransactionsService(extReq request.ExternalRequest, logger *uti
 	}
 
 	var wg sync.WaitGroup
-	ch := make(chan chanData)
+	ch := make(chan chanData, len(transactions))
 	wg.Add(len(transactions))
 	for _, t := range transactions {
 		go func(extReq request.ExternalRequest, logger *utility.Logger, db postgresql.Databases, transactionID string, ch chan chanData, wg *sync.WaitGroup) {
@@ -588,7 +588,7 @@ func getPartiesAndMembersFromParties(extReq request.ExternalRequest, parties []m
 		Err    error
 	}
 
-	ch := make(chan chanData)
+	ch := make(chan chanData, len(parties))
 	wg.Add(len(parties))
 	for _, p := range parties {
 		partiess[p.Role] = p
