@@ -165,6 +165,8 @@ func ListTransactionsByIDService(extReq request.ExternalRequest, logger *utility
 		return models.TransactionByIDResponse{}, http.StatusInternalServerError, err
 	}
 
+	titleSlice := strings.Split(transaction.Title, ";")
+	transaction.Title = titleSlice[0]
 	transactionReponse.Milestones = milestones[0]
 	transactionReponse.Broker = transactionBroker
 	transactionReponse.Activities = activities
