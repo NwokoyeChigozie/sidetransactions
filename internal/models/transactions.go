@@ -56,7 +56,7 @@ type CreateTransactionRequest struct {
 	Amount           float64     `json:"amount"`
 	InspectionPeriod int         `json:"inspection_period"`
 	GracePeriod      string      `json:"grace_period"`
-	DueDate          string      `json:"due_date" validate:"required"`
+	DueDate          string      `json:"due_date"`
 	ShippingFee      float64     `json:"shipping_fee"`
 	Currency         string      `json:"currency"  validate:"required"`
 	Source           string      `json:"source" validate:"oneof=api instantescrow trizact transfer"`
@@ -150,11 +150,11 @@ type MilestonesResponse struct {
 }
 
 type MilestonesRecipientResponse struct {
-	AccountID   int     `json:"title"`
-	AccountName string  `json:"amount"`
-	Email       string  `json:"status"`
-	PhoneNumber string  `json:"inspection_period"`
-	Amount      float64 `json:"due_date"`
+	AccountID   int     `json:"account_id"`
+	AccountName string  `json:"account_name"`
+	Email       string  `json:"email"`
+	PhoneNumber string  `json:"phone_number"`
+	Amount      float64 `json:"amount"`
 }
 
 type File struct {

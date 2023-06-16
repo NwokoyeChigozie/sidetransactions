@@ -165,6 +165,8 @@ func ListTransactionsByIDService(extReq request.ExternalRequest, logger *utility
 		return models.TransactionByIDResponse{}, http.StatusInternalServerError, err
 	}
 
+	titleSlice := strings.Split(transactionReponse.Title, ";")
+	transactionReponse.Title = titleSlice[0]
 	transactionReponse.Milestones = milestones[0]
 	transactionReponse.Broker = transactionBroker
 	transactionReponse.Activities = activities
@@ -540,6 +542,7 @@ func resolveTransactionForAmountAndMilestoneResponse(extReq request.ExternalRequ
 	var recipients []models.MileStoneRecipient
 	var recipientsResponse []models.MilestonesRecipientResponse
 
+	fmt.Println("recipients string", t.Recipients)
 	err := json.Unmarshal([]byte(t.Recipients), &recipients)
 	if err != nil {
 		extReq.Logger.Error("error unmarshaling recipient json string to struct", t.Recipients, err.Error())
