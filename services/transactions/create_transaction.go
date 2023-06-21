@@ -113,18 +113,20 @@ func CreateTransactionService(extReq request.ExternalRequest, logger *utility.Lo
 		escrowCharge = 2
 	}
 
-	if transactionType == "oneoff" {
+	switch transactionType {
+	case "oneoff":
 		transaction, mileStoneResponse, err = resolveCreateOneOffTransaction(extReq, req.Milestones, transactionAmount, escrowCharge, transactionObj, db)
 		if err != nil {
 			return models.TransactionCreateResponse{}, http.StatusInternalServerError, err
 		}
-	} else if transactionType == "milestone" {
+	case "milestone":
 		transaction, mileStoneResponse, err = resolveCreateMilestoneTransaction(extReq, req.Milestones, transactionAmount, escrowCharge, transactionObj, db)
 		if err != nil {
 			return models.TransactionCreateResponse{}, http.StatusInternalServerError, err
 		}
-	} else {
+	default:
 		return models.TransactionCreateResponse{}, http.StatusBadRequest, fmt.Errorf("transaction type not implemented")
+
 	}
 
 	transaction.IsPaylinked = transactionPaylinked
@@ -407,7 +409,10 @@ func resolveCreateMilestoneTransaction(extReq request.ExternalRequest, milestone
 		if err != nil {
 			return transactionM, milestonesResponse, err
 		} else {
-			transactionM = transaction
+			if i == 0 {
+				transactionM = transaction
+			}
+
 			if len(m.Recipients) > 0 {
 				recipientsArray := []models.MilestonesRecipientResponse{}
 				for _, r := range m.Recipients {

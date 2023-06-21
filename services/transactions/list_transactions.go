@@ -84,6 +84,161 @@ func ListTransactionsByIDService(extReq request.ExternalRequest, logger *utility
 	}
 
 	transactionReponse.Files = transactionFiles
+	milestones := []models.MilestonesResponse{}
+
+	type chanData struct {
+		MileStoneSlice models.MilestonesResponse
+		TotalAmount    float64
+		Err            error
+	}
+
+	var wg sync.WaitGroup
+	ch := make(chan chanData, len(transactions))
+
+	for i, t := range transactions {
+		wg.Add(1)
+		go func(extReq request.ExternalRequest, db postgresql.Databases, index int, transaction models.Transaction, ch chan chanData, wg *sync.WaitGroup) {
+			defer wg.Done()
+
+			totalAmount, mileSresponse := resolveTransactionForAmountAndMilestoneResponse(extReq, index, transaction)
+			response := chanData{MileStoneSlice: mileSresponse, TotalAmount: totalAmount}
+
+			ch <- response
+		}(extReq, db, i, t, ch, &wg)
+
+	}
+	go func() {
+		defer close(ch)
+		wg.Wait()
+	}()
+
+	for data := range ch {
+		if data.Err != nil {
+			logger.Error("error getting transactions", data.Err.Error())
+		} else {
+			if len(milestones) == 0 {
+				transactionReponse.TotalAmount = data.TotalAmount
+			}
+			milestones = append(milestones, data.MileStoneSlice)
+		}
+
+	}
+
+	transactionBroker := models.TransactionBroker{TransactionID: transactionID}
+	activity := models.ActivityLog{TransactionID: transactionID}
+
+	code, err = transactionBroker.GetTransactionBrokerByTransactionID(db.Transaction)
+	if err != nil && code == http.StatusInternalServerError {
+		logger.Error("error getting transaction broker", err.Error())
+	}
+
+	activities, err := activity.GetAllByTransactionID(db.Transaction)
+	if err != nil {
+		return models.TransactionByIDResponse{}, http.StatusInternalServerError, err
+	}
+
+	country, err := GetCountryByNameOrCode(extReq, logger, transaction.Country)
+	if err != nil && code == http.StatusInternalServerError {
+		logger.Error("error getting country", err.Error())
+	}
+
+	dDateFormatted, err := utility.FormatDate(transaction.DueDate, "2006-01-02", "2006-01-02 15:04:05")
+	if err != nil {
+		dDateFormatted = ""
+	}
+
+	transactionState := models.TransactionState{TransactionID: transactionID, Status: "Closed"}
+	code, err = transactionState.GetTransactionStateByTransactionIDAndStatus(db.Transaction)
+	if err != nil && code == http.StatusInternalServerError {
+		return models.TransactionByIDResponse{}, http.StatusInternalServerError, err
+	}
+
+	transactionDispute := models.TransactionDispute{TransactionID: transactionID}
+	isDisputed, err := transactionDispute.IsDisputed(db.Transaction)
+	if err != nil {
+		return models.TransactionByIDResponse{}, http.StatusInternalServerError, err
+	}
+
+	titleSlice := strings.Split(transactionReponse.Title, ";")
+	transactionReponse.Title = titleSlice[0]
+	transactionReponse.Milestones = milestones
+	transactionReponse.Broker = transactionBroker
+	transactionReponse.Activities = activities
+	transactionReponse.Country = country
+	transactionReponse.DueDateFormatted = dDateFormatted
+	transactionReponse.TransactionClosedAt = transactionState.CreatedAt
+	transactionReponse.IsDisputed = isDisputed
+	return transactionReponse, http.StatusOK, nil
+}
+func ListTransactionsByIDLegacyService(extReq request.ExternalRequest, logger *utility.Logger, db postgresql.Databases, transactionID string) (models.TransactionByIDResponse, int, error) {
+	var (
+		transaction        = models.Transaction{TransactionID: transactionID}
+		productTransaction = models.ProductTransaction{TransactionID: transactionID}
+		parties            = []models.TransactionParty{}
+		transactionFile    = models.TransactionFile{TransactionID: transactionID}
+	)
+
+	transactions, err := transaction.GetAllByTransactionID(db.Transaction)
+	if err != nil {
+		return models.TransactionByIDResponse{}, http.StatusInternalServerError, err
+	}
+
+	code, err := transaction.GetTransactionByTransactionID(db.Transaction)
+	if err != nil {
+		return models.TransactionByIDResponse{}, code, fmt.Errorf("transaction not found: %v", err.Error())
+	}
+
+	productTransactions, err := productTransaction.GetAllByTransactionID(db.Transaction)
+	if err != nil {
+		return models.TransactionByIDResponse{}, http.StatusInternalServerError, err
+	}
+
+	if transaction.Type == "milestone" {
+		transactionParty := models.TransactionParty{TransactionPartiesID: transactions[0].PartiesID}
+		parties, err = transactionParty.GetAllByTransactionPartiesID(db.Transaction)
+		if err != nil {
+			return models.TransactionByIDResponse{}, http.StatusInternalServerError, err
+		}
+	} else {
+		transactionParty := models.TransactionParty{TransactionID: transaction.TransactionID}
+		parties, err = transactionParty.GetAllByTransactionID(db.Transaction)
+		if err != nil {
+			return models.TransactionByIDResponse{}, http.StatusInternalServerError, err
+		}
+	}
+
+	transactionFiles, err := transactionFile.GetAllByTransactionID(db.Transaction)
+	if err != nil {
+		return models.TransactionByIDResponse{}, http.StatusInternalServerError, err
+	}
+
+	transactionReponse := resolveTransactionAndListTransactionResponse(transaction)
+	transactionReponse.Products = productTransactions
+
+	partiess, members, err := getPartiesAndMembersFromParties(extReq, parties)
+	if err != nil {
+		return models.TransactionByIDResponse{}, http.StatusInternalServerError, err
+	}
+
+	if len(parties) > 0 {
+		transactionReponse.Parties = partiess
+		transactionReponse.Members = members
+	} else {
+		transactionParty := models.TransactionParty{TransactionPartiesID: transactions[0].PartiesID}
+		tParties, err := transactionParty.GetAllByTransactionPartiesID(db.Transaction)
+		if err != nil {
+			return models.TransactionByIDResponse{}, http.StatusInternalServerError, err
+		}
+		partiess, members, err = getPartiesAndMembersFromParties(extReq, tParties)
+		if err != nil {
+			return models.TransactionByIDResponse{}, http.StatusInternalServerError, err
+		}
+
+		transactionReponse.Parties = partiess
+		transactionReponse.Members = members
+	}
+
+	transactionReponse.Files = transactionFiles
 	milestones := map[int][]models.MilestonesResponse{}
 
 	type chanData struct {
@@ -93,7 +248,7 @@ func ListTransactionsByIDService(extReq request.ExternalRequest, logger *utility
 	}
 
 	var wg sync.WaitGroup
-	ch := make(chan chanData)
+	ch := make(chan chanData, len(transactions))
 	wg.Add(len(transactions))
 	for i, t := range transactions {
 		go func(extReq request.ExternalRequest, db postgresql.Databases, index int, transaction models.Transaction, currentMileStoneSlice []models.MilestonesResponse, ch chan chanData, wg *sync.WaitGroup) {
@@ -215,9 +370,10 @@ func ListTransactionsService(extReq request.ExternalRequest, logger *utility.Log
 	}
 
 	var wg sync.WaitGroup
-	ch := make(chan chanData)
-	wg.Add(len(transactions))
+	ch := make(chan chanData, len(transactions))
+
 	for _, t := range transactions {
+		wg.Add(1)
 		go func(extReq request.ExternalRequest, logger *utility.Logger, db postgresql.Databases, transactionID string, ch chan chanData, wg *sync.WaitGroup) {
 			defer wg.Done()
 			response := chanData{}
@@ -272,9 +428,10 @@ func ListTransactionsByBusinessService(extReq request.ExternalRequest, logger *u
 		Err                 error
 	}
 	var wg sync.WaitGroup
-	ch := make(chan chanData)
-	wg.Add(len(transactions))
+	ch := make(chan chanData, len(transactions))
+
 	for _, t := range transactions {
+		wg.Add(1)
 		go func(extReq request.ExternalRequest, logger *utility.Logger, db postgresql.Databases, transactionID string, ch chan chanData, wg *sync.WaitGroup) {
 			defer wg.Done()
 			response := chanData{}
@@ -338,9 +495,9 @@ func ListByBusinessFromMondayToThursdayService(extReq request.ExternalRequest, l
 		Err                 error
 	}
 	var wg sync.WaitGroup
-	ch := make(chan chanData)
-	wg.Add(len(transactions))
+	ch := make(chan chanData, len(transactions))
 	for _, t := range transactions {
+		wg.Add(1)
 		go func(extReq request.ExternalRequest, logger *utility.Logger, db postgresql.Databases, transactionID string, ch chan chanData, wg *sync.WaitGroup) {
 			defer wg.Done()
 			response := chanData{}
@@ -383,7 +540,7 @@ func ListByBusinessFromMondayToThursdayService(extReq request.ExternalRequest, l
 
 func ListTransactionsByUserService(extReq request.ExternalRequest, logger *utility.Logger, db postgresql.Databases, req models.ListTransactionByUserRequest, paginator postgresql.Pagination, user external_models.User) ([]models.TransactionByIDResponse, postgresql.PaginationResponse, int, error) {
 	var (
-		transactions          = []models.Transaction{}
+		// transactions          = []models.Transaction{}
 		transactionsResponses = []models.TransactionByIDResponse{}
 		transactionParty      = models.TransactionParty{AccountID: int(user.AccountID), Role: req.Role}
 	)
@@ -398,18 +555,18 @@ func ListTransactionsByUserService(extReq request.ExternalRequest, logger *utili
 		return []models.TransactionByIDResponse{}, postgresql.PaginationResponse{}, http.StatusInternalServerError, err
 	}
 
-	for _, tp := range transactionParties {
-		lTransaction := models.Transaction{TransactionID: tp.TransactionID, IsPaylinked: req.Paylinked, Status: statusC}
-		code, err := lTransaction.GetLatestByAndQueries(db.Transaction, req.Paylinked, "")
-		if err != nil {
-			if code == http.StatusInternalServerError {
-				return []models.TransactionByIDResponse{}, postgresql.PaginationResponse{}, code, err
-			}
-			logger.Error("error getting latest transaction by transaction id", err.Error())
-		} else {
-			transactions = append(transactions, lTransaction)
-		}
-	}
+	// for _, tp := range transactionParties {
+	// 	lTransaction := models.Transaction{TransactionID: tp.TransactionID, IsPaylinked: req.Paylinked, Status: statusC}
+	// 	code, err := lTransaction.GetLatestByAndQueries(db.Transaction, req.Paylinked, "")
+	// 	if err != nil {
+	// 		if code == http.StatusInternalServerError {
+	// 			return []models.TransactionByIDResponse{}, postgresql.PaginationResponse{}, code, err
+	// 		}
+	// 		logger.Error("error getting latest transaction by transaction id", err.Error())
+	// 	} else {
+	// 		transactions = append(transactions, lTransaction)
+	// 	}
+	// }
 
 	type chanData struct {
 		TransactionResponse models.TransactionByIDResponse
@@ -417,18 +574,14 @@ func ListTransactionsByUserService(extReq request.ExternalRequest, logger *utili
 	}
 
 	var wg sync.WaitGroup
-	ch := make(chan chanData)
-	wg.Add(len(transactions))
-	for _, t := range transactions {
+	ch := make(chan chanData, len(transactionParties))
+
+	for _, t := range transactionParties {
+		wg.Add(1)
 		go func(extReq request.ExternalRequest, logger *utility.Logger, db postgresql.Databases, transactionID string, ch chan chanData, wg *sync.WaitGroup) {
 			defer wg.Done()
-			response := chanData{}
 			transactionResponse, _, err := ListTransactionsByIDService(extReq, logger, db, transactionID)
-			if err != nil {
-				response.Err = err
-			} else {
-				response.TransactionResponse = transactionResponse
-			}
+			response := chanData{Err: err, TransactionResponse: transactionResponse}
 			ch <- response
 		}(extReq, logger, db, t.TransactionID, ch, &wg)
 	}
@@ -452,7 +605,7 @@ func ListTransactionsByUserService(extReq request.ExternalRequest, logger *utili
 
 func ListArchivedTransactionsService(extReq request.ExternalRequest, logger *utility.Logger, db postgresql.Databases, paginator postgresql.Pagination, user external_models.User) ([]models.TransactionByIDResponse, postgresql.PaginationResponse, int, error) {
 	var (
-		transactions          = []models.Transaction{}
+		// transactions          = []models.Transaction{}
 		transactionsResponses = []models.TransactionByIDResponse{}
 		transactionParty      = models.TransactionParty{AccountID: int(user.AccountID), Role: "sender"}
 	)
@@ -462,18 +615,18 @@ func ListArchivedTransactionsService(extReq request.ExternalRequest, logger *uti
 		return []models.TransactionByIDResponse{}, postgresql.PaginationResponse{}, http.StatusInternalServerError, err
 	}
 
-	for _, tp := range transactionParties {
-		lTransaction := models.Transaction{TransactionID: tp.TransactionID, Status: "Deleted"}
-		code, err := lTransaction.GetLatestByAndQueries(db.Transaction, false, "")
-		if err != nil {
-			if code == http.StatusInternalServerError {
-				return []models.TransactionByIDResponse{}, postgresql.PaginationResponse{}, code, err
-			}
-			logger.Error("error getting lastest transaction byy transaction id", err.Error())
-		} else {
-			transactions = append(transactions, lTransaction)
-		}
-	}
+	// for _, tp := range transactionParties {
+	// 	lTransaction := models.Transaction{TransactionID: tp.TransactionID, Status: "Deleted"}
+	// 	code, err := lTransaction.GetLatestByAndQueries(db.Transaction, false, "")
+	// 	if err != nil {
+	// 		if code == http.StatusInternalServerError {
+	// 			return []models.TransactionByIDResponse{}, postgresql.PaginationResponse{}, code, err
+	// 		}
+	// 		logger.Error("error getting lastest transaction byy transaction id", err.Error())
+	// 	} else {
+	// 		transactions = append(transactions, lTransaction)
+	// 	}
+	// }
 
 	type chanData struct {
 		TransactionResponse models.TransactionByIDResponse
@@ -481,9 +634,9 @@ func ListArchivedTransactionsService(extReq request.ExternalRequest, logger *uti
 	}
 
 	var wg sync.WaitGroup
-	ch := make(chan chanData)
-	wg.Add(len(transactions))
-	for _, t := range transactions {
+	ch := make(chan chanData, len(transactionParties))
+	for _, t := range transactionParties {
+		wg.Add(1)
 		go func(extReq request.ExternalRequest, logger *utility.Logger, db postgresql.Databases, transactionID string, ch chan chanData, wg *sync.WaitGroup) {
 			defer wg.Done()
 			response := chanData{}
@@ -588,7 +741,7 @@ func getPartiesAndMembersFromParties(extReq request.ExternalRequest, parties []m
 		Err    error
 	}
 
-	ch := make(chan chanData)
+	ch := make(chan chanData, len(parties))
 	wg.Add(len(parties))
 	for _, p := range parties {
 		partiess[p.Role] = p
