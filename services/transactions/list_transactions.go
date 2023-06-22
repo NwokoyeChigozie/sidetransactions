@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"sort"
 	"strconv"
 	"strings"
 	"sync"
@@ -123,6 +124,10 @@ func ListTransactionsByIDService(extReq request.ExternalRequest, logger *utility
 		}
 
 	}
+
+	sort.SliceStable(milestones, func(i, j int) bool {
+		return milestones[i].Index < milestones[j].Index
+	})
 
 	transactionBroker := models.TransactionBroker{TransactionID: transactionID}
 	activity := models.ActivityLog{TransactionID: transactionID}
@@ -399,6 +404,9 @@ func ListTransactionsService(extReq request.ExternalRequest, logger *utility.Log
 			transactionsResponses = append(transactionsResponses, data.TransactionResponse)
 		}
 	}
+	sort.SliceStable(transactionsResponses, func(i, j int) bool {
+		return transactionsResponses[i].ID > transactionsResponses[j].ID
+	})
 
 	return transactionsResponses, pagination, http.StatusOK, nil
 
@@ -468,6 +476,10 @@ func ListTransactionsByBusinessService(extReq request.ExternalRequest, logger *u
 		}
 	}
 
+	sort.SliceStable(transactionsResponses, func(i, j int) bool {
+		return transactionsResponses[i].ID > transactionsResponses[j].ID
+	})
+
 	return transactionsResponses, pagination, http.StatusOK, nil
 
 }
@@ -534,6 +546,10 @@ func ListByBusinessFromMondayToThursdayService(extReq request.ExternalRequest, l
 		}
 	}
 
+	sort.SliceStable(transactionsResponses, func(i, j int) bool {
+		return transactionsResponses[i].ID > transactionsResponses[j].ID
+	})
+
 	return transactionsResponses, pagination, http.StatusOK, nil
 
 }
@@ -599,6 +615,10 @@ func ListTransactionsByUserService(extReq request.ExternalRequest, logger *utili
 		}
 	}
 
+	sort.SliceStable(transactionsResponses, func(i, j int) bool {
+		return transactionsResponses[i].ID > transactionsResponses[j].ID
+	})
+
 	return transactionsResponses, pagination, http.StatusOK, nil
 
 }
@@ -662,6 +682,10 @@ func ListArchivedTransactionsService(extReq request.ExternalRequest, logger *uti
 			transactionsResponses = append(transactionsResponses, data.TransactionResponse)
 		}
 	}
+
+	sort.SliceStable(transactionsResponses, func(i, j int) bool {
+		return transactionsResponses[i].ID > transactionsResponses[j].ID
+	})
 
 	return transactionsResponses, pagination, http.StatusOK, nil
 
